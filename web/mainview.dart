@@ -7,6 +7,7 @@ import 'package:dart_web_toolkit/scheduler.dart' as scheduler;
 import 'package:dart_web_toolkit/validation.dart' as validation;
 
 import 'dart:async' as async;
+
 class MainView {
   static const int MAIN = 0;
   static const int INFO = 1;
@@ -17,6 +18,10 @@ class MainView {
   ui.VerticalPanel _otherForSubPanel = new ui.VerticalPanel();
 
   async.StreamController _controllerTab = new async.StreamController.broadcast();
+  async.StreamController<bool> _controllerMainButton = new async.StreamController.broadcast();
+
+  async.Stream get onChangeTabState => _controllerTab.stream;
+  async.Stream get onChangeMainButtonState => _controllerMainButton.stream;
 
   void init() {
     initTab();
@@ -35,10 +40,10 @@ class MainView {
       ui.ToggleButton normalToggleButton = null;
       normalToggleButton = new ui.ToggleButton.fromImage(new ui.Image("start.png"), downImage: new ui.Image("stop.png"), handler: new event.ClickHandlerAdapter((event.ClickEvent event) {
         print("click${normalToggleButton.isDown()}");
+        _controllerMainButton.add(normalToggleButton.isDown());
       }));
       togglePanel.add(normalToggleButton);
 
-//      ui.RootPanel.get().add(vpanel);//normalToggleButton);
       _mainForSubPanel.add(vpanel);
     }
     {
@@ -61,6 +66,7 @@ class MainView {
       _mainForSubPanel.add(layout);
     }
   }
+
   void initTab() {
     ui.TabBar bar = new ui.TabBar();
     bar.addTabText("main");
