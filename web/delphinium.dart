@@ -10,6 +10,8 @@ String address = "0.0.0.0";
 int port = 18085;
 
 mainview.MainView m = new mainview.MainView();
+hetima.HetiHttpServer server = null;
+
 void main() {
   m.init();
   m.onChangeMainButtonState.listen((bool isDown){
@@ -20,25 +22,32 @@ void main() {
     }
   });
 }
-hetima.HetiServerSocket _server = null;
+hetima.HetiHttpServer _server = null;
+
 void startServer() {
   print("startServer");
-   (new hetimacl.HetiSocketBuilderChrome()).startServer(address, port).then((hetima.HetiServerSocket server) {
-     _server = server;
-     _server.onAccept().listen((hetima.HetiSocket s) {
-       print("accept");
-       s.onReceive().listen((hetima.HetiReceiveInfo info){
-         print("receive");
-         s.send(convert.UTF8.encode("hello")).then((hetima.HetiSendInfo info) {
-           s.close();
-         });
-       });
-     });
-   }).catchError((e){
-     print("error");
-   });
+  if(_server != null) {
+    return;
+  }
+  hetima.HetiHttpServer.bind(new hetimacl.HetiSocketBuilderChrome(), address, port).then((hetima.HetiHttpServer server){
+    _server = server;
+    server.onNewRequest().listen((hetima.HetiHttpServerRequest req) {
+      print("${req.info.line.requestTarget}");
+      if("/index.html" == req.info.line.requestTarget) {
+        return req.socket.send(convert.UTF8.encode("hello")).then((hetima.HetiSendInfo i) {
+          req.socket.close();
+        });
+      } else {
+        req.socket.close();
+      }
+    });
+  });
 }
 
 void stopServer() {
-  
+  if(_server == null) {
+    return;
+  }
+  _server.close();
+  _server = null;
 }
