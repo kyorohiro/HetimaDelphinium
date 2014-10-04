@@ -1,51 +1,119 @@
+import 'dart:html' as html;
 
-import 'dart:html';
-
-import 'package:chrome/chrome_app.dart' as chrome;
+import 'package:chrome/chrome_app.dart' as chromeapp;
 import 'mainview.dart' as mainview;
 import 'package:hetima/hetima.dart' as hetima;
 import 'package:hetima/hetima_cl.dart' as hetimacl;
 import 'dart:convert' as convert;
+import 'package:hetima/hetima.dart' as hetima;
 String address = "0.0.0.0";
 int port = 18085;
 
 mainview.MainView m = new mainview.MainView();
 hetima.HetiHttpServer server = null;
+Map<String, mainview.FileSelectResult> fileList = {};
 
 void main() {
   m.init();
-  m.onChangeMainButtonState.listen((bool isDown){
-    if(isDown) {
+  m.onChangeMainButtonState.listen((bool isDown) {
+    if (isDown) {
       startServer();
     } else {
       stopServer();
     }
   });
+  int id = 0;
+  m.onSelectFile.listen((mainview.FileSelectResult result) {
+    String label = "${id++}_${result.fname}";
+    fileList[label] = result;
+    m.addFile(result.fname);
+  });
+
+  m.onDeleteFileFromList.listen((String fname) {
+    fileList.remove(fname);
+  });
 }
 hetima.HetiHttpServer _server = null;
 
+void test() {
+  html.FileSystem s;
+
+}
+
 void startServer() {
   print("startServer");
-  if(_server != null) {
+  if (_server != null) {
     return;
   }
-  hetima.HetiHttpServer.bind(new hetimacl.HetiSocketBuilderChrome(), address, port).then((hetima.HetiHttpServer server){
+  hetima.HetiHttpServer.bind(new hetimacl.HetiSocketBuilderChrome(), address, port).then((hetima.HetiHttpServer server) {
     _server = server;
     server.onNewRequest().listen((hetima.HetiHttpServerRequest req) {
       print("${req.info.line.requestTarget}");
-      if("/index.html" == req.info.line.requestTarget) {
-        return req.socket.send(convert.UTF8.encode("hello")).then((hetima.HetiSendInfo i) {
+      if (req.info.line.requestTarget.length < 0) {
+        req.socket.close();
+        return {};
+      }
+      if ("/index.html" == req.info.line.requestTarget) {
+        StringBuffer buffer = new StringBuffer();
+        for (String r in fileList.keys) {
+          buffer.write("<div><a href=./${r}>${r}</div>");
+        }
+        return req.socket.send(convert.UTF8.encode(buffer.toString())).then((hetima.HetiSendInfo i) {
           req.socket.close();
         });
-      } else {
+      }
+
+      String path = req.info.line.requestTarget.substring(1);
+      if (!fileList.containsKey(path)) {
         req.socket.close();
+      } else {
+        response(req.socket, fileList[path]);
       }
     });
   });
 }
 
+void response(hetima.HetiSocket socket, mainview.FileSelectResult f) {
+  hetima.ArrayBuilder response = new hetima.ArrayBuilder();
+  int index = 0;
+  int size = 1024;
+  int length = 0;
+  res() {
+    int l = index+1024;
+    if(l<length) {
+      l=length;
+    }
+    f.file.read(index, l).then((hetima.ReadResult r) {
+      return socket.send(r.buffer);
+    }).then((hetima.HetiSendInfo i) {
+      if(l >= length) {
+        socket.close();
+      } else {
+        index = l;
+        res();
+      }
+    }).catchError((e) {
+      socket.close();
+    });
+  }
+  f.file.getLength().then((int l) {
+    length = l;
+    response.appendString("HTTP/1.1 200 OK'\r\n");
+    response.appendString("Connection: close\r\n");
+    response.appendString("Content-Length: ${length}\r\n");
+    response.appendString("\r\n");
+    socket.send(response.toList());
+    f.file.read(0, length).then((hetima.ReadResult r) {
+      return socket.send(r.buffer);
+    }).then((hetima.HetiSendInfo i) {
+      socket.close();
+    }).catchError((e) {
+      socket.close();
+    });
+  });
+}
 void stopServer() {
-  if(_server == null) {
+  if (_server == null) {
     return;
   }
   _server.close();

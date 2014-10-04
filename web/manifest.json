@@ -29,6 +29,8 @@
     {
       "socket": ["udp-send-to", "udp-bind", "udp-multicast-membership","tcp-listen","tcp-connect:*:*"]
     },
-    "system.network"
+    "system.network",
+    "unlimitedStorage",
+    {"fileSystem": ["write", "retainEntries", "directory", "retainEntries"]} 
   ]
 }
