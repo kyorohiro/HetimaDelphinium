@@ -19,6 +19,7 @@ void main() {
   m.onChangeMainButtonState.listen((bool isDown) {
     if (isDown) {
       startServer();
+      startLocalIp();
     } else {
       stopServer();
     }
@@ -36,7 +37,23 @@ void main() {
 }
 hetima.HetiHttpServer _server = null;
 
-void test() {
+void startLocalIp() {
+  (new hetimacl.HetiSocketBuilderChrome()).getNetworkInterfaces().then((List<hetima.HetiNetworkInterface> l) {
+    // search 24
+    for(hetima.HetiNetworkInterface i in l) {
+      if(i.prefixLength == 24 && !i.address.startsWith("127")) {
+        m.localIP = i.address;
+        return;
+      }
+    }
+    //
+    for(hetima.HetiNetworkInterface i in l) {
+      if(i.prefixLength == 64) {
+        m.localIP = i.address;
+        return;
+      }
+    }
+  });
   html.FileSystem s;
 
 }
@@ -89,13 +106,13 @@ void startServer() {
       if (!fileList.containsKey(path)) {
         req.socket.close();
       } else {
-        response(req.socket, fileList[path]);
+        startResponse(req.socket, fileList[path]);
       }
     });
   });
 }
 
-void response(hetima.HetiSocket socket, mainview.FileSelectResult f) {
+void startResponse(hetima.HetiSocket socket, mainview.FileSelectResult f) {
   hetima.ArrayBuilder response = new hetima.ArrayBuilder();
   int index = 0;
   int size = 1024;
@@ -134,6 +151,7 @@ void response(hetima.HetiSocket socket, mainview.FileSelectResult f) {
     });
   });
 }
+
 void stopServer() {
   if (_server == null) {
     return;
