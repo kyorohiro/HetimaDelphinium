@@ -164,12 +164,30 @@ async.Future<int> startServer() {
         return {};
       }
       if ("/index.html" == req.info.line.requestTarget) {
-        StringBuffer buffer = new StringBuffer();
+
+        StringBuffer content = new StringBuffer();
+        content.write("<html>");
+        content.write("<body>");
         for (String r in fileList.keys) {
-          buffer.write("<div><a href=./${r}>${r}</div>");
+          content.write("<div><a href=./${r}>${r}</div>");
         }
-        return req.socket.send(convert.UTF8.encode(buffer.toString())).then((hetima.HetiSendInfo i) {
+        content.write("</body>");
+        content.write("</html>");
+
+        String cv = content.toString();
+        List<int> b = convert.UTF8.encode(content.toString());
+        StringBuffer response = new StringBuffer();
+        response.write("HTTP/1.1 200 OK'\r\n");
+        response.write("Connection: close\r\n");
+        response.write("Content-Length: ${b.length}\r\n");
+        response.write("Content-Type: text/html\r\n");
+        response.write("\r\n");
+        return req.socket.send(convert.UTF8.encode(response.toString())).then((hetima.HetiSendInfo i) {
+          return req.socket.send(b);
+        }).then((hetima.HetiSendInfo i) {
           req.socket.close();
+        }).catchError((e){
+          req.socket.close();          
         });
       }
 
