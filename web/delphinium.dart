@@ -23,29 +23,29 @@ part 'portmap.dart';
 
 
 void main() {
-  MainView m = new MainView();
+  MainView mainView = new MainView();
   HttpServer httpServer = new HttpServer();
   PortMap portMap = new PortMap();
 
   httpServer.onUpdateLocalServer.listen((String localPort){
-    m.localPort = localPort;
+    mainView.localPort = localPort;
     portMap.localPort = int.parse(localPort);
   });
   portMap.onUpdateGlobalIp.listen((String globalIp) {
-    m.globalIP = globalIp;
+    mainView.globalIP = globalIp;
   });
   portMap.onUpdateGlobalPort.listen((String globalPort) {
-    m.globalPort = globalPort;
+    mainView.globalPort = globalPort;
   });
   portMap.onUpdateLocalIp.listen((String localIP) {
-    m.localIP = localIP;
+    mainView.localIP = localIP;
   });
 
-  m.init();
-  m.onChangeMainButtonState.listen((bool isDown) {
+  mainView.init();
+  mainView.onChangeMainButtonState.listen((bool isDown) {
     if (isDown) {
       httpServer.startServer().then((int v) {
-        return portMap.startLocalIp();
+        return portMap.startGetLocalIp();
       }).then((int v) {
         portMap.startPortMap();
       });
@@ -54,16 +54,18 @@ void main() {
       portMap.deleteAllPortMap();
     }
   });
+
   int id = 0;
-  m.onSelectFile.listen((FileSelectResult result) {
+  mainView.onSelectFile.listen((FileSelectResult result) {
     String label = "${id++}_${result.fname}";
     httpServer.publicFileList[label] = result;
-    m.addFile(label);
+    mainView.addFile(label);
   });
 
-  m.onDeleteFileFromList.listen((String fname) {
+  mainView.onDeleteFileFromList.listen((String fname) {
     httpServer.publicFileList.remove(fname);
   });
+
   chrome.app.window.current().onClosed.listen((d) {
     portMap.deleteAllPortMap();
     httpServer.stopServer();

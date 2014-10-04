@@ -1,9 +1,14 @@
 part of delphiniumapp;
 
+/**
+ * app parts
+ */
 class PortMap {
   String localAddress = "0.0.0.0";
+  int basePort = 18085;
   int localPort = 18085;
-  int externalPort = 18085;
+  int _externalPort = 18085;
+  int get externalPort => _externalPort;
 
   async.StreamController<String> _controllerUpdateGlobalPort = new async.StreamController.broadcast();
   async.Stream<String> get onUpdateGlobalPort => _controllerUpdateGlobalPort.stream;
@@ -16,6 +21,7 @@ class PortMap {
   async.Stream<String> get onUpdateLocalIp => _controllerUpdateLocalIp.stream;
 
   void startPortMap() {
+    _externalPort = basePort;
     hetima.UpnpDeviceSearcher.createInstance(new hetimacl.HetiSocketBuilderChrome()).then((hetima.UpnpDeviceSearcher searcher) {
       searcher.searchWanPPPDevice().then((int e) {
         if (searcher.deviceInfoList.length <= 0) {
@@ -27,23 +33,22 @@ class PortMap {
           res.externalIp;
           _controllerUpdateGlobalIp.add(res.externalIp);
         });
-        int baseExternalPort = externalPort + 50;
-        a() {
-          pppDevice.requestAddPortMapping(externalPort, hetima.UPnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP, localPort, localAddress, hetima.UPnpPPPDevice.VALUE_ENABLE, "HetimaDelphinium", 0).then((hetima.UPnpAddPortMappingResponse res) {
+        int baseExternalPort = _externalPort + 50;
+        tryAddPortMap() {
+          pppDevice.requestAddPortMapping(_externalPort, hetima.UPnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP, localPort, localAddress, hetima.UPnpPPPDevice.VALUE_ENABLE, "HetimaDelphinium", 0).then((hetima.UPnpAddPortMappingResponse res) {
             if (200 == res.resultCode) {
-              _controllerUpdateGlobalPort.add("${externalPort}");              
+              _controllerUpdateGlobalPort.add("${_externalPort}");
               return;
             }
             if (-500 == res.resultCode) {
-              externalPort++;
-              if (externalPort < baseExternalPort) {
-                a();
+              _externalPort++;
+              if (_externalPort < baseExternalPort) {
+                tryAddPortMap();
               }
             }
           });
         }
-        ;
-        a();
+        tryAddPortMap();
       });
     });
   }
@@ -55,18 +60,18 @@ class PortMap {
           return;
         }
         int index = 0;
-        List<int> portList = [];
-        b(hetima.UPnpPPPDevice pppDevice) {
-          for (int port in portList) {
+        List<int> deletePortList = [];
+        deletePortMap(hetima.UPnpPPPDevice pppDevice) {
+          for (int port in deletePortList) {
             pppDevice.requestDeletePortMapping(port, hetima.UPnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP);
           }
         }
-        a() {
+        tryGetPortMapInfo() {
           hetima.UPnpDeviceInfo info = searcher.deviceInfoList.first;
           hetima.UPnpPPPDevice pppDevice = new hetima.UPnpPPPDevice(info);
           pppDevice.requestGetGenericPortMapping(index++).then((hetima.UPnpGetGenericPortMappingResponse res) {
             if (res.resultCode != 200) {
-              b(pppDevice);
+              deletePortMap(pppDevice);
               return;
             }
             String description = res.getValue(hetima.UPnpGetGenericPortMappingResponse.KEY_NewPortMappingDescription, "");
@@ -74,21 +79,21 @@ class PortMap {
             String ip = res.getValue(hetima.UPnpGetGenericPortMappingResponse.KEY_NewInternalClient, "");
             if (description == "HetimaDelphinium") {
               int portAsNum = int.parse(port);
-              portList.add(portAsNum);
+              deletePortList.add(portAsNum);
             }
             if (port.replaceAll(" |\t|\r|\n", "") == "" && ip.replaceAll(" |\t|\r|\n", "") == "") {
-              b(pppDevice);
+              deletePortMap(pppDevice);
               return;
             }
-            a();
+            tryGetPortMapInfo();
           });
         }
-        a();
+        tryGetPortMapInfo();
       });
     });
   }
 
-  async.Future<int> startLocalIp() {
+  async.Future<int> startGetLocalIp() {
     async.Completer<int> completer = new async.Completer();
     (new hetimacl.HetiSocketBuilderChrome()).getNetworkInterfaces().then((List<hetima.HetiNetworkInterface> l) {
       // search 24

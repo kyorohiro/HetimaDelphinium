@@ -1,6 +1,8 @@
 part of delphiniumapp;
 
-
+/**
+ * app parts
+ */
 class HttpServer {
   String localIP = "0.0.0.0";
   int basePort = 18085;
