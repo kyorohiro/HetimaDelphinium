@@ -1,7 +1,5 @@
 part of delphiniumapp;
 
-
-
 /**
  * ui parts
  * MainView
