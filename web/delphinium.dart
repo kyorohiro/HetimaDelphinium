@@ -6,6 +6,7 @@ import 'package:hetima/hetima.dart' as hetima;
 import 'package:hetima/hetima_cl.dart' as hetimacl;
 import 'dart:convert' as convert;
 import 'package:hetima/hetima.dart' as hetima;
+import 'dart:async' as async;
 String address = "0.0.0.0";
 int port = 18085;
 
@@ -26,7 +27,7 @@ void main() {
   m.onSelectFile.listen((mainview.FileSelectResult result) {
     String label = "${id++}_${result.fname}";
     fileList[label] = result;
-    m.addFile(result.fname);
+    m.addFile(label);
   });
 
   m.onDeleteFileFromList.listen((String fname) {
@@ -40,12 +41,33 @@ void test() {
 
 }
 
+async.Future<hetima.HetiHttpServer> _retryBind() {
+  async.Completer<hetima.HetiHttpServer> co = new async.Completer();
+  int portMax = port + 100;
+  a() {
+    hetima.HetiHttpServer.bind(new hetimacl.HetiSocketBuilderChrome(), address, port).then((hetima.HetiHttpServer server) {
+      co.complete(server);
+    }).catchError((e) {
+      port++;
+      if (port < portMax) {
+        a();
+      } else {
+        co.completeError(e);
+      }
+    });
+  }
+  a();
+  return co.future;
+}
+
 void startServer() {
   print("startServer");
   if (_server != null) {
     return;
   }
-  hetima.HetiHttpServer.bind(new hetimacl.HetiSocketBuilderChrome(), address, port).then((hetima.HetiHttpServer server) {
+
+  _retryBind().then((hetima.HetiHttpServer server) {
+    m.localPort = "${port}";
     _server = server;
     server.onNewRequest().listen((hetima.HetiHttpServerRequest req) {
       print("${req.info.line.requestTarget}");
@@ -79,14 +101,14 @@ void response(hetima.HetiSocket socket, mainview.FileSelectResult f) {
   int size = 1024;
   int length = 0;
   res() {
-    int l = index+1024;
-    if(l<length) {
-      l=length;
+    int l = index + 1024;
+    if (l < length) {
+      l = length;
     }
     f.file.read(index, l).then((hetima.ReadResult r) {
       return socket.send(r.buffer);
     }).then((hetima.HetiSendInfo i) {
-      if(l >= length) {
+      if (l >= length) {
         socket.close();
       } else {
         index = l;

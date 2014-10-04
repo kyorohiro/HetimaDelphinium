@@ -12,6 +12,26 @@ class MainPanel {
   async.Stream<FileSelectResult> get onSelectFile => _controllerFileSelect.stream;
   List<String> _fileList = [];
 
+  ui.Html _localPort = new ui.Html("[]");
+  ui.Html _localIP = new ui.Html("[]");
+  ui.Html _globalPort = new ui.Html("[]");
+  ui.Html _globalIP = new ui.Html("[]");
+
+  void setLocalPort(String port) {
+    _localPort.text = port;
+  }
+
+  void setLocalIP(String ip) {
+    _localIP.text = ip;
+  }
+
+  void setGlobalPort(String port) {
+    _globalPort.text = port;
+  }
+
+  void setGlobalIP(String ip) {
+    _globalIP.text = ip;
+  }
 
   void clearFile() {
     _fileList.clear();
@@ -76,13 +96,14 @@ class MainPanel {
       cellFormatter.setColSpan(0, 0, 2);
       cellFormatter.setHorizontalAlignment(0, 0, i18n.HasHorizontalAlignment.ALIGN_CENTER);
       layout.setWidget(1, 0, new ui.HtmlPanel("IP"));
-      layout.setWidget(1, 1, new ui.HtmlPanel("[]"));
+
+      layout.setWidget(1, 1, _globalIP);
       layout.setWidget(2, 0, new ui.HtmlPanel("Port"));
-      layout.setWidget(2, 1, new ui.HtmlPanel("[]"));
+      layout.setWidget(2, 1, _globalPort);
       layout.setWidget(3, 0, new ui.HtmlPanel("Local IP"));
-      layout.setWidget(3, 1, new ui.HtmlPanel("[]"));
+      layout.setWidget(3, 1, _localIP);
       layout.setWidget(4, 0, new ui.HtmlPanel("Local Port"));
-      layout.setWidget(4, 1, new ui.HtmlPanel("[]"));
+      layout.setWidget(4, 1, _localPort);
       mainForSubPanel.add(layout);
     }
   }

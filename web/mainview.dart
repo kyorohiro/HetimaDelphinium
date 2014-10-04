@@ -38,6 +38,11 @@ class MainView {
     _minfoPanel.initInfoPanel();
   }
 
+  void set localPort(String port) => _mmainPanel.setLocalPort(port);
+  void set localIP(String ip) => _mmainPanel.setLocalIP(ip);
+  void set globalPort(String port) => _mmainPanel.setGlobalPort(port);
+  void set globalIP(String ip) => _mmainPanel.setGlobalIP(ip);
+
   void clearFile() {
     _minfoPanel.clearFile();
   }
