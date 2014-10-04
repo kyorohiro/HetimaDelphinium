@@ -1,5 +1,8 @@
-part of a;
+part of delphiniumapp;
 
+/**
+ * ui parts
+ */
 class MainPanel {
   ui.VerticalPanel mainForSubPanel = new ui.VerticalPanel();
   ui.FileUpload _fileUpload = new ui.FileUpload();

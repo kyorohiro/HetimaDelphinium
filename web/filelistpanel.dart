@@ -1,10 +1,16 @@
-part of a;
+part of delphiniumapp;
 
-class InfoPanel {
-  ui.VerticalPanel otherForSubPanel = new ui.VerticalPanel();
+/**
+ * ui parts
+ */
+class FileListPanel {
+  ui.VerticalPanel filelistForSubPanel = new ui.VerticalPanel();
 
   List<String> _fileList = [];
+
   async.StreamController<String> _controllerDelete = new async.StreamController.broadcast();
+
+  async.Stream<String> get onDelete => _controllerDelete.stream;
 
   void clearFile() {
     _fileList.clear();
@@ -14,10 +20,9 @@ class InfoPanel {
     _fileList.add(filename);
   }
 
-  async.Stream<String> get onDelete => _controllerDelete.stream;
-
   void initInfoPanel() {
-    otherForSubPanel.clear();
+    filelistForSubPanel.clear();
+
     ui.FlexTable layout = new ui.FlexTable();
     layout.setCellSpacing(_fileList.length + 2);
     ui.FlexCellFormatter cellFormatter = layout.getFlexCellFormatter();
@@ -38,7 +43,7 @@ class InfoPanel {
       layout.setWidget(i + 2, 0, new ui.Button("x", handler));
       layout.setWidget(i + 2, 1, new ui.HtmlPanel("${_fileList[i]}"));
     }
-    otherForSubPanel.add(layout);
+    filelistForSubPanel.add(layout);
   }
 
 }

@@ -1,4 +1,4 @@
-library a;
+library delphiniumapp;
 import 'package:dart_web_toolkit/event.dart' as event;
 import 'package:dart_web_toolkit/ui.dart' as ui;
 import 'package:dart_web_toolkit/util.dart' as util;
@@ -11,11 +11,17 @@ import 'dart:async' as async;
 import 'package:hetima/hetima.dart' as hetima;
 import 'package:hetima/hetima_cl.dart' as hetimacl;
 part 'mainpanel.dart';
-part 'infopanel.dart';
+part 'filelistpanel.dart';
 
+/**
+ * ui parts
+ * MainView
+ *  |_MainPanel
+ *  |_FileListPanel
+ */
 class MainView {
   static const int MAIN = 0;
-  static const int INFO = 1;
+  static const int FILELIST = 1;
 
   ui.VerticalPanel _mainPanel = new ui.VerticalPanel();
   ui.VerticalPanel _subPanel = new ui.VerticalPanel();
@@ -30,7 +36,7 @@ class MainView {
   List<String> _fileList = [];
 
   MainPanel _mmainPanel = new MainPanel();
-  InfoPanel _minfoPanel = new InfoPanel();
+  FileListPanel _minfoPanel = new FileListPanel();
 
   void init() {
     initTab();
@@ -50,7 +56,6 @@ class MainView {
   void addFile(String filename) {
     _minfoPanel.addFile(filename);
   }
-
 
   void initTab() {
     ui.TabBar bar = new ui.TabBar();
@@ -73,8 +78,8 @@ class MainView {
       } else if (selectedTabIndx == 1) {
         _subPanel.clear();
         _minfoPanel.initInfoPanel();
-        _subPanel.add(_minfoPanel.otherForSubPanel);
-        _controllerTab.add(INFO);
+        _subPanel.add(_minfoPanel.filelistForSubPanel);
+        _controllerTab.add(FILELIST);
       }
     }));
 
