@@ -21,7 +21,7 @@ void main() {
       startServer().then((int v){
         return startLocalIp();
       }).then((int v) {
-        
+        startPortMap();
       });
     } else {
       stopServer();
@@ -40,6 +40,23 @@ void main() {
 }
 hetima.HetiHttpServer _server = null;
 
+void startPortMap() {
+  ;
+  hetima.UpnpDeviceSearcher.createInstance(new hetimacl.HetiSocketBuilderChrome())
+  .then((hetima.UpnpDeviceSearcher searcher){
+    searcher.searchWanPPPDevice().then((int e){
+      if(searcher.deviceInfoList.length <= 0) {
+        return;
+      }
+      hetima.UPnpDeviceInfo info = searcher.deviceInfoList.first;
+      hetima.UPnpPPPDevice pppDevice = new hetima.UPnpPPPDevice(info);
+      pppDevice.requestGetExternalIPAddress().then((hetima.UPnpGetExternalIPAddressResponse res) {
+        res.externalIp;
+        m.globalIP = res.externalIp;
+      });
+    });
+  });
+}
 async.Future<int> startLocalIp() {
   async.Completer<int> completer = new async.Completer();
   (new hetimacl.HetiSocketBuilderChrome()).getNetworkInterfaces().then((List<hetima.HetiNetworkInterface> l) {
