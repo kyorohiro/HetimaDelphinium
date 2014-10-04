@@ -8,7 +8,10 @@ import 'dart:convert' as convert;
 import 'package:hetima/hetima.dart' as hetima;
 import 'dart:async' as async;
 String address = "0.0.0.0";
-int port = 18085;
+String localAddress = "0.0.0.0";
+int basePort = 18085;
+int localPort = basePort;
+int externalPort = basePort;
 
 mainview.MainView m = new mainview.MainView();
 hetima.HetiHttpServer server = null;
@@ -18,13 +21,14 @@ void main() {
   m.init();
   m.onChangeMainButtonState.listen((bool isDown) {
     if (isDown) {
-      startServer().then((int v){
+      startServer().then((int v) {
         return startLocalIp();
       }).then((int v) {
         startPortMap();
       });
     } else {
       stopServer();
+      stopPortMap();
     }
   });
   int id = 0;
@@ -41,11 +45,9 @@ void main() {
 hetima.HetiHttpServer _server = null;
 
 void startPortMap() {
-  ;
-  hetima.UpnpDeviceSearcher.createInstance(new hetimacl.HetiSocketBuilderChrome())
-  .then((hetima.UpnpDeviceSearcher searcher){
-    searcher.searchWanPPPDevice().then((int e){
-      if(searcher.deviceInfoList.length <= 0) {
+  hetima.UpnpDeviceSearcher.createInstance(new hetimacl.HetiSocketBuilderChrome()).then((hetima.UpnpDeviceSearcher searcher) {
+    searcher.searchWanPPPDevice().then((int e) {
+      if (searcher.deviceInfoList.length <= 0) {
         return;
       }
       hetima.UPnpDeviceInfo info = searcher.deviceInfoList.first;
@@ -54,29 +56,69 @@ void startPortMap() {
         res.externalIp;
         m.globalIP = res.externalIp;
       });
+      int baseExternalPort = externalPort + 50;
+      a() {
+        pppDevice.requestAddPortMapping(externalPort, hetima.UPnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP, localPort, localAddress, hetima.UPnpPPPDevice.VALUE_ENABLE, "HetimaDelphinium", 0).then((hetima.UPnpAddPortMappingResponse res) {
+          if (200 == res.resultCode) {
+            m.globalPort = "${externalPort}";
+            return;
+          }
+          if (-500 == res.resultCode) {
+            externalPort++;
+            if (externalPort < baseExternalPort) {
+              a();
+            }
+          }
+        });
+      }
+      ;
+      a();
     });
   });
 }
+
+void stopPortMap() {
+  hetima.UpnpDeviceSearcher.createInstance(new hetimacl.HetiSocketBuilderChrome()).then((hetima.UpnpDeviceSearcher searcher) {
+    searcher.searchWanPPPDevice().then((int e) {
+      if (searcher.deviceInfoList.length <= 0) {
+        return;
+      }
+      hetima.UPnpDeviceInfo info = searcher.deviceInfoList.first;
+      hetima.UPnpPPPDevice pppDevice = new hetima.UPnpPPPDevice(info);
+      pppDevice.requestGetExternalIPAddress().then((hetima.UPnpGetExternalIPAddressResponse res) {
+        res.externalIp;
+        m.globalIP = res.externalIp;
+      });
+      int baseExternalPort = externalPort + 50;
+
+      pppDevice.requestDeletePortMapping(externalPort, hetima.UPnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP);
+    });
+  });
+}
+
+
 async.Future<int> startLocalIp() {
   async.Completer<int> completer = new async.Completer();
   (new hetimacl.HetiSocketBuilderChrome()).getNetworkInterfaces().then((List<hetima.HetiNetworkInterface> l) {
     // search 24
-    for(hetima.HetiNetworkInterface i in l) {
-      if(i.prefixLength == 24 && !i.address.startsWith("127")) {
+    for (hetima.HetiNetworkInterface i in l) {
+      if (i.prefixLength == 24 && !i.address.startsWith("127")) {
         m.localIP = i.address;
+        localAddress = i.address;
         completer.complete(0);
         return;
       }
     }
     //
-    for(hetima.HetiNetworkInterface i in l) {
-      if(i.prefixLength == 64) {
+    for (hetima.HetiNetworkInterface i in l) {
+      if (i.prefixLength == 64) {
         m.localIP = i.address;
+        localAddress = i.address;
         completer.complete(0);
         return;
       }
     }
-  }).catchError((e){
+  }).catchError((e) {
     completer.completeError(e);
   });
   return completer.future;
@@ -84,13 +126,13 @@ async.Future<int> startLocalIp() {
 
 async.Future<hetima.HetiHttpServer> _retryBind() {
   async.Completer<hetima.HetiHttpServer> co = new async.Completer();
-  int portMax = port + 100;
+  int portMax = localPort + 100;
   a() {
-    hetima.HetiHttpServer.bind(new hetimacl.HetiSocketBuilderChrome(), address, port).then((hetima.HetiHttpServer server) {
+    hetima.HetiHttpServer.bind(new hetimacl.HetiSocketBuilderChrome(), address, localPort).then((hetima.HetiHttpServer server) {
       co.complete(server);
     }).catchError((e) {
-      port++;
-      if (port < portMax) {
+      localPort++;
+      if (localPort < portMax) {
         a();
       } else {
         co.completeError(e);
@@ -103,6 +145,8 @@ async.Future<hetima.HetiHttpServer> _retryBind() {
 
 async.Future<int> startServer() {
   print("startServer");
+  localPort = basePort;
+  externalPort = basePort;
   async.Completer<int> completer = new async.Completer();
   if (_server != null) {
     completer.completeError({});
@@ -110,7 +154,7 @@ async.Future<int> startServer() {
   }
 
   _retryBind().then((hetima.HetiHttpServer server) {
-    m.localPort = "${port}";
+    m.localPort = "${localPort}";
     _server = server;
     completer.complete(0);
     server.onNewRequest().listen((hetima.HetiHttpServerRequest req) {
@@ -136,7 +180,7 @@ async.Future<int> startServer() {
         startResponse(req.socket, fileList[path]);
       }
     });
-  }).catchError((e){
+  }).catchError((e) {
     completer.completeError(e);
   });
   return completer.future;
