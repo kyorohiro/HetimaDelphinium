@@ -1,12 +1,13 @@
 import 'dart:html' as html;
 
-import 'package:chrome/chrome_app.dart' as chromeapp;
+import 'package:chrome/chrome_app.dart' as chrome;
 import 'mainview.dart' as mainview;
 import 'package:hetima/hetima.dart' as hetima;
 import 'package:hetima/hetima_cl.dart' as hetimacl;
 import 'dart:convert' as convert;
 import 'package:hetima/hetima.dart' as hetima;
 import 'dart:async' as async;
+
 String address = "0.0.0.0";
 String localAddress = "0.0.0.0";
 int basePort = 18085;
@@ -16,6 +17,7 @@ int externalPort = basePort;
 mainview.MainView m = new mainview.MainView();
 hetima.HetiHttpServer server = null;
 Map<String, mainview.FileSelectResult> fileList = {};
+hetima.HetiHttpServer _server = null;
 
 void main() {
   m.init();
@@ -28,7 +30,7 @@ void main() {
       });
     } else {
       stopServer();
-      stopPortMap();
+      deleteAllPortMap();
     }
   });
   int id = 0;
@@ -41,8 +43,12 @@ void main() {
   m.onDeleteFileFromList.listen((String fname) {
     fileList.remove(fname);
   });
+  chrome.app.window.current().onClosed.listen((d) {
+    deleteAllPortMap();
+    stopServer();
+  });
 }
-hetima.HetiHttpServer _server = null;
+
 
 void startPortMap() {
   hetima.UpnpDeviceSearcher.createInstance(new hetimacl.HetiSocketBuilderChrome()).then((hetima.UpnpDeviceSearcher searcher) {
@@ -77,25 +83,45 @@ void startPortMap() {
   });
 }
 
-void stopPortMap() {
+void deleteAllPortMap() {
   hetima.UpnpDeviceSearcher.createInstance(new hetimacl.HetiSocketBuilderChrome()).then((hetima.UpnpDeviceSearcher searcher) {
     searcher.searchWanPPPDevice().then((int e) {
       if (searcher.deviceInfoList.length <= 0) {
         return;
       }
-      hetima.UPnpDeviceInfo info = searcher.deviceInfoList.first;
-      hetima.UPnpPPPDevice pppDevice = new hetima.UPnpPPPDevice(info);
-      pppDevice.requestGetExternalIPAddress().then((hetima.UPnpGetExternalIPAddressResponse res) {
-        res.externalIp;
-        m.globalIP = res.externalIp;
-      });
-      int baseExternalPort = externalPort + 50;
-
-      pppDevice.requestDeletePortMapping(externalPort, hetima.UPnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP);
+      int index = 0;
+      List<int> portList = [];
+      b(hetima.UPnpPPPDevice pppDevice) {
+        for (int port in portList) {
+          pppDevice.requestDeletePortMapping(port, hetima.UPnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP);
+        }
+      }
+      a() {
+        hetima.UPnpDeviceInfo info = searcher.deviceInfoList.first;
+        hetima.UPnpPPPDevice pppDevice = new hetima.UPnpPPPDevice(info);
+        pppDevice.requestGetGenericPortMapping(index++).then((hetima.UPnpGetGenericPortMappingResponse res) {
+          if (res.resultCode != 200) {
+            b(pppDevice);
+            return;
+          }
+          String description = res.getValue(hetima.UPnpGetGenericPortMappingResponse.KEY_NewPortMappingDescription, "");
+          String port = res.getValue(hetima.UPnpGetGenericPortMappingResponse.KEY_NewExternalPort, "");
+          String ip = res.getValue(hetima.UPnpGetGenericPortMappingResponse.KEY_NewInternalClient, "");
+          if (description == "HetimaDelphinium") {
+            int portAsNum = int.parse(port);
+            portList.add(portAsNum);
+          }
+          if (port.replaceAll(" |\t|\r|\n", "") == "" && ip.replaceAll(" |\t|\r|\n", "") == "") {
+            b(pppDevice);
+            return;
+          }
+          a();
+        });
+      }
+      a();
     });
   });
 }
-
 
 async.Future<int> startLocalIp() {
   async.Completer<int> completer = new async.Completer();
@@ -186,8 +212,8 @@ async.Future<int> startServer() {
           return req.socket.send(b);
         }).then((hetima.HetiSendInfo i) {
           req.socket.close();
-        }).catchError((e){
-          req.socket.close();          
+        }).catchError((e) {
+          req.socket.close();
         });
       }
 
