@@ -1,18 +1,30 @@
+library delphiniumapp;
 import 'dart:html' as html;
+import 'dart:convert' as convert;
+import 'dart:async' as async;
 
 import 'package:chrome/chrome_app.dart' as chrome;
-import 'mainview.dart' as mainview;
 import 'package:hetima/hetima.dart' as hetima;
 import 'package:hetima/hetima_cl.dart' as hetimacl;
-import 'dart:convert' as convert;
-import 'package:hetima/hetima.dart' as hetima;
-import 'dart:async' as async;
-import 'httpserver.dart' as app;
+
+import 'package:dart_web_toolkit/event.dart' as event;
+import 'package:dart_web_toolkit/ui.dart' as ui;
+import 'package:dart_web_toolkit/util.dart' as util;
+import 'package:dart_web_toolkit/i18n.dart' as i18n;
+import 'package:dart_web_toolkit/text.dart' as text;
+import 'package:dart_web_toolkit/scheduler.dart' as scheduler;
+import 'package:dart_web_toolkit/validation.dart' as validation;
+
+part 'mainpanel.dart';
+part 'filelistpanel.dart';
+part 'mainview.dart';
+part 'httpserver.dart';
+
 String localAddress = "0.0.0.0";
 int externalPort = 18085;
 
-mainview.MainView m = new mainview.MainView();
-app.HttpServer httpServer = new app.HttpServer();
+MainView m = new MainView();
+HttpServer httpServer = new HttpServer();
 
 void main() {
   httpServer.onUpdateLocalServer.listen((String localPort){
@@ -32,7 +44,7 @@ void main() {
     }
   });
   int id = 0;
-  m.onSelectFile.listen((mainview.FileSelectResult result) {
+  m.onSelectFile.listen((FileSelectResult result) {
     String label = "${id++}_${result.fname}";
     httpServer.publicFileList[label] = result;
     m.addFile(label);

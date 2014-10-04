@@ -1,17 +1,6 @@
-library delphiniumapp;
-import 'package:dart_web_toolkit/event.dart' as event;
-import 'package:dart_web_toolkit/ui.dart' as ui;
-import 'package:dart_web_toolkit/util.dart' as util;
-import 'package:dart_web_toolkit/i18n.dart' as i18n;
-import 'package:dart_web_toolkit/text.dart' as text;
-import 'package:dart_web_toolkit/scheduler.dart' as scheduler;
-import 'package:dart_web_toolkit/validation.dart' as validation;
-import 'dart:html' as html;
-import 'dart:async' as async;
-import 'package:hetima/hetima.dart' as hetima;
-import 'package:hetima/hetima_cl.dart' as hetimacl;
-part 'mainpanel.dart';
-part 'filelistpanel.dart';
+part of delphiniumapp;
+
+
 
 /**
  * ui parts

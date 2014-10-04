@@ -1,9 +1,5 @@
-import 'mainview.dart' as mainview;
-import 'package:hetima/hetima.dart' as hetima;
-import 'package:hetima/hetima_cl.dart' as hetimacl;
-import 'dart:convert' as convert;
-import 'package:hetima/hetima.dart' as hetima;
-import 'dart:async' as async;
+part of delphiniumapp;
+
 
 class HttpServer {
   String localIP = "0.0.0.0";
@@ -11,7 +7,7 @@ class HttpServer {
   int _localPort = 18085;
   int get localPort => _localPort;
 
-  Map<String, mainview.FileSelectResult> publicFileList = {};
+  Map<String, FileSelectResult> publicFileList = {};
   hetima.HetiHttpServer _server = null;
 
   async.StreamController<String> _controllerUpdateLocalServer = new async.StreamController.broadcast();
@@ -104,7 +100,7 @@ class HttpServer {
     return completer.future;
   }
 
-  void startResponse(hetima.HetiSocket socket, mainview.FileSelectResult f) {
+  void startResponse(hetima.HetiSocket socket, FileSelectResult f) {
     hetima.ArrayBuilder response = new hetima.ArrayBuilder();
     int index = 0;
     int size = 1024;
