@@ -15,7 +15,7 @@ class HttpServer {
   hetima.HetiHttpServer _server = null;
 
   async.StreamController<String> _controllerUpdateLocalServer = new async.StreamController.broadcast();
-  async.Stream get onUpdateLocalServer => _controllerUpdateLocalServer.stream;
+  async.Stream<String> get onUpdateLocalServer => _controllerUpdateLocalServer.stream;
 
   async.Future<hetima.HetiHttpServer> _retryBind() {
     async.Completer<hetima.HetiHttpServer> completer = new async.Completer();
