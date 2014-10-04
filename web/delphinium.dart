@@ -18,8 +18,11 @@ void main() {
   m.init();
   m.onChangeMainButtonState.listen((bool isDown) {
     if (isDown) {
-      startServer();
-      startLocalIp();
+      startServer().then((int v){
+        return startLocalIp();
+      }).then((int v) {
+        
+      });
     } else {
       stopServer();
     }
@@ -37,12 +40,14 @@ void main() {
 }
 hetima.HetiHttpServer _server = null;
 
-void startLocalIp() {
+async.Future<int> startLocalIp() {
+  async.Completer<int> completer = new async.Completer();
   (new hetimacl.HetiSocketBuilderChrome()).getNetworkInterfaces().then((List<hetima.HetiNetworkInterface> l) {
     // search 24
     for(hetima.HetiNetworkInterface i in l) {
       if(i.prefixLength == 24 && !i.address.startsWith("127")) {
         m.localIP = i.address;
+        completer.complete(0);
         return;
       }
     }
@@ -50,12 +55,14 @@ void startLocalIp() {
     for(hetima.HetiNetworkInterface i in l) {
       if(i.prefixLength == 64) {
         m.localIP = i.address;
+        completer.complete(0);
         return;
       }
     }
+  }).catchError((e){
+    completer.completeError(e);
   });
-  html.FileSystem s;
-
+  return completer.future;
 }
 
 async.Future<hetima.HetiHttpServer> _retryBind() {
@@ -77,15 +84,18 @@ async.Future<hetima.HetiHttpServer> _retryBind() {
   return co.future;
 }
 
-void startServer() {
+async.Future<int> startServer() {
   print("startServer");
+  async.Completer<int> completer = new async.Completer();
   if (_server != null) {
-    return;
+    completer.completeError({});
+    return completer.future;
   }
 
   _retryBind().then((hetima.HetiHttpServer server) {
     m.localPort = "${port}";
     _server = server;
+    completer.complete(0);
     server.onNewRequest().listen((hetima.HetiHttpServerRequest req) {
       print("${req.info.line.requestTarget}");
       if (req.info.line.requestTarget.length < 0) {
@@ -109,7 +119,10 @@ void startServer() {
         startResponse(req.socket, fileList[path]);
       }
     });
+  }).catchError((e){
+    completer.completeError(e);
   });
+  return completer.future;
 }
 
 void startResponse(hetima.HetiSocket socket, mainview.FileSelectResult f) {
