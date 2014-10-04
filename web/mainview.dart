@@ -47,7 +47,7 @@ class MainView {
   void initTab() {
     ui.TabBar bar = new ui.TabBar();
     bar.addTabText("main");
-    bar.addTabText("info");
+    bar.addTabText("files");
     bar.selectTab(0);
     _mainPanel.add(bar);
     _mainPanel.add(_subPanel);

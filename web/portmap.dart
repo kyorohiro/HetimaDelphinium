@@ -30,7 +30,6 @@ class PortMap {
         hetima.UPnpDeviceInfo info = searcher.deviceInfoList.first;
         hetima.UPnpPPPDevice pppDevice = new hetima.UPnpPPPDevice(info);
         pppDevice.requestGetExternalIPAddress().then((hetima.UPnpGetExternalIPAddressResponse res) {
-          res.externalIp;
           _controllerUpdateGlobalIp.add(res.externalIp);
         });
         int baseExternalPort = _externalPort + 50;
@@ -38,6 +37,7 @@ class PortMap {
           pppDevice.requestAddPortMapping(_externalPort, hetima.UPnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP, localPort, localAddress, hetima.UPnpPPPDevice.VALUE_ENABLE, "HetimaDelphinium", 0).then((hetima.UPnpAddPortMappingResponse res) {
             if (200 == res.resultCode) {
               _controllerUpdateGlobalPort.add("${_externalPort}");
+              searcher.close();
               return;
             }
             if (-500 == res.resultCode) {
@@ -46,9 +46,13 @@ class PortMap {
                 tryAddPortMap();
               }
             }
+          }).catchError((e){
+            searcher.close();
           });
         }
         tryAddPortMap();
+      }).catchError((e){
+        searcher.close();
       });
     });
   }
@@ -65,6 +69,9 @@ class PortMap {
           for (int port in deletePortList) {
             pppDevice.requestDeletePortMapping(port, hetima.UPnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP);
           }
+          new async.Future.delayed(new Duration(seconds: 5),(){
+            searcher.close();
+          });
         }
         tryGetPortMapInfo() {
           hetima.UPnpDeviceInfo info = searcher.deviceInfoList.first;
@@ -86,6 +93,8 @@ class PortMap {
               return;
             }
             tryGetPortMapInfo();
+          }).catchError((e){
+            searcher.close();
           });
         }
         tryGetPortMapInfo();
