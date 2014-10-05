@@ -24,8 +24,11 @@ part 'infopanel.dart';
 
 
 void main() {
+  String downloadPath = "hetima";
   MainView mainView = new MainView();
+  mainView.downloadPath = downloadPath;
   HttpServer httpServer = new HttpServer();
+  httpServer.dataPath = downloadPath;
   PortMap portMap = new PortMap();
 
   httpServer.onUpdateLocalServer.listen((String localPort){
@@ -44,6 +47,7 @@ void main() {
 
   mainView.onChRootPath.listen((String path){
     httpServer.localIP = path;
+    mainView.downloadPath = path;
   });
 
   mainView.onInitAddress.listen((String ip) {

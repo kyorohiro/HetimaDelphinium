@@ -5,6 +5,7 @@ part of delphiniumapp;
  */
 class PortMap {
   String localAddress = "0.0.0.0";
+  String _externalAddress = "0.0.0.0";
   int basePort = 18085;
   int localPort = 18085;
   int _externalPort = 18085;

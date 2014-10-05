@@ -18,6 +18,10 @@ class MainView {
   MainPanel _mmainPanel = new MainPanel();
   FileListPanel _mfileListPanel = new FileListPanel();
   InfoPanel _minfoPane = new InfoPanel();
+  void set downloadPath(String path) {
+    _mmainPanel.setDownloadPath(path);
+    _minfoPane.setDownloadPath(path);
+  }
 
   async.StreamController _controllerTab = new async.StreamController.broadcast();
 

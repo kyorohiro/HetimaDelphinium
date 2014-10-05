@@ -22,6 +22,10 @@ class InfoPanel {
     _rootPath.text = "hetima";
   }
 
+  void setDownloadPath(String path) {
+    _rootPath.text = path;
+  }
+
   void initInfoPanel() {
     infoForSubPanel.clear();
 

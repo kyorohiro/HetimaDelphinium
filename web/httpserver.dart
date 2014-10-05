@@ -62,15 +62,13 @@ class HttpServer {
           req.socket.close();
           return {};
         }
-        if ("/${dataPath}/index.html" == req.info.line.requestTarget 
-            || "/${dataPath}/" == req.info.line.requestTarget
-            || "/${dataPath}" == req.info.line.requestTarget) {
+        if ("/${dataPath}/index.html" == req.info.line.requestTarget || "/${dataPath}/" == req.info.line.requestTarget || "/${dataPath}" == req.info.line.requestTarget) {
 
           StringBuffer content = new StringBuffer();
           content.write("<html>");
           content.write("<body>");
           for (String r in publicFileList.keys) {
-            content.write("<div><a href=./${r}>${r}</div>");
+            content.write("<div><a href=./${dataPath}/${r}>${r}</div>");
           }
           content.write("</body>");
           content.write("</html>");
@@ -92,7 +90,7 @@ class HttpServer {
           });
         }
 
-        if(!req.info.line.requestTarget.startsWith("/${dataPath}/")){
+        if (!req.info.line.requestTarget.startsWith("/${dataPath}/")) {
           req.socket.close();
           return null;
         }

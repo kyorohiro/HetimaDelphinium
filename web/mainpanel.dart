@@ -19,21 +19,39 @@ class MainPanel {
   ui.Html _localIP = new ui.Html("[]");
   ui.Html _globalPort = new ui.Html("[]");
   ui.Html _globalIP = new ui.Html("[]");
+  String _downloadPath = "hetima";
 
+  ui.Html _globalAccessPoint = new ui.Html("[]");
+  ui.Html _localAccessPoint = new ui.Html("[]");
+
+  void setDownloadPath(String path) {
+    _downloadPath = path;
+    _globalAccessPoint.text = "http://${_globalIP.text}:${_globalPort.text}/${_downloadPath}";
+    _localAccessPoint.text = "http://${_localIP.text}:${_localPort.text}/${_downloadPath}";
+  }
+
+  void updateAccessPointer() {
+    _globalAccessPoint.text = "http://${_globalIP.text}:${_globalPort.text}/${_downloadPath}";
+    _localAccessPoint.text = "http://${_localIP.text}:${_localPort.text}/${_downloadPath}";
+  }
   void setLocalPort(String port) {
     _localPort.text = port;
+    updateAccessPointer();
   }
 
   void setLocalIP(String ip) {
     _localIP.text = ip;
+    updateAccessPointer();
   }
 
   void setGlobalPort(String port) {
     _globalPort.text = port;
+    updateAccessPointer();
   }
 
   void setGlobalIP(String ip) {
     _globalIP.text = ip;
+    updateAccessPointer();
   }
 
   void clearFile() {
@@ -47,12 +65,12 @@ class MainPanel {
   void initMainPanel() {
     {
       mainForSubPanel.add(_fileUpload);
-      event.ChangeHandler handler = new event.ChangeHandlerAdapter((event.ChangeEvent e){
+      event.ChangeHandler handler = new event.ChangeHandlerAdapter((event.ChangeEvent e) {
         print("##${_fileUpload.name}");
         print("##${_fileUpload.getFilename()}");
         print("##${_fileUpload.title}");
         String path = _fileUpload.getFilename();
-        for(html.File f in (_fileUpload.getElement() as html.InputElement).files) {
+        for (html.File f in (_fileUpload.getElement() as html.InputElement).files) {
           hetimacl.HetimaFileBlob file = new hetimacl.HetimaFileBlob(f);
           file.getLength().then((int length) {
             print("###${length}");
@@ -62,7 +80,7 @@ class MainPanel {
             ff.apath = path;
             _controllerFileSelect.add(ff);
           });
-      }
+        }
       });
       _fileUpload.addChangeHandler(handler);
       _fileUpload.addStyleName("hetima-grid");
@@ -78,11 +96,15 @@ class MainPanel {
 
       ui.Button normalToggleButton = null;
       bool isDown = false;
-      normalToggleButton = 
-          new ui.Button("start",
-                new event.ClickHandlerAdapter((event.ClickEvent event) {
+      normalToggleButton = new ui.Button("start", new event.ClickHandlerAdapter((event.ClickEvent event) {
         print("click${isDown}");
-        if(isDown){isDown = false;normalToggleButton.text = "start";}else{isDown = true;normalToggleButton.text = "stop";} 
+        if (isDown) {
+          isDown = false;
+          normalToggleButton.text = "start";
+        } else {
+          isDown = true;
+          normalToggleButton.text = "stop";
+        }
         _controllerMainButton.add(isDown);
       }));
       normalToggleButton.addStyleName("hetima-grid");
@@ -109,6 +131,22 @@ class MainPanel {
       layout.setWidget(4, 1, _localPort);
       mainForSubPanel.add(layout);
     }
+    {
+      ui.FlexTable layout = new ui.FlexTable();
+      layout.setCellSpacing(9);
+      ui.FlexCellFormatter cellFormatter = layout.getFlexCellFormatter();
+
+      layout.setHtml(0, 0, "");
+      cellFormatter.setColSpan(0, 0, 2);
+      cellFormatter.setHorizontalAlignment(0, 0, i18n.HasHorizontalAlignment.ALIGN_CENTER);
+      layout.setWidget(1, 0, new ui.HtmlPanel("@"));
+      layout.setWidget(1, 1, new ui.HtmlPanel("Access Point"));
+
+      layout.setWidget(2, 1, _globalAccessPoint);
+      layout.setWidget(3, 1, _localAccessPoint);
+      mainForSubPanel.add(layout);
+    }
+
   }
 
 }
