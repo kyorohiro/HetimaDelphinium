@@ -20,7 +20,7 @@ class FileListPanel {
     _fileList.add(filename);
   }
 
-  void initInfoPanel() {
+  void initFileListPanel() {
     filelistForSubPanel.clear();
 
     ui.FlexTable layout = new ui.FlexTable();

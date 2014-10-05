@@ -20,6 +20,7 @@ part 'filelistpanel.dart';
 part 'mainview.dart';
 part 'httpserver.dart';
 part 'portmap.dart';
+part 'infopanel.dart';
 
 
 void main() {
@@ -41,6 +42,13 @@ void main() {
     mainView.localIP = localIP;
   });
 
+  mainView.onChRootPath.listen((String path){
+    httpServer.localIP = path;
+  });
+
+  mainView.onInitAddress.listen((String ip) {
+    httpServer.localIP = ip;    
+  });
   mainView.init();
   mainView.onChangeMainButtonState.listen((bool isDown) {
     if (isDown) {

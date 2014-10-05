@@ -8,6 +8,7 @@ class HttpServer {
   int basePort = 18085;
   int _localPort = 18085;
   int get localPort => _localPort;
+  String dataPath = "hetima";
 
   Map<String, FileSelectResult> publicFileList = {};
   hetima.HetiHttpServer _server = null;
@@ -61,7 +62,9 @@ class HttpServer {
           req.socket.close();
           return {};
         }
-        if ("/index.html" == req.info.line.requestTarget) {
+        if ("/${dataPath}/index.html" == req.info.line.requestTarget 
+            || "/${dataPath}/" == req.info.line.requestTarget
+            || "/${dataPath}" == req.info.line.requestTarget) {
 
           StringBuffer content = new StringBuffer();
           content.write("<html>");
@@ -89,11 +92,15 @@ class HttpServer {
           });
         }
 
-        String path = req.info.line.requestTarget.substring(1);
-        if (!publicFileList.containsKey(path)) {
+        if(!req.info.line.requestTarget.startsWith("/${dataPath}/")){
+          req.socket.close();
+          return null;
+        }
+        String filename = req.info.line.requestTarget.substring("/${dataPath}/".length);
+        if (!publicFileList.containsKey(filename)) {
           req.socket.close();
         } else {
-          startResponse(req.socket, publicFileList[path]);
+          startResponse(req.socket, publicFileList[filename]);
         }
       });
     }).catchError((e) {
