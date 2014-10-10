@@ -109,7 +109,7 @@ class HttpServer {
 
   void _startResponseBuffer(hetima.HetiSocket socket, FileSelectResult f, int index, int length) {
     res() {
-      int l = index + 1024;
+      int l = index + 20*1024;
       if (l > length) {
         l = length;
       }

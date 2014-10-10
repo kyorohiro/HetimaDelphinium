@@ -15359,7 +15359,7 @@ var $$ = {};
       var t1, t2, l, t3, t4;
       t1 = {};
       t2 = this.box_1;
-      l = J.$add$ns(t2.index_1, 1024);
+      l = J.$add$ns(t2.index_1, 20480);
       t1.l_0 = l;
       t3 = this.length_4;
       if (J.$gt$n(l, t3))
