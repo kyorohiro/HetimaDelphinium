@@ -131,17 +131,13 @@ class HttpServer {
 
   void startResponse(hetima.HetiSocket socket, FileSelectResult f) {
     hetima.ArrayBuilder response = new hetima.ArrayBuilder();
-    int index = 0;
-    int size = 1024;
-    int length = 0;
-    f.file.getLength().then((int l) {
-      length = l;
+    f.file.getLength().then((int length) {
       response.appendString("HTTP/1.1 200 OK'\r\n");
       response.appendString("Connection: close\r\n");
       response.appendString("Content-Length: ${length}\r\n");
       response.appendString("\r\n");
       socket.send(response.toList()).then((hetima.HetiSendInfo i) {
-        _startResponseBuffer(socket, f, index, length);
+        _startResponseBuffer(socket, f, 0, length);
       }).catchError((e) {
         socket.close();
       });
