@@ -68,7 +68,7 @@ class HttpServer {
           content.write("<html>");
           content.write("<body>");
           for (String r in publicFileList.keys) {
-            content.write("<div><a href=./${dataPath}/${r}>${r}</div>");
+            content.write("<div><a href=./${r}>${r}</div>");
           }
           content.write("</body>");
           content.write("</html>");
@@ -107,14 +107,10 @@ class HttpServer {
     return completer.future;
   }
 
-  void startResponse(hetima.HetiSocket socket, FileSelectResult f) {
-    hetima.ArrayBuilder response = new hetima.ArrayBuilder();
-    int index = 0;
-    int size = 1024;
-    int length = 0;
+  void _startResponseBuffer(hetima.HetiSocket socket, FileSelectResult f, int index, int length) {
     res() {
       int l = index + 1024;
-      if (l < length) {
+      if (l > length) {
         l = length;
       }
       f.file.read(index, l).then((hetima.ReadResult r) {
@@ -130,17 +126,22 @@ class HttpServer {
         socket.close();
       });
     }
+    res();
+  }
+
+  void startResponse(hetima.HetiSocket socket, FileSelectResult f) {
+    hetima.ArrayBuilder response = new hetima.ArrayBuilder();
+    int index = 0;
+    int size = 1024;
+    int length = 0;
     f.file.getLength().then((int l) {
       length = l;
       response.appendString("HTTP/1.1 200 OK'\r\n");
       response.appendString("Connection: close\r\n");
       response.appendString("Content-Length: ${length}\r\n");
       response.appendString("\r\n");
-      socket.send(response.toList());
-      f.file.read(0, length).then((hetima.ReadResult r) {
-        return socket.send(r.buffer);
-      }).then((hetima.HetiSendInfo i) {
-        socket.close();
+      socket.send(response.toList()).then((hetima.HetiSendInfo i) {
+        _startResponseBuffer(socket, f, index, length);
       }).catchError((e) {
         socket.close();
       });
