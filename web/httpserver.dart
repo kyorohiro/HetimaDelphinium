@@ -109,7 +109,7 @@ class HttpServer {
 
   void _startResponseBuffer(hetima.HetiSocket socket, FileSelectResult f, int index, int length) {
     res() {
-      int l = index + 20*1024;
+      int l = index + 256*1024;
       if (l > length) {
         l = length;
       }
@@ -120,7 +120,9 @@ class HttpServer {
           socket.close();
         } else {
           index = l;
-          res();
+          new async.Future((){
+           res();
+          });
         }
       }).catchError((e) {
         socket.close();
