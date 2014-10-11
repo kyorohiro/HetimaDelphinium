@@ -14,7 +14,7 @@ import 'package:dart_web_toolkit/i18n.dart' as i18n;
 import 'package:dart_web_toolkit/text.dart' as text;
 import 'package:dart_web_toolkit/scheduler.dart' as scheduler;
 import 'package:dart_web_toolkit/validation.dart' as validation;
-
+import 'package:crypto/crypto.dart' as crypt;
 part 'mainpanel.dart';
 part 'filelistpanel.dart';
 part 'mainview.dart';
@@ -67,15 +67,14 @@ void main() {
     }
   });
 
-  int id = 0;
   mainView.onSelectFile.listen((FileSelectResult result) {
-    String label = "${id++}_${result.fname}";
-    httpServer.publicFileList[label] = result;
+    String label = "${result.fname}";
+    httpServer.addFile(label, result);
     mainView.addFile(label);
   });
 
   mainView.onDeleteFileFromList.listen((String fname) {
-    httpServer.publicFileList.remove(fname);
+    httpServer.removeFile(fname);
   });
 
   chrome.app.window.current().onClosed.listen((d) {

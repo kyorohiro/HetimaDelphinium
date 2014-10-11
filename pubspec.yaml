@@ -2,6 +2,7 @@ name: HetimaDelphinium
 description: A sample Chrome packaged application
 dependencies:
   chrome: any
+  crypto: any
   dart_web_toolkit: any
   hetima:
     path: /Users/kiyohiro/dart/git/dart_hetimalib

@@ -10,12 +10,21 @@ class HttpServer {
   int get localPort => _localPort;
   String dataPath = "hetima";
 
-  Map<String, FileSelectResult> publicFileList = {};
+  Map<String, FileSelectResult> _publicFileList = {};
   hetima.HetiHttpServer _server = null;
 
   async.StreamController<String> _controllerUpdateLocalServer = new async.StreamController.broadcast();
   async.Stream<String> get onUpdateLocalServer => _controllerUpdateLocalServer.stream;
 
+  void addFile(String name, FileSelectResult fileinfo) {
+    String key = hetima.PercentEncode.encode(convert.UTF8.encode(name));
+    _publicFileList[key] = fileinfo;
+  }
+  
+  void removeFile(String name) {
+    String key = hetima.PercentEncode.encode(convert.UTF8.encode(name));
+    _publicFileList.remove(key);
+  }
   async.Future<hetima.HetiHttpServer> _retryBind() {
     async.Completer<hetima.HetiHttpServer> completer = new async.Completer();
     int portMax = _localPort + 100;
@@ -67,7 +76,7 @@ class HttpServer {
           StringBuffer content = new StringBuffer();
           content.write("<html>");
           content.write("<body>");
-          for (String r in publicFileList.keys) {
+          for (String r in _publicFileList.keys) {
             content.write("<div><a href=./${r}>${r}</div>");
           }
           content.write("</body>");
@@ -95,10 +104,10 @@ class HttpServer {
           return null;
         }
         String filename = req.info.line.requestTarget.substring("/${dataPath}/".length);
-        if (!publicFileList.containsKey(filename)) {
+        if (!_publicFileList.containsKey(filename)) {
           req.socket.close();
         } else {
-          startResponse(req.socket, publicFileList[filename]);
+          startResponse(req.socket, _publicFileList[filename]);
         }
       });
     }).catchError((e) {
