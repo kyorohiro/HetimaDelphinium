@@ -66,7 +66,7 @@ class HttpServer {
         if (!_publicFileList.containsKey(filename)) {
           req.socket.close();
         } else {
-          _startResponseFile(req.socket, _publicFileList[filename]);
+          _startResponseFile(req.socket, _publicFileList[filename].file);
         }
       });
     }).catchError((e) {
@@ -75,15 +75,15 @@ class HttpServer {
     return completer.future;
   }
 
-  void _startResponseFile(hetima.HetiSocket socket, FileSelectResult f) {
+  void _startResponseFile(hetima.HetiSocket socket, hetima.HetimaFile file) {
     hetima.ArrayBuilder response = new hetima.ArrayBuilder();
-    f.file.getLength().then((int length) {
+    file.getLength().then((int length) {
       response.appendString("HTTP/1.1 200 OK'\r\n");
       response.appendString("Connection: close\r\n");
       response.appendString("Content-Length: ${length}\r\n");
       response.appendString("\r\n");
       socket.send(response.toList()).then((hetima.HetiSendInfo i) {
-        _startResponseBuffer(socket, f, 0, length);
+        _startResponseBuffer(socket, file, 0, length);
       }).catchError((e) {
         socket.close();
       });
