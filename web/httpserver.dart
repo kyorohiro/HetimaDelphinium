@@ -20,30 +20,11 @@ class HttpServer {
     String key = hetima.PercentEncode.encode(convert.UTF8.encode(name));
     _publicFileList[key] = fileinfo;
   }
-  
+
   void removeFile(String name) {
     String key = hetima.PercentEncode.encode(convert.UTF8.encode(name));
     _publicFileList.remove(key);
   }
-  async.Future<hetima.HetiHttpServer> _retryBind() {
-    async.Completer<hetima.HetiHttpServer> completer = new async.Completer();
-    int portMax = _localPort + 100;
-    bindFunc() {
-      hetima.HetiHttpServer.bind(new hetimacl.HetiSocketBuilderChrome(), localIP, _localPort).then((hetima.HetiHttpServer server) {
-        completer.complete(server);
-      }).catchError((e) {
-        _localPort++;
-        if (_localPort < portMax) {
-          bindFunc();
-        } else {
-          completer.completeError(e);
-        }
-      });
-    }
-    bindFunc();
-    return completer.future;
-  }
-
   void stopServer() {
     if (_server == null) {
       return;
@@ -72,31 +53,7 @@ class HttpServer {
           return {};
         }
         if ("/${dataPath}/index.html" == req.info.line.requestTarget || "/${dataPath}/" == req.info.line.requestTarget || "/${dataPath}" == req.info.line.requestTarget) {
-
-          StringBuffer content = new StringBuffer();
-          content.write("<html>");
-          content.write("<body>");
-          for (String r in _publicFileList.keys) {
-            content.write("<div><a href=./${r}>${r}</div>");
-          }
-          content.write("</body>");
-          content.write("</html>");
-
-          String cv = content.toString();
-          List<int> b = convert.UTF8.encode(content.toString());
-          StringBuffer response = new StringBuffer();
-          response.write("HTTP/1.1 200 OK'\r\n");
-          response.write("Connection: close\r\n");
-          response.write("Content-Length: ${b.length}\r\n");
-          response.write("Content-Type: text/html\r\n");
-          response.write("\r\n");
-          return req.socket.send(convert.UTF8.encode(response.toString())).then((hetima.HetiSendInfo i) {
-            return req.socket.send(b);
-          }).then((hetima.HetiSendInfo i) {
-            req.socket.close();
-          }).catchError((e) {
-            req.socket.close();
-          });
+          _startResponseHomePage(req.socket);
         }
 
         if (!req.info.line.requestTarget.startsWith("/${dataPath}/")) {
@@ -107,7 +64,7 @@ class HttpServer {
         if (!_publicFileList.containsKey(filename)) {
           req.socket.close();
         } else {
-          startResponse(req.socket, _publicFileList[filename]);
+          _startResponseFile(req.socket, _publicFileList[filename]);
         }
       });
     }).catchError((e) {
@@ -116,31 +73,8 @@ class HttpServer {
     return completer.future;
   }
 
-  void _startResponseBuffer(hetima.HetiSocket socket, FileSelectResult f, int index, int length) {
-    res() {
-      int l = index + 256*1024;
-      if (l > length) {
-        l = length;
-      }
-      f.file.read(index, l).then((hetima.ReadResult r) {
-        return socket.send(r.buffer);
-      }).then((hetima.HetiSendInfo i) {
-        if (l >= length) {
-          socket.close();
-        } else {
-          index = l;
-          new async.Future((){
-           res();
-          });
-        }
-      }).catchError((e) {
-        socket.close();
-      });
-    }
-    res();
-  }
 
-  void startResponse(hetima.HetiSocket socket, FileSelectResult f) {
+  void _startResponseFile(hetima.HetiSocket socket, FileSelectResult f) {
     hetima.ArrayBuilder response = new hetima.ArrayBuilder();
     f.file.getLength().then((int length) {
       response.appendString("HTTP/1.1 200 OK'\r\n");
@@ -153,6 +87,76 @@ class HttpServer {
         socket.close();
       });
     });
+  }
+
+  async.Future _startResponseHomePage(hetima.HetiSocket socket) {
+    StringBuffer content = new StringBuffer();
+    content.write("<html>");
+    content.write("<body>");
+    for (String r in _publicFileList.keys) {
+      content.write("<div><a href=./${r}>${r}</div>");
+    }
+    content.write("</body>");
+    content.write("</html>");
+
+    String cv = content.toString();
+    List<int> b = convert.UTF8.encode(content.toString());
+    StringBuffer response = new StringBuffer();
+    response.write("HTTP/1.1 200 OK'\r\n");
+    response.write("Connection: close\r\n");
+    response.write("Content-Length: ${b.length}\r\n");
+    response.write("Content-Type: text/html\r\n");
+    response.write("\r\n");
+    return socket.send(convert.UTF8.encode(response.toString())).then((hetima.HetiSendInfo i) {
+      return socket.send(b);
+    }).then((hetima.HetiSendInfo i) {
+      socket.close();
+    }).catchError((e) {
+      socket.close();
+    });
+  }
+
+  async.Future<hetima.HetiHttpServer> _retryBind() {
+    async.Completer<hetima.HetiHttpServer> completer = new async.Completer();
+    int portMax = _localPort + 100;
+    bindFunc() {
+      hetima.HetiHttpServer.bind(new hetimacl.HetiSocketBuilderChrome(), localIP, _localPort).then((hetima.HetiHttpServer server) {
+        completer.complete(server);
+      }).catchError((e) {
+        _localPort++;
+        if (_localPort < portMax) {
+          bindFunc();
+        } else {
+          completer.completeError(e);
+        }
+      });
+    }
+    bindFunc();
+    return completer.future;
+  }
+
+  void _startResponseBuffer(hetima.HetiSocket socket, FileSelectResult f, int index, int length) {
+    res() {
+      int l = index + 256 * 1024;
+      if (l > length) {
+        l = length;
+      }
+      f.file.read(index, l).then((hetima.ReadResult r) {
+        return socket.send(r.buffer);
+      }).then((hetima.HetiSendInfo i) {
+        if (l >= length) {
+          socket.close();
+        } else {
+          index = l;
+          new async.Future(() {
+            res();
+          });
+        }
+      }).catchError((e) {
+        socket.close();
+      });
+    }
+    res();
   }
 
 }

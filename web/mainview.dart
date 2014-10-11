@@ -67,7 +67,7 @@ class MainView {
     _mainPanel.add(_subPanel);
     _subPanel.clear();
     _subPanel.add(_mmainPanel.mainForSubPanel);
-    
+
     ui.RootPanel.get().add(_mainPanel);
 
     bar.addSelectionHandler(new event.SelectionHandlerAdapter((event.SelectionEvent evt) {
@@ -81,18 +81,17 @@ class MainView {
         _mfileListPanel.initFileListPanel();
         _subPanel.add(_mfileListPanel.filelistForSubPanel);
         _controllerTab.add(FILELIST);
-      } else if(selectedTabIndx == 2) {
+      } else if (selectedTabIndx == 2) {
         _subPanel.clear();
         _subPanel.add(_minfoPane.infoForSubPanel);
-        _controllerTab.add(INFO);        
+        _controllerTab.add(INFO);
       }
     }));
 
   }
 }
 
-class FileSelectResult
-{
+class FileSelectResult {
   String apath;
   String fname;
   hetima.HetimaFile file;
