@@ -66,7 +66,19 @@ class HttpServer {
         if (!_publicFileList.containsKey(filename)) {
           req.socket.close();
         } else {
-          _startResponseFile(req.socket, _publicFileList[filename].file);
+          hetima.HetiHttpResponseHeaderField header = req.info.find(hetima.RfcTable.HEADER_FIELD_RANGE);
+          if(header!=null) {
+            typed_data.Uint8List buff = new typed_data.Uint8List.fromList(convert.UTF8.encode(header.fieldValue));
+            hetima.ArrayBuilder builder = new hetima.ArrayBuilder.fromList(buff);
+            hetima.HetiHttpResponse.decodeRequestRangeValue(new hetima.EasyParser(builder))
+            .then((hetima.HetiHttpRequestRange range){
+              _startResponseRangeFile(req.socket,
+                  _publicFileList[filename].file,
+                  range.start, range.end);
+           });
+          } else {
+            _startResponseFile(req.socket, _publicFileList[filename].file);
+          }
         }
       });
     }).catchError((e) {
@@ -75,6 +87,26 @@ class HttpServer {
     return completer.future;
   }
 
+  void _startResponseRangeFile(hetima.HetiSocket socket, hetima.HetimaFile file, int start, int end) {
+    hetima.ArrayBuilder response = new hetima.ArrayBuilder();
+    file.getLength().then((int length) {
+      if(end == -1||end>length-1) {
+        end = length-1;
+      }
+      int contentLength = end-start+1;
+      response.appendString("HTTP/1.1 206 OK'\r\n");
+      response.appendString("Connection: close\r\n");
+      response.appendString("Accept-Ranges: bytes\r\n");
+      response.appendString("Content-Length: ${contentLength}\r\n");
+      response.appendString("Content-Ranges: ${start}-${end}/${length}\r\n");
+      response.appendString("\r\n");
+      socket.send(response.toList()).then((hetima.HetiSendInfo i) {
+        _startResponseBuffer(socket, file, 0, length);
+      }).catchError((e) {
+        socket.close();
+      });
+    });
+  }
   void _startResponseFile(hetima.HetiSocket socket, hetima.HetimaFile file) {
     hetima.ArrayBuilder response = new hetima.ArrayBuilder();
     file.getLength().then((int length) {
