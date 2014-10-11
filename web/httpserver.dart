@@ -25,6 +25,7 @@ class HttpServer {
     String key = hetima.PercentEncode.encode(convert.UTF8.encode(name));
     _publicFileList.remove(key);
   }
+
   void stopServer() {
     if (_server == null) {
       return;
@@ -54,6 +55,7 @@ class HttpServer {
         }
         if ("/${dataPath}/index.html" == req.info.line.requestTarget || "/${dataPath}/" == req.info.line.requestTarget || "/${dataPath}" == req.info.line.requestTarget) {
           _startResponseHomePage(req.socket);
+          return null;
         }
 
         if (!req.info.line.requestTarget.startsWith("/${dataPath}/")) {
@@ -72,7 +74,6 @@ class HttpServer {
     });
     return completer.future;
   }
-
 
   void _startResponseFile(hetima.HetiSocket socket, FileSelectResult f) {
     hetima.ArrayBuilder response = new hetima.ArrayBuilder();
@@ -135,28 +136,27 @@ class HttpServer {
     return completer.future;
   }
 
-  void _startResponseBuffer(hetima.HetiSocket socket, FileSelectResult f, int index, int length) {
-    res() {
-      int l = index + 256 * 1024;
-      if (l > length) {
-        l = length;
+  void _startResponseBuffer(hetima.HetiSocket socket, hetima.HetimaFile file, int index, int length) {
+    int start = index;
+    responseTask() {
+      int end = start + 256 * 1024;
+      if (end > (index+length)) {
+        end = (index+length);
       }
-      f.file.read(index, l).then((hetima.ReadResult r) {
-        return socket.send(r.buffer);
+      file.read(start, end).then((hetima.ReadResult readResult) {
+        return socket.send(readResult.buffer);
       }).then((hetima.HetiSendInfo i) {
-        if (l >= length) {
+        if (end >= (index+length)) {
           socket.close();
         } else {
-          index = l;
-          new async.Future(() {
-            res();
-          });
+          start = end;
+          responseTask();
         }
       }).catchError((e) {
         socket.close();
       });
     }
-    res();
+    responseTask();
   }
 
 }
