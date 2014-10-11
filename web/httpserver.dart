@@ -70,6 +70,7 @@ class HttpServer {
           if(header!=null) {
             typed_data.Uint8List buff = new typed_data.Uint8List.fromList(convert.UTF8.encode(header.fieldValue));
             hetima.ArrayBuilder builder = new hetima.ArrayBuilder.fromList(buff);
+            builder.fin();
             hetima.HetiHttpResponse.decodeRequestRangeValue(new hetima.EasyParser(builder))
             .then((hetima.HetiHttpRequestRange range){
               _startResponseRangeFile(req.socket,
@@ -94,14 +95,16 @@ class HttpServer {
         end = length-1;
       }
       int contentLength = end-start+1;
-      response.appendString("HTTP/1.1 206 OK'\r\n");
+      response.appendString("HTTP/1.1 206 Partial Content\r\n");
       response.appendString("Connection: close\r\n");
-      response.appendString("Accept-Ranges: bytes\r\n");
+//      response.appendString("Accept-Ranges: bytes\r\n");
       response.appendString("Content-Length: ${contentLength}\r\n");
-      response.appendString("Content-Ranges: ${start}-${end}/${length}\r\n");
+      response.appendString("Content-Type: video/mp4\r\n");
+      response.appendString("Content-Range: bytes ${start}-${end}/${length}\r\n");
       response.appendString("\r\n");
+      print(response.toText());
       socket.send(response.toList()).then((hetima.HetiSendInfo i) {
-        _startResponseBuffer(socket, file, 0, length);
+        _startResponseBuffer(socket, file, start, contentLength);
       }).catchError((e) {
         socket.close();
       });
@@ -110,7 +113,7 @@ class HttpServer {
   void _startResponseFile(hetima.HetiSocket socket, hetima.HetimaFile file) {
     hetima.ArrayBuilder response = new hetima.ArrayBuilder();
     file.getLength().then((int length) {
-      response.appendString("HTTP/1.1 200 OK'\r\n");
+      response.appendString("HTTP/1.1 200 OK\r\n");
       response.appendString("Connection: close\r\n");
       response.appendString("Content-Length: ${length}\r\n");
       response.appendString("\r\n");
@@ -128,6 +131,7 @@ class HttpServer {
     content.write("<body>");
     for (String r in _publicFileList.keys) {
       content.write("<div><a href=./${r}>${r}</div>");
+      content.write("<video src=\"${r}\"><p>unsupport video tag</p></video>");
     }
     content.write("</body>");
     content.write("</html>");
@@ -135,7 +139,7 @@ class HttpServer {
     String cv = content.toString();
     List<int> b = convert.UTF8.encode(content.toString());
     StringBuffer response = new StringBuffer();
-    response.write("HTTP/1.1 200 OK'\r\n");
+    response.write("HTTP/1.1 200 OK\r\n");
     response.write("Connection: close\r\n");
     response.write("Content-Length: ${b.length}\r\n");
     response.write("Content-Type: text/html\r\n");
@@ -175,6 +179,7 @@ class HttpServer {
       if (end > (index+length)) {
         end = (index+length);
       }
+      print("####### ${start} ${end}");
       file.read(start, end).then((hetima.ReadResult readResult) {
         return socket.send(readResult.buffer);
       }).then((hetima.HetiSendInfo i) {
