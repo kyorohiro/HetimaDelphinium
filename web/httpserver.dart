@@ -137,7 +137,12 @@ class HttpServer {
     StringBuffer content = new StringBuffer();
     content.write("<html>");
     content.write("<body>");
-    content.write("<video src=\"${path}\" controls autoplay><p>unsupport video tag</p></video>");
+    if(isVideoFile(path)) {
+      content.write("<video src=\"${path}\" controls autoplay><p>unsupport video tag</p></video>");
+    }
+    else if(isAudioFile(path)){
+      content.write("<audio src=\"${path}\" controls autoplay><p>unsupport video tag</p></audio>");
+    }
     content.write("</body>");
     content.write("</html>");
 
@@ -158,17 +163,45 @@ class HttpServer {
     });
   }
 
-  bool isMovieFile(String path) {
-    if(path.endsWith(".mp4")) {
+  bool isVideoFile(String path) {
+    String type = contentType(path);
+    if(type.startsWith("video/")){
+      return true;
+    } else {
+      return false;
+    }
+  }
+  //
+  bool isAudioFile(String path) {
+    String type = contentType(path);
+    if(type.startsWith("audio/")){
       return true;
     } else {
       return false;
     }
   }
  
+  Map<String,String> contentTypeMap = {".mp4":"video/mp4",
+                                       ".ogv":"video/ogg",
+                                       ".webm":"video/webm",
+                                       ".m4v":"video/x-m4v",
+                                       ".flv":"video/x-flv",
+                                       ".wmv":"video/x-ms-wmv",
+                                       ".ogg":"audio/ogg",
+                                       ".oga":"audio/ogg",
+                                       ".m4a":"audio/aac",
+                                       ".mp3":"audio/mp3",
+                                       ".midi":"audio/midi",
+                                       ".mid":"audio/midi",
+                                      };
   String contentType(String path) {
-    if(path.endsWith(".mp4")){
-      return "video/mp4";
+    int index = path.lastIndexOf(".");
+    if(index <= 0) {
+      return "application/octet-stream";
+    }
+    String suffix = path.substring(index);
+    if(contentTypeMap.containsKey(suffix)) {
+      return contentTypeMap[suffix];      
     } else {
       return "application/octet-stream";
     }
@@ -179,7 +212,7 @@ class HttpServer {
     content.write("<body>");
     for (String r in _publicFileList.keys) {
       content.write("<div><a href=./${r}>${r}</a>");
-      if(isMovieFile("${r}")) {
+      if(isVideoFile("${r}")||isAudioFile("${r}")) {
         content.write("<a href=./${r}?preview=true>(preview)</a></div>");
       } else {
         content.write("</div>");        
