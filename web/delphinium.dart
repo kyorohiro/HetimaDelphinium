@@ -21,7 +21,7 @@ part 'mainview.dart';
 part 'httpserver.dart';
 part 'portmap.dart';
 part 'infopanel.dart';
-
+part 'swfplayer.dart';
 
 void main() {
   String downloadPath = "hetima";
