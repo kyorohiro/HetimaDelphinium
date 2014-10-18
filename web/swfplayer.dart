@@ -10,38 +10,13 @@ class SwfPlayerBuffer {
     return new hetima.HetimaBuilderToFile(builder);
   }
 
-  static hetima.HetimaFile createSwfObject() {
-    List<int> buffer = crypt.CryptoUtils.base64StringToBytes(swfobject);
-    hetima.ArrayBuilder builder = new hetima.ArrayBuilder.fromList(buffer);
-    return new hetima.HetimaBuilderToFile(builder);
-  }
 
   static String previewFlvHtml(String path) {
     return 
-   """<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><title></title><meta http-equiv="Content-Type" content="text/html; charset=utf-8" />"""+
-   """ <style type="text/css" media="screen"> """+
-   """ html, body  { height:100%; } \n"""+
-   """ body { margin:0; padding:0; overflow:auto; text-align:center; background-color: #ffffff; }  object:focus { outline:none; } \n"""+
-   """ #flashContent { display:none; } \n"""+
-   """ </style><script type="text/javascript" src="hetima.system.swfobject.js"></script><script type="text/javascript"> \n"""+
-   """ var swfVersionStr = "0.0.0"; \n"""+
-   """ var xiSwfUrlStr = "";\n"""+
-   """ var flashvars = {flvaddr:"${path}"};\n"""+
-   """ var params = {b:4}; \n"""+
-   """ params.quality = "high"; \n"""+
-   """ params.bgcolor = "#ffffff"; \n"""+
-   """ params.allowscriptaccess = "sameDomain"; \n"""+
-   """ params.allowfullscreen = "true"; \n"""+
-   """ var attributes = {}; \n"""+
-   """ attributes.id = "Player"; \n"""+
-   """ attributes.name = "Player"; \n"""+
-   """ attributes.align = "middle"; \n"""+
-   """ swfobject.embedSWF( \n"""+
-   """ "hetima.system.player.swf", "flashContent", \n"""+
-   """ "100%", "100%", \n"""+
-   """ swfVersionStr, xiSwfUrlStr, \n"""+
-   """ flashvars, params, attributes); \n"""+
-   """ swfobject.createCSS("#flashContent", "display:block;text-align:left;");\n"""+
-   """ </script></head><body><div id="flashContent"></div></body></html>\n""";
+"""<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><body>"""+
+"""<object type="application/x-shockwave-flash" data="hetima.system.player.swf" width="100%" height="100%">"""+
+"""<param name="FlashVars" value="flvaddr=${path}" />"""+
+"""<param name="quality" value="high"/><param name="bgcolor" value="#ffffff"/>"""+
+"""<param name="allowScriptAccess" value="sameDomain" /><param name="allowFullScreen" value="true" /></object></object></body></html>""";
   }
 }

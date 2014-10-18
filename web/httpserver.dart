@@ -29,13 +29,6 @@ class HttpServer {
       result.apath = "hetima.system";
       addFile(result.fname, result);
     }
-    {
-      FileSelectResult result = new FileSelectResult();
-      result.file = SwfPlayerBuffer.createSwfObject();
-      result.fname = "hetima.system.swfobject.js";
-      result.apath = "hetima.system";
-      addFile(result.fname, result);
-    }
   }
 
   void addFile(String name, FileSelectResult fileinfo) {
