@@ -8,68 +8,49 @@
 //    if this function is defined, the Dart [main] method will not be invoked
 //    directly. Instead, a closure that will invoke [main], and its arguments
 //    [args] is passed to [dartMainRunner].
+if (typeof($dart_deferred_initializers) === "undefined") $dart_deferred_initializers = Object.create(null);
 (function($) {
-function dart(){ this.x = 0 }var A = new dart;
-delete A.x;
+function dart() {
+  this.x = 0;
+  delete this.x;
+}
+var A = new dart;
 var B = new dart;
-delete B.x;
 var C = new dart;
-delete C.x;
 var D = new dart;
-delete D.x;
 var E = new dart;
-delete E.x;
 var F = new dart;
-delete F.x;
 var G = new dart;
-delete G.x;
 var H = new dart;
-delete H.x;
 var J = new dart;
-delete J.x;
 var K = new dart;
-delete K.x;
 var L = new dart;
-delete L.x;
 var M = new dart;
-delete M.x;
 var N = new dart;
-delete N.x;
 var O = new dart;
-delete O.x;
 var P = new dart;
-delete P.x;
 var Q = new dart;
-delete Q.x;
 var R = new dart;
-delete R.x;
 var S = new dart;
-delete S.x;
 var T = new dart;
-delete T.x;
 var U = new dart;
-delete U.x;
 var V = new dart;
-delete V.x;
 var W = new dart;
-delete W.x;
 var X = new dart;
-delete X.x;
 var Y = new dart;
-delete Y.x;
 var Z = new dart;
-delete Z.x;
 function Isolate() {}
 init();
 
 $ = Isolate.$isolateProperties;
-var $$ = {};
+var $$ = Object.create(null);
 
 // Native classes
 (function(reflectionData) {
   "use strict";
   function map(x) {
-    x = {x: x};
+    x = Object.create(null);
+    x.x = 0;
     delete x.x;
     return x;
   }
@@ -331,7 +312,7 @@ var $$ = {};
     noSuchMethod$1: [function(receiver, invocation) {
       throw H.wrapException(P.NoSuchMethodError$(receiver, invocation.get$memberName(), invocation.get$positionalArguments(), invocation.get$namedArguments(), null));
     }, "call$1", "get$noSuchMethod", 2, 0, null, 51],
-    "%": "DOMImplementation|MediaError|MediaKeyError|Navigator|SVGAnimatedEnumeration|SVGAnimatedLength|SVGAnimatedLengthList|SVGAnimatedNumber|SVGAnimatedNumberList|SVGAnimatedString"
+    "%": "DOMImplementation|MediaError|MediaKeyError|Navigator|NavigatorCPU|PushManager|Request|SVGAnimatedEnumeration|SVGAnimatedLength|SVGAnimatedLengthList|SVGAnimatedNumber|SVGAnimatedNumberList|SVGAnimatedString"
   },
   JSBool: {
     "^": "Interceptor;",
@@ -375,6 +356,14 @@ var $$ = {};
   },
   JSArray: {
     "^": "Interceptor;",
+    checkMutable$1: function(receiver, reason) {
+      if (!!receiver.immutable$list)
+        throw H.wrapException(P.UnsupportedError$(reason));
+    },
+    checkGrowable$1: function(receiver, reason) {
+      if (!!receiver.fixed$length)
+        throw H.wrapException(P.UnsupportedError$(reason));
+    },
     add$1: function(receiver, value) {
       if (!!receiver.fixed$length)
         H.throwExpression(P.UnsupportedError$("add"));
@@ -383,14 +372,12 @@ var $$ = {};
     removeAt$1: function(receiver, index) {
       if (index < 0 || index >= receiver.length)
         throw H.wrapException(P.RangeError$value(index));
-      if (!!receiver.fixed$length)
-        H.throwExpression(P.UnsupportedError$("removeAt"));
+      this.checkGrowable$1(receiver, "removeAt");
       return receiver.splice(index, 1)[0];
     },
     remove$1: function(receiver, element) {
       var i;
-      if (!!receiver.fixed$length)
-        H.throwExpression(P.UnsupportedError$("remove"));
+      this.checkGrowable$1(receiver, "remove");
       for (i = 0; i < receiver.length; ++i)
         if (J.$eq(receiver[i], element)) {
           receiver.splice(i, 1);
@@ -407,7 +394,17 @@ var $$ = {};
         this.add$1(receiver, t1.get$current());
     },
     forEach$1: function(receiver, f) {
-      return H.IterableMixinWorkaround_forEach(receiver, f);
+      var t1, $length, i;
+      t1 = new J.JSArray_forEach_getLength(receiver);
+      $length = t1.call$0();
+      if (typeof $length !== "number")
+        return H.iae($length);
+      i = 0;
+      for (; i < $length; ++i) {
+        f.call$1(receiver[i]);
+        if ($length !== t1.call$0())
+          throw H.wrapException(P.ConcurrentModificationError$(receiver));
+      }
     },
     map$1: function(receiver, f) {
       return H.setRuntimeTypeInfo(new H.MappedListIterable(receiver, f), [null, null]);
@@ -431,20 +428,14 @@ var $$ = {};
       return receiver[index];
     },
     sublist$2: function(receiver, start, end) {
-      if (start == null)
-        H.throwExpression(P.ArgumentError$(null));
       if (typeof start !== "number" || Math.floor(start) !== start)
         throw H.wrapException(P.ArgumentError$(start));
       if (start < 0 || start > receiver.length)
         throw H.wrapException(P.RangeError$range(start, 0, receiver.length));
-      if (end == null)
-        end = receiver.length;
-      else {
-        if (typeof end !== "number" || Math.floor(end) !== end)
-          throw H.wrapException(P.ArgumentError$(end));
-        if (end < start || end > receiver.length)
-          throw H.wrapException(P.RangeError$range(end, start, receiver.length));
-      }
+      if (typeof end !== "number" || Math.floor(end) !== end)
+        throw H.wrapException(P.ArgumentError$(end));
+      if (end < start || end > receiver.length)
+        throw H.wrapException(P.RangeError$range(end, start, receiver.length));
       if (start === end)
         return H.setRuntimeTypeInfo([], [H.getTypeArgumentByIndex(receiver, 0)]);
       return H.setRuntimeTypeInfo(receiver.slice(start, end), [H.getTypeArgumentByIndex(receiver, 0)]);
@@ -509,8 +500,7 @@ var $$ = {};
         throw H.wrapException(P.ArgumentError$(newLength));
       if (newLength < 0)
         throw H.wrapException(P.RangeError$value(newLength));
-      if (!!receiver.fixed$length)
-        H.throwExpression(P.UnsupportedError$("set length"));
+      this.checkGrowable$1(receiver, "set length");
       receiver.length = newLength;
     },
     $index: function(receiver, index) {
@@ -521,8 +511,7 @@ var $$ = {};
       return receiver[index];
     },
     $indexSet: function(receiver, index, value) {
-      if (!!receiver.immutable$list)
-        H.throwExpression(P.UnsupportedError$("indexed set"));
+      this.checkMutable$1(receiver, "indexed set");
       if (typeof index !== "number" || Math.floor(index) !== index)
         throw H.wrapException(P.ArgumentError$(index));
       if (index >= receiver.length || index < 0)
@@ -536,6 +525,13 @@ var $$ = {};
     $isEfficientLength: true,
     $isIterable: true,
     $asIterable: null
+  },
+  JSArray_forEach_getLength: {
+    "^": "Closure:52;this_0",
+    call$0: function() {
+      return this.this_0.length;
+    },
+    $isFunction: true
   },
   JSNumber: {
     "^": "Interceptor;",
@@ -725,25 +721,15 @@ var $$ = {};
       return receiver.charCodeAt(index);
     },
     matchAsPrefix$2: function(receiver, string, start) {
-      var t1, t2, i, t3;
+      var t1, i;
       if (start < 0 || start > string.length)
         throw H.wrapException(P.RangeError$range(start, 0, string.length));
       t1 = receiver.length;
-      t2 = string.length;
-      if (start + t1 > t2)
+      if (start + t1 > string.length)
         return;
-      for (i = 0; i < t1; ++i) {
-        t3 = start + i;
-        if (t3 < 0)
-          H.throwExpression(P.RangeError$value(t3));
-        if (t3 >= t2)
-          H.throwExpression(P.RangeError$value(t3));
-        t3 = string.charCodeAt(t3);
-        if (i >= t1)
-          H.throwExpression(P.RangeError$value(i));
-        if (t3 !== receiver.charCodeAt(i))
+      for (i = 0; i < t1; ++i)
+        if (this.codeUnitAt$1(string, start + i) !== this.codeUnitAt$1(receiver, i))
           return;
-      }
       return new H.StringMatch(start, string, receiver);
     },
     $add: function(receiver, other) {
@@ -752,13 +738,18 @@ var $$ = {};
       return receiver + other;
     },
     replaceAll$2: function(receiver, from, to) {
+      H.checkString(to);
       return H.stringReplaceAllUnchecked(receiver, from, to);
     },
     replaceAllMapped$2: function(receiver, from, convert) {
       return H.stringReplaceAllFuncUnchecked(receiver, from, convert, null);
     },
+    split$1: function(receiver, pattern) {
+      return receiver.split(pattern);
+    },
     startsWith$2: function(receiver, pattern, index) {
       var endIndex;
+      H.checkInt(index);
       if (index > receiver.length)
         throw H.wrapException(P.RangeError$range(index, 0, receiver.length));
       endIndex = index + pattern.length;
@@ -770,14 +761,10 @@ var $$ = {};
       return this.startsWith$2($receiver, pattern, 0);
     },
     substring$2: function(receiver, startIndex, endIndex) {
-      if (typeof startIndex !== "number" || Math.floor(startIndex) !== startIndex)
-        H.throwExpression(P.ArgumentError$(startIndex));
+      H.checkInt(startIndex);
       if (endIndex == null)
         endIndex = receiver.length;
-      if (typeof endIndex !== "number" || Math.floor(endIndex) !== endIndex)
-        H.throwExpression(P.ArgumentError$(endIndex));
-      if (typeof startIndex !== "number")
-        return startIndex.$lt();
+      H.checkInt(endIndex);
       if (startIndex < 0)
         throw H.wrapException(P.RangeError$value(startIndex));
       if (typeof endIndex !== "number")
@@ -956,21 +943,17 @@ var $$ = {};
       }, JSString__skipLeadingWhitespace: function(string, index) {
         var t1, codeUnit;
         for (t1 = string.length; index < t1;) {
-          if (index >= t1)
-            H.throwExpression(P.RangeError$value(index));
-          codeUnit = string.charCodeAt(index);
+          codeUnit = C.JSString_methods.codeUnitAt$1(string, index);
           if (codeUnit !== 32 && codeUnit !== 13 && !J.JSString__isWhitespace(codeUnit))
             break;
           ++index;
         }
         return index;
       }, JSString__skipTrailingWhitespace: function(string, index) {
-        var t1, index0, codeUnit;
-        for (t1 = string.length; index > 0; index = index0) {
+        var index0, codeUnit;
+        for (; index > 0; index = index0) {
           index0 = index - 1;
-          if (index0 >= t1)
-            H.throwExpression(P.RangeError$value(index0));
-          codeUnit = string.charCodeAt(index0);
+          codeUnit = C.JSString_methods.codeUnitAt$1(string, index0);
           if (codeUnit !== 32 && codeUnit !== 13 && !J.JSString__isWhitespace(codeUnit))
             break;
         }
@@ -1072,7 +1055,7 @@ var $$ = {};
       case "start":
         init.globalState.currentManagerId = t1.$index(msg, "id");
         functionName = t1.$index(msg, "functionName");
-        entryPoint = functionName == null ? init.globalState.entry : init.globalFunctions[functionName]();
+        entryPoint = functionName == null ? init.globalState.entry : H.IsolateNatives__getJSFunctionFromName(functionName);
         args = t1.$index(msg, "args");
         message = H._deserializeMessage(t1.$index(msg, "msg"));
         isSpawnUri = t1.$index(msg, "isSpawnUri");
@@ -1134,6 +1117,9 @@ var $$ = {};
       }
 
   },
+  IsolateNatives__getJSFunctionFromName: function(functionName) {
+    return init.globalFunctions[functionName]();
+  },
   IsolateNatives__startIsolate: function(topLevel, args, message, isSpawnUri, startPaused, replyTo) {
     var context, t1, t2, t3;
     context = init.globalState.currentContext;
@@ -1176,14 +1162,14 @@ var $$ = {};
     return x == null || typeof x === "string" || typeof x === "number" || typeof x === "boolean";
   },
   startRootIsolate_closure: {
-    "^": "Closure:52;box_0,entry_1",
+    "^": "Closure:53;box_0,entry_1",
     call$0: function() {
       this.entry_1.call$1(this.box_0.args_0);
     },
     $isFunction: true
   },
   startRootIsolate_closure0: {
-    "^": "Closure:52;box_0,entry_2",
+    "^": "Closure:53;box_0,entry_2",
     call$0: function() {
       this.entry_2.call$2(this.box_0.args_0, null);
     },
@@ -1203,10 +1189,7 @@ var $$ = {};
         t2 = true;
       this.supportsWorkers = t2;
       this.fromCommandLine = t1 && !t3;
-      t2 = H._IsolateEvent;
-      t3 = H.setRuntimeTypeInfo(new P.ListQueue(null, 0, 0, 0), [t2]);
-      t3.ListQueue$1(null, t2);
-      this.topEventLoop = new H._EventLoop(t3, 0);
+      this.topEventLoop = new H._EventLoop(P.ListQueue$(null, H._IsolateEvent), 0);
       this.isolates = P.LinkedHashMap_LinkedHashMap(null, null, null, P.$int, H._IsolateContext);
       this.managers = P.LinkedHashMap_LinkedHashMap(null, null, null, P.$int, null);
       if (this.isWorker === true) {
@@ -1308,8 +1291,7 @@ var $$ = {};
       }
       t1 = this._scheduledControlEvents;
       if (t1 == null) {
-        t1 = H.setRuntimeTypeInfo(new P.ListQueue(null, 0, 0, 0), [null]);
-        t1.ListQueue$1(null, null);
+        t1 = P.ListQueue$(null, null);
         this._scheduledControlEvents = t1;
       }
       t1._add$1(t2);
@@ -1335,8 +1317,7 @@ var $$ = {};
       }
       t1 = this._scheduledControlEvents;
       if (t1 == null) {
-        t1 = H.setRuntimeTypeInfo(new P.ListQueue(null, 0, 0, 0), [null]);
-        t1.ListQueue$1(null, null);
+        t1 = P.ListQueue$(null, null);
         this._scheduledControlEvents = t1;
       }
       t1._add$1(this.get$kill());
@@ -1447,7 +1428,7 @@ var $$ = {};
       if (t1 != null)
         t1.clear$0(0);
       for (t1 = this.ports, t2 = t1.get$values(t1), t2 = H.setRuntimeTypeInfo(new H.MappedIterator(null, J.get$iterator$ax(t2._iterable), t2._f), [H.getTypeArgumentByIndex(t2, 0), H.getTypeArgumentByIndex(t2, 1)]); t2.moveNext$0();)
-        t2._current.__isolate_helper$_close$0();
+        t2.__internal$_current.__isolate_helper$_close$0();
       t1.clear$0(0);
       this.weakPorts.clear$0(0);
       init.globalState.isolates.remove$1(0, this.id);
@@ -1455,7 +1436,7 @@ var $$ = {};
       t1 = this.doneHandlers;
       if (t1 != null) {
         for (t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();)
-          J.send$1$x(t1._current, null);
+          J.send$1$x(t1.__internal$_current, null);
         this.doneHandlers = null;
       }
     }, "call$0", "get$kill", 0, 0, 26]
@@ -1543,7 +1524,7 @@ var $$ = {};
     "^": "Object;"
   },
   IsolateNatives__processWorkerMessage_closure: {
-    "^": "Closure:52;entryPoint_0,args_1,message_2,isSpawnUri_3,startPaused_4,replyTo_5",
+    "^": "Closure:53;entryPoint_0,args_1,message_2,isSpawnUri_3,startPaused_4,replyTo_5",
     call$0: [function() {
       H.IsolateNatives__startIsolate(this.entryPoint_0, this.args_1, this.message_2, this.isSpawnUri_3, this.startPaused_4, this.replyTo_5);
     }, "call$0", null, 0, 0, null, "call"],
@@ -1615,7 +1596,7 @@ var $$ = {};
     $isCapability: true
   },
   _NativeJsSendPort_send_closure: {
-    "^": "Closure:52;box_0,this_1,shouldSerialize_2",
+    "^": "Closure:53;box_0,this_1,shouldSerialize_2",
     call$0: [function() {
       var t1, t2;
       t1 = this.this_1._receivePort;
@@ -1702,6 +1683,12 @@ var $$ = {};
       if (!!x.$isCapabilityImpl)
         return ["capability", x._id];
       throw H.wrapException("Capability not serializable: " + x.toString$0(0));
+    },
+    visitFunction$1: function(topLevelFunction) {
+      var $name = !!topLevelFunction.$isClosure ? topLevelFunction.$name : null;
+      if ($name == null)
+        throw H.wrapException(P.UnsupportedError$("only top-level functions can be sent."));
+      return ["function", $name];
     }
   },
   _JsCopier: {
@@ -1717,6 +1704,12 @@ var $$ = {};
       if (!!x.$isCapabilityImpl)
         return new H.CapabilityImpl(x._id);
       throw H.wrapException("Capability not serializable: " + x.toString$0(0));
+    },
+    visitFunction$1: function(topLevelFunction) {
+      var $name = !!topLevelFunction.$isClosure ? topLevelFunction.$name : null;
+      if ($name == null)
+        throw H.wrapException(P.UnsupportedError$("only top-level functions can be sent."));
+      return H.IsolateNatives__getJSFunctionFromName($name);
     }
   },
   _JsDeserializer: {
@@ -1740,6 +1733,9 @@ var $$ = {};
     },
     deserializeCapability$1: function(list) {
       return new H.CapabilityImpl(J.$index$asx(list, 1));
+    },
+    deserializeFunction$1: function(list) {
+      return H.IsolateNatives__getJSFunctionFromName(J.$index$asx(list, 1));
     }
   },
   _JsVisitedMap: {
@@ -1805,6 +1801,8 @@ var $$ = {};
         return this.visitSendPort$1(x);
       if (!!t1.$isCapability)
         return this.visitCapability$1(x);
+      if (!!t1.$isFunction)
+        return this.visitFunction$1(x);
       return this.visitObject$1(x);
     },
     visitObject$1: function(x) {
@@ -1843,6 +1841,9 @@ var $$ = {};
       map.forEach$1(0, new H._Copier_visitMap_closure(t1, this));
       return t1.copy_0;
     },
+    visitFunction$1: function(f) {
+      return H.throwExpression(P.UnimplementedError$(null));
+    },
     visitSendPort$1: function(x) {
       return H.throwExpression(P.UnimplementedError$(null));
     },
@@ -1851,7 +1852,7 @@ var $$ = {};
     }
   },
   _Copier_visitMap_closure: {
-    "^": "Closure:53;box_0,this_1",
+    "^": "Closure:54;box_0,this_1",
     call$2: function(key, val) {
       var t1 = this.this_1;
       J.$indexSet$ax(this.box_0.copy_0, t1._dispatch$1(key), t1._dispatch$1(val));
@@ -1900,6 +1901,9 @@ var $$ = {};
     },
     visitCapability$1: function(x) {
       return H.throwExpression(P.UnimplementedError$(null));
+    },
+    visitFunction$1: function(f) {
+      return H.throwExpression(P.UnimplementedError$(null));
     }
   },
   _Deserializer: {
@@ -1927,6 +1931,8 @@ var $$ = {};
           return this.deserializeSendPort$1(x);
         case "capability":
           return this.deserializeCapability$1(x);
+        case "function":
+          return this.deserializeFunction$1(x);
         default:
           return this.deserializeObject$1(x);
       }
@@ -2103,8 +2109,7 @@ var $$ = {};
   Primitives_parseInt: function(source, radix, handleError) {
     var match, t1, maxCharCode, digitsPart, i, t2;
     handleError = H.Primitives__throwFormatException$closure();
-    if (typeof source !== "string")
-      H.throwExpression(P.ArgumentError$(source));
+    H.checkString(source);
     match = /^\s*[+-]?((0x[a-f0-9]+)|(\d+)|([a-z0-9]+))\s*$/i.exec(source);
     if (radix == null) {
       if (match != null) {
@@ -2200,7 +2205,7 @@ var $$ = {};
     a = [];
     a.$builtinTypeInfo = [P.$int];
     for (t1 = new H.ListIterator(codePoints, codePoints.length, 0, null); t1.moveNext$0();) {
-      i = t1._current;
+      i = t1.__internal$_current;
       if (typeof i !== "number" || Math.floor(i) !== i)
         throw H.wrapException(P.ArgumentError$(i));
       if (i <= 65535)
@@ -2216,7 +2221,7 @@ var $$ = {};
   Primitives_stringFromCharCodes: function(charCodes) {
     var t1, i;
     for (t1 = new H.ListIterator(charCodes, charCodes.length, 0, null); t1.moveNext$0();) {
-      i = t1._current;
+      i = t1.__internal$_current;
       if (typeof i !== "number" || Math.floor(i) !== i)
         throw H.wrapException(P.ArgumentError$(i));
       if (i < 0)
@@ -2313,6 +2318,16 @@ var $$ = {};
     if (typeof index !== "number" || Math.floor(index) !== index)
       H.iae(index);
     throw H.wrapException(P.RangeError$value(index));
+  },
+  checkInt: function(value) {
+    if (typeof value !== "number" || Math.floor(value) !== value)
+      throw H.wrapException(P.ArgumentError$(value));
+    return value;
+  },
+  checkString: function(value) {
+    if (typeof value !== "string")
+      throw H.wrapException(P.ArgumentError$(value));
+    return value;
   },
   wrapException: function(ex) {
     var wrapper;
@@ -2716,6 +2731,9 @@ var $$ = {};
       return value;
     H.propertyTypeCastError(value, property);
   },
+  throwNoSuchMethod: function(obj, $name, $arguments, expectedArgumentNames) {
+    throw H.wrapException(P.NoSuchMethodError$(obj, new H.Symbol0($name), $arguments, P.LinkedHashMap_LinkedHashMap(null, null, null, P.Symbol, null), expectedArgumentNames));
+  },
   throwCyclicInit: function(staticName) {
     throw H.wrapException(P.CyclicInitializationError$("Cyclic initialization for static " + H.S(staticName)));
   },
@@ -2728,8 +2746,8 @@ var $$ = {};
   random64: function() {
     return (Math.random() * 0x100000000 >>> 0) + (Math.random() * 0x100000000 >>> 0) * 4294967296;
   },
-  createRuntimeType: function($name) {
-    return new H.TypeImpl($name, null);
+  getIsolateAffinityTag: function($name) {
+    return init.getIsolateTag($name);
   },
   setRuntimeTypeInfo: function(target, typeInfo) {
     if (target != null)
@@ -3008,10 +3026,8 @@ var $$ = {};
       return H.patchInteriorProto(obj, interceptor);
   },
   patchInteriorProto: function(obj, interceptor) {
-    var proto, record;
-    proto = Object.getPrototypeOf(obj);
-    record = J.makeDispatchRecord(interceptor, proto, null, null);
-    Object.defineProperty(proto, init.dispatchPropertyName, {value: record, enumerable: false, writable: true, configurable: true});
+    var proto = Object.getPrototypeOf(obj);
+    Object.defineProperty(proto, init.dispatchPropertyName, {value: J.makeDispatchRecord(interceptor, proto, null, null), enumerable: false, writable: true, configurable: true});
     return interceptor;
   },
   makeLeafDispatchRecord: function(interceptor) {
@@ -3095,6 +3111,7 @@ var $$ = {};
   },
   stringReplaceAllUnchecked: function(receiver, from, to) {
     var result, $length, i, t1, nativeRegexp;
+    H.checkString(to);
     if (typeof from === "string")
       if (from === "")
         if (receiver === "")
@@ -3108,7 +3125,8 @@ var $$ = {};
             t1 = result._contents += t1;
             result._contents = t1 + to;
           }
-          return result._contents;
+          t1 = result._contents;
+          return t1.charCodeAt(0) == 0 ? t1 : t1;
         }
       else
         return receiver.replace(new RegExp(from.replace(new RegExp("[[\\]{}()*+?.\\\\^$|]", 'g'), "\\$&"), 'g'), to.replace(/\$/g, "$$$$"));
@@ -3151,7 +3169,8 @@ var $$ = {};
       startIndex = t3 + t2;
     }
     buffer.write$1(onNonMatch.call$1(C.JSString_methods.substring$1(receiver, startIndex)));
-    return buffer._contents;
+    t1 = buffer._contents;
+    return t1.charCodeAt(0) == 0 ? t1 : t1;
   },
   ConstantMap: {
     "^": "Object;",
@@ -3209,7 +3228,7 @@ var $$ = {};
     "^": "Closure:21;this_0",
     call$1: [function(key) {
       return this.this_0._fetch$1(key);
-    }, "call$1", null, 2, 0, null, 54, "call"],
+    }, "call$1", null, 2, 0, null, 55, "call"],
     $isFunction: true
   },
   _ConstantMapKeyIterable: {
@@ -3309,9 +3328,10 @@ var $$ = {};
         t1.index_0 = 0;
         t2 = positions.get$keys();
         t2 = P.List_List$from(t2, true, H.getRuntimeTypeArgument(t2, "IterableBase", 0));
+        C.JSArray_methods.checkMutable$1(t2, "sort");
         compare = P.Comparable_compare$closure();
         H.Sort__doSort(t2, 0, t2.length - 1, compare);
-        H.IterableMixinWorkaround_forEach(t2, new H.ReflectionInfo_sortedIndex_closure(t1, this, positions));
+        C.JSArray_methods.forEach$1(t2, new H.ReflectionInfo_sortedIndex_closure(t1, this, positions));
       }
       t1 = this.cachedSortedIndices;
       if (unsortedIndex < 0 || unsortedIndex >= t1.length)
@@ -3344,7 +3364,7 @@ var $$ = {};
     $isFunction: true
   },
   Primitives_functionNoSuchMethod_closure: {
-    "^": "Closure:55;box_0,arguments_1,namedArgumentList_2",
+    "^": "Closure:56;box_0,arguments_1,namedArgumentList_2",
     call$2: function($name, argument) {
       var t1 = this.box_0;
       t1.names_1 = t1.names_1 + "$" + H.S($name);
@@ -3355,7 +3375,7 @@ var $$ = {};
     $isFunction: true
   },
   Primitives_applyFunction_closure: {
-    "^": "Closure:55;box_0,defaultArguments_1",
+    "^": "Closure:56;box_0,defaultArguments_1",
     call$2: function(parameter, value) {
       var t1 = this.defaultArguments_1;
       if (t1.containsKey$1(parameter))
@@ -3372,7 +3392,7 @@ var $$ = {};
       match = new RegExp(this._pattern).exec(message);
       if (match == null)
         return;
-      result = {};
+      result = Object.create(null);
       t1 = this._arguments;
       if (t1 !== -1)
         result.arguments = match[t1 + 1];
@@ -3486,35 +3506,35 @@ var $$ = {};
     }
   },
   invokeClosure_closure: {
-    "^": "Closure:52;closure_0",
+    "^": "Closure:53;closure_0",
     call$0: function() {
       return this.closure_0.call$0();
     },
     $isFunction: true
   },
   invokeClosure_closure0: {
-    "^": "Closure:52;closure_1,arg1_2",
+    "^": "Closure:53;closure_1,arg1_2",
     call$0: function() {
       return this.closure_1.call$1(this.arg1_2);
     },
     $isFunction: true
   },
   invokeClosure_closure1: {
-    "^": "Closure:52;closure_3,arg1_4,arg2_5",
+    "^": "Closure:53;closure_3,arg1_4,arg2_5",
     call$0: function() {
       return this.closure_3.call$2(this.arg1_4, this.arg2_5);
     },
     $isFunction: true
   },
   invokeClosure_closure2: {
-    "^": "Closure:52;closure_6,arg1_7,arg2_8,arg3_9",
+    "^": "Closure:53;closure_6,arg1_7,arg2_8,arg3_9",
     call$0: function() {
       return this.closure_6.call$3(this.arg1_7, this.arg2_8, this.arg3_9);
     },
     $isFunction: true
   },
   invokeClosure_closure3: {
-    "^": "Closure:52;closure_10,arg1_11,arg2_12,arg3_13,arg4_14",
+    "^": "Closure:53;closure_10,arg1_11,arg2_12,arg3_13,arg4_14",
     call$0: function() {
       return this.closure_10.call$4(this.arg1_11, this.arg2_12, this.arg3_13, this.arg4_14);
     },
@@ -3525,6 +3545,7 @@ var $$ = {};
     toString$0: function(_) {
       return "Closure";
     },
+    $isClosure: true,
     $isFunction: true,
     get$$call: function() {
       return this;
@@ -3627,7 +3648,7 @@ var $$ = {};
         result.opt = H.RuntimeFunctionType_listToRti(t1);
       t1 = this.namedParameters;
       if (t1 != null) {
-        namedRti = {};
+        namedRti = Object.create(null);
         keys = H.extractKeys(t1);
         for (t2 = keys.length, i = 0; i < t2; ++i) {
           $name = keys[i];
@@ -3696,29 +3717,6 @@ var $$ = {};
     },
     $isDynamicRuntimeType: true
   },
-  TypeImpl: {
-    "^": "Object;_typeName,_unmangledName",
-    toString$0: function(_) {
-      var t1, unmangledName;
-      t1 = this._unmangledName;
-      if (t1 != null)
-        return t1;
-      unmangledName = this._typeName.replace(/[^<,> ]+/g, function(m) {
-        return init.mangledGlobalNames[m] || m;
-      });
-      this._unmangledName = unmangledName;
-      return unmangledName;
-    },
-    get$hashCode: function(_) {
-      return J.get$hashCode$(this._typeName);
-    },
-    $eq: function(_, other) {
-      if (other == null)
-        return false;
-      return !!J.getInterceptor(other).$isTypeImpl && J.$eq(this._typeName, other._typeName);
-    },
-    $isTypeImpl: true
-  },
   initHooks_closure: {
     "^": "Closure:21;getTag_0",
     call$1: function(o) {
@@ -3727,7 +3725,7 @@ var $$ = {};
     $isFunction: true
   },
   initHooks_closure0: {
-    "^": "Closure:56;getUnknownTag_1",
+    "^": "Closure:57;getUnknownTag_1",
     call$2: function(o, tag) {
       return this.getUnknownTag_1(o, tag);
     },
@@ -3762,8 +3760,8 @@ var $$ = {};
     },
     allMatches$2: function(_, string, start) {
       var t1;
-      if (typeof string !== "string")
-        H.throwExpression(P.ArgumentError$(string));
+      H.checkString(string);
+      H.checkInt(start);
       t1 = J.get$length$asx(string);
       if (typeof t1 !== "number")
         return H.iae(t1);
@@ -3809,6 +3807,7 @@ var $$ = {};
     $isPattern: true,
     static: {JSSyntaxRegExp_makeNative: function(source, multiLine, caseSensitive, global) {
         var m, i, g, regexp, errorMessage;
+        H.checkString(source);
         m = multiLine ? "m" : "";
         i = caseSensitive ? "" : "i";
         g = global ? "g" : "";
@@ -3921,9 +3920,7 @@ var $$ = {};
       return this.get$end().call$0();
     },
     $index: function(_, g) {
-      if (!J.$eq(g, 0))
-        H.throwExpression(P.RangeError$value(g));
-      return this.pattern;
+      return this.group$1(g);
     },
     group$1: function(group_) {
       if (!J.$eq(group_, 0))
@@ -3958,7 +3955,7 @@ var $$ = {};
       }}
   },
   ChromeAppRuntime$__closure: {
-    "^": "Closure:52;this_0",
+    "^": "Closure:53;this_0",
     call$0: function() {
       return J.$index$asx(J.$index$asx($.get$chrome(), "app"), "runtime");
     },
@@ -3994,7 +3991,7 @@ var $$ = {};
     }
   },
   _ChromeAppWindow$__closure: {
-    "^": "Closure:52;this_0",
+    "^": "Closure:53;this_0",
     call$0: function() {
       return J.$index$asx(J.$index$asx($.get$chrome(), "app"), "window");
     },
@@ -4022,7 +4019,7 @@ var $$ = {};
     }
   },
   AppWindow_onClosed_closure: {
-    "^": "Closure:52;this_0",
+    "^": "Closure:53;this_0",
     call$0: [function() {
       var t1 = this.this_0._onClosedStream;
       if (t1._state >= 4)
@@ -4082,7 +4079,7 @@ var $$ = {};
       }}
   },
   ChromeSocketsTcp$__closure: {
-    "^": "Closure:52;this_0",
+    "^": "Closure:53;this_0",
     call$0: function() {
       return J.$index$asx(J.$index$asx($.get$chrome(), "sockets"), "tcp");
     },
@@ -4143,7 +4140,7 @@ var $$ = {};
       }}
   },
   ChromeSocketsTcpServer$__closure: {
-    "^": "Closure:52;this_0",
+    "^": "Closure:53;this_0",
     call$0: function() {
       return J.$index$asx(J.$index$asx($.get$chrome(), "sockets"), "tcpServer");
     },
@@ -4184,7 +4181,7 @@ var $$ = {};
       }}
   },
   ChromeSocketsUdp$__closure: {
-    "^": "Closure:52;this_0",
+    "^": "Closure:53;this_0",
     call$0: function() {
       return J.$index$asx(J.$index$asx($.get$chrome(), "sockets"), "udp");
     },
@@ -4271,24 +4268,20 @@ var $$ = {};
       }}
   },
   ChromeCompleter$noArgs_closure: {
-    "^": "Closure:52;this_0",
+    "^": "Closure:53;this_0",
     call$0: [function() {
       var le, t1;
       le = F.lastError();
       t1 = this.this_0;
       if (le != null)
         t1._completer.completeError$1(le);
-      else {
-        t1 = t1._completer.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(null);
-      }
+      else
+        t1._completer.complete$0(0);
     }, "call$0", null, 0, 0, null, "call"],
     $isFunction: true
   },
   ChromeCompleter$oneArg_closure: {
-    "^": "Closure:57;this_0,transformer_1",
+    "^": "Closure:58;this_0,transformer_1",
     call$1: [function(arg1) {
       var le, t1;
       le = F.lastError();
@@ -4298,10 +4291,7 @@ var $$ = {};
         t1 = this.transformer_1;
         if (t1 != null)
           arg1 = t1.call$1(arg1);
-        t1 = this.this_0._completer.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(arg1);
+        this.this_0._completer.complete$1(0, arg1);
       }
     }, function() {
       return this.call$1(null);
@@ -4352,7 +4342,7 @@ var $$ = {};
       }}
   },
   ChromeStreamController$noArgs_closure: {
-    "^": "Closure:52;this_0",
+    "^": "Closure:53;this_0",
     call$0: [function() {
       var t1 = this.this_0._controller;
       if (t1._state >= 4)
@@ -4362,7 +4352,7 @@ var $$ = {};
     $isFunction: true
   },
   ChromeStreamController$oneArg_closure: {
-    "^": "Closure:57;this_0,transformer_1,returnVal_2",
+    "^": "Closure:58;this_0,transformer_1,returnVal_2",
     call$1: [function(arg1) {
       var t1, t2;
       t1 = this.this_0._controller;
@@ -4458,7 +4448,7 @@ var $$ = {};
       }}
   },
   ChromeSystemDisplay$__closure: {
-    "^": "Closure:52;this_0",
+    "^": "Closure:53;this_0",
     call$0: function() {
       return J.$index$asx(J.$index$asx($.get$chrome(), "system"), "display");
     },
@@ -4515,7 +4505,7 @@ var $$ = {};
       }}
   },
   ChromeSystemStorage$__closure: {
-    "^": "Closure:52;this_0",
+    "^": "Closure:53;this_0",
     call$0: function() {
       return J.$index$asx(J.$index$asx($.get$chrome(), "system"), "storage");
     },
@@ -4540,7 +4530,7 @@ var $$ = {};
     }
   },
   _createStorageUnitType_closure: {
-    "^": "Closure:58;value_0",
+    "^": "Closure:59;value_0",
     call$1: function(e) {
       return J.$eq(J.get$value$x(e), this.value_0);
     },
@@ -4555,9 +4545,7 @@ var $$ = {};
     if (len === 0)
       return H.setRuntimeTypeInfo(Array(0), [P.$int]);
     for (extrasLen = 0, i = 0; i < len; ++i) {
-      if (i >= len)
-        H.throwExpression(P.RangeError$value(i));
-      t1 = input.charCodeAt(i);
+      t1 = C.JSString_methods.codeUnitAt$1(input, i);
       if (t1 >= 256)
         return H.ioore(C.List_q3m, t1);
       c = C.List_q3m[t1];
@@ -4571,9 +4559,7 @@ var $$ = {};
     if (C.JSInt_methods.$mod(t1, 4) !== 0)
       throw H.wrapException(P.FormatException$("Size of Base 64 characters in Input\n          must be a multiple of 4. Input: " + input, null, null));
     for (i = len - 1, padLength = 0; i >= 0; --i) {
-      if (i >= len)
-        H.throwExpression(P.RangeError$value(i));
-      currentCodeUnit = input.charCodeAt(i);
+      currentCodeUnit = C.JSString_methods.codeUnitAt$1(input, i);
       if (currentCodeUnit >= 256)
         return H.ioore(C.List_q3m, currentCodeUnit);
       if (C.List_q3m[currentCodeUnit] > 0)
@@ -4586,11 +4572,7 @@ var $$ = {};
     for (t1 = out.length, i = 0, o = 0; o < outputLen;) {
       for (x = 0, j = 4; j > 0; i = i0) {
         i0 = i + 1;
-        if (i < 0)
-          H.throwExpression(P.RangeError$value(i));
-        if (i >= len)
-          H.throwExpression(P.RangeError$value(i));
-        t2 = input.charCodeAt(i);
+        t2 = C.JSString_methods.codeUnitAt$1(input, i);
         if (t2 >= 256)
           return H.ioore(C.List_q3m, t2);
         c = C.List_q3m[t2];
@@ -5030,23 +5012,23 @@ var $$ = {};
       }}
   },
   ListIterator: {
-    "^": "Object;_iterable,_length,_index,_current",
+    "^": "Object;_iterable,__internal$_length,_index,__internal$_current",
     get$current: function() {
-      return this._current;
+      return this.__internal$_current;
     },
     moveNext$0: function() {
       var t1, t2, $length, t3;
       t1 = this._iterable;
       t2 = J.getInterceptor$asx(t1);
       $length = t2.get$length(t1);
-      if (this._length !== $length)
+      if (this.__internal$_length !== $length)
         throw H.wrapException(P.ConcurrentModificationError$(t1));
       t3 = this._index;
       if (t3 >= $length) {
-        this._current = null;
+        this.__internal$_current = null;
         return false;
       }
-      this._current = t2.elementAt$1(t1, t3);
+      this.__internal$_current = t2.elementAt$1(t1, t3);
       ++this._index;
       return true;
     }
@@ -5087,21 +5069,21 @@ var $$ = {};
     $isEfficientLength: true
   },
   MappedIterator: {
-    "^": "Iterator;_current,_iterator,_f",
+    "^": "Iterator;__internal$_current,_iterator,_f",
     _f$1: function(arg0) {
       return this._f.call$1(arg0);
     },
     moveNext$0: function() {
       var t1 = this._iterator;
       if (t1.moveNext$0()) {
-        this._current = this._f$1(t1.get$current());
+        this.__internal$_current = this._f$1(t1.get$current());
         return true;
       }
-      this._current = null;
+      this.__internal$_current = null;
       return false;
     },
     get$current: function() {
-      return this._current;
+      return this.__internal$_current;
     }
   },
   MappedListIterable: {
@@ -5151,20 +5133,16 @@ var $$ = {};
   },
   IterableMixinWorkaround: {
     "^": "Object;",
-    static: {IterableMixinWorkaround_forEach: function(iterable, f) {
+    static: {IterableMixinWorkaround_any: function(iterable, f) {
         var t1;
         for (t1 = new H.ListIterator(iterable, iterable.length, 0, null); t1.moveNext$0();)
-          f.call$1(t1._current);
-      }, IterableMixinWorkaround_any: function(iterable, f) {
-        var t1;
-        for (t1 = new H.ListIterator(iterable, iterable.length, 0, null); t1.moveNext$0();)
-          if (f.call$1(t1._current) === true)
+          if (f.call$1(t1.__internal$_current) === true)
             return true;
         return false;
       }, IterableMixinWorkaround_singleWhere: function(iterable, test) {
         var t1, result, foundMatching, element;
         for (t1 = new H.ListIterator(iterable, iterable.length, 0, null), result = null, foundMatching = false; t1.moveNext$0();) {
-          element = t1._current;
+          element = t1.__internal$_current;
           if (test.call$1(element) === true) {
             if (foundMatching)
               throw H.wrapException(H.IterableElementError_tooMany());
@@ -5269,13 +5247,18 @@ var $$ = {};
       t1.storedCallback_0 = null;
       new self.MutationObserver(H.convertDartClosureToJS(new P._AsyncRun__initializeScheduleImmediate_internalCallback(t1), 1)).observe(div, {childList: true});
       return new P._AsyncRun__initializeScheduleImmediate_closure(t1, div, span);
-    }
+    } else if (self.setImmediate != null)
+      return P._AsyncRun__scheduleImmediateWithSetImmediate$closure();
     return P._AsyncRun__scheduleImmediateWithTimer$closure();
   },
   _AsyncRun__scheduleImmediateJsOverride: [function(callback) {
     ++init.globalState.topEventLoop._activeJsAsyncCount;
     self.scheduleImmediate(H.convertDartClosureToJS(new P._AsyncRun__scheduleImmediateJsOverride_internalCallback(callback), 0));
   }, "call$1", "_AsyncRun__scheduleImmediateJsOverride$closure", 2, 0, 25],
+  _AsyncRun__scheduleImmediateWithSetImmediate: [function(callback) {
+    ++init.globalState.topEventLoop._activeJsAsyncCount;
+    self.setImmediate(H.convertDartClosureToJS(new P._AsyncRun__scheduleImmediateWithSetImmediate_internalCallback(callback), 0));
+  }, "call$1", "_AsyncRun__scheduleImmediateWithSetImmediate$closure", 2, 0, 25],
   _AsyncRun__scheduleImmediateWithTimer: [function(callback) {
     P.Timer__createTimer(C.Duration_0, callback);
   }, "call$1", "_AsyncRun__scheduleImmediateWithTimer$closure", 2, 0, 25],
@@ -5300,19 +5283,26 @@ var $$ = {};
       t1 = H.unwrapException(exception);
       error = t1;
       stackTrace = new H._StackTrace(exception, null);
+      error = error;
+      stackTrace = stackTrace;
       t1 = T0;
-      t2 = H.setRuntimeTypeInfo(new P._Future(0, $.Zone__current, null, null, null, null, null, null), [t1]);
+      t2 = $.Zone__current;
+      if (t2 !== C.C__RootZone)
+        t2.toString;
+      t2 = H.setRuntimeTypeInfo(new P._Future(0, t2, null, null, null, null, null, null), [t1]);
       t2._async$_Future$immediateError$2(error, stackTrace, t1);
       return t2;
     }
 
   },
   Future_Future$delayed: function(duration, computation, $T) {
-    var completer, result;
-    completer = H.setRuntimeTypeInfo(new P._SyncCompleter(P._Future$(null)), [null]);
-    result = completer.future.then$1(new P.Future_Future$delayed_closure(computation));
-    P.Timer_Timer(duration, completer.get$complete(completer));
+    var result = P._Future$($T);
+    P.Timer_Timer(duration, new P.Future_Future$delayed_closure(computation, result));
     return result;
+  },
+  _completeWithErrorCallback: function(result, error, stackTrace) {
+    $.Zone__current.toString;
+    result._completeError$2(error, stackTrace);
   },
   _asyncRunCallbackLoop: function() {
     var t1, t2;
@@ -5393,14 +5383,19 @@ var $$ = {};
   _nullDoneHandler: [function() {
   }, "call$0", "_nullDoneHandler$closure", 0, 0, 26],
   _runUserCode: function(userCode, onSuccess, onError) {
-    var e, s, exception, t1;
+    var e, s, replacement, exception, t1;
     try {
       onSuccess.call$1(userCode.call$0());
     } catch (exception) {
       t1 = H.unwrapException(exception);
       e = t1;
       s = new H._StackTrace(exception, null);
-      onError.call$2(e, s);
+      $.Zone__current.toString;
+      replacement = null;
+      if (replacement == null)
+        onError.call$2(e, s);
+      else
+        onError.call$2(J.get$error$x(replacement), replacement.get$stackTrace());
     }
 
   },
@@ -5420,6 +5415,10 @@ var $$ = {};
       cancelFuture.whenComplete$1(new P._cancelAndValue_closure(future, value));
     else
       future._complete$1(value);
+  },
+  _addErrorWithReplacement: function(sink, error, stackTrace) {
+    $.Zone__current.toString;
+    sink._addError$2(error, stackTrace);
   },
   Timer_Timer: function(duration, callback) {
     var t1 = $.Zone__current;
@@ -5524,11 +5523,11 @@ var $$ = {};
       f = t1.storedCallback_0;
       t1.storedCallback_0 = null;
       f.call$0();
-    }, "call$1", null, 2, 0, null, 59, "call"],
+    }, "call$1", null, 2, 0, null, 60, "call"],
     $isFunction: true
   },
   _AsyncRun__initializeScheduleImmediate_closure: {
-    "^": "Closure:60;box_0,div_1,span_2",
+    "^": "Closure:61;box_0,div_1,span_2",
     call$1: function(callback) {
       var t1, t2;
       ++init.globalState.topEventLoop._activeJsAsyncCount;
@@ -5540,19 +5539,23 @@ var $$ = {};
     $isFunction: true
   },
   _AsyncRun__scheduleImmediateJsOverride_internalCallback: {
-    "^": "Closure:52;callback_0",
+    "^": "Closure:53;callback_0",
     call$0: [function() {
       H.leaveJsAsync();
       this.callback_0.call$0();
     }, "call$0", null, 0, 0, null, "call"],
     $isFunction: true
   },
-  _AsyncError: {
-    "^": "Object;error>,stackTrace<",
-    $isError: true
+  _AsyncRun__scheduleImmediateWithSetImmediate_internalCallback: {
+    "^": "Closure:53;callback_0",
+    call$0: [function() {
+      H.leaveJsAsync();
+      this.callback_0.call$0();
+    }, "call$0", null, 0, 0, null, "call"],
+    $isFunction: true
   },
   _UncaughtAsyncError: {
-    "^": "_AsyncError;error,stackTrace",
+    "^": "AsyncError;error,stackTrace",
     toString$0: function(_) {
       var result, t1;
       result = "Uncaught Error: " + H.S(this.error);
@@ -5702,9 +5705,6 @@ var $$ = {};
     _async$_add$1: function(data) {
       this._sendData$1(data);
     },
-    _addError$2: function(error, stackTrace) {
-      this._sendError$2(error, stackTrace);
-    },
     _close$0: function() {
       var addState = this._addStreamState;
       this._addStreamState = null;
@@ -5765,11 +5765,6 @@ var $$ = {};
       }
       this._forEachListener$1(new P._SyncBroadcastStreamController__sendData_closure(this, data));
     },
-    _sendError$2: function(error, stackTrace) {
-      if (this._async$_next === this)
-        return;
-      this._forEachListener$1(new P._SyncBroadcastStreamController__sendError_closure(this, error, stackTrace));
-    },
     _sendDone$0: function() {
       if (this._async$_next !== this)
         this._forEachListener$1(new P._SyncBroadcastStreamController__sendDone_closure(this));
@@ -5781,18 +5776,6 @@ var $$ = {};
     "^": "Closure;this_0,data_1",
     call$1: function(subscription) {
       subscription._async$_add$1(this.data_1);
-    },
-    $isFunction: true,
-    $signature: function() {
-      return H.computeSignature(function(T) {
-        return {func: "dynamic___BufferingStreamSubscription", args: [[P._BufferingStreamSubscription, T]]};
-      }, this.this_0, "_SyncBroadcastStreamController");
-    }
-  },
-  _SyncBroadcastStreamController__sendError_closure: {
-    "^": "Closure;this_0,error_1,stackTrace_2",
-    call$1: function(subscription) {
-      subscription._addError$2(this.error_1, this.stackTrace_2);
     },
     $isFunction: true,
     $signature: function() {
@@ -5820,11 +5803,6 @@ var $$ = {};
       for (link = this._async$_next; link !== this; link = link.get$_async$_next())
         link._addPending$1(new P._DelayedData(data, null));
     },
-    _sendError$2: function(error, stackTrace) {
-      var link;
-      for (link = this._async$_next; link !== this; link = link.get$_async$_next())
-        link._addPending$1(new P._DelayedError(error, stackTrace, null));
-    },
     _sendDone$0: function() {
       var link = this._async$_next;
       if (link !== this)
@@ -5839,40 +5817,50 @@ var $$ = {};
     $isFuture: true
   },
   Future_Future$delayed_closure: {
-    "^": "Closure:21;computation_0",
-    call$1: [function(ignored) {
-      return this.computation_0.call$0();
-    }, "call$1", null, 2, 0, null, 61, "call"],
+    "^": "Closure:53;computation_0,result_1",
+    call$0: function() {
+      var e, s, t1, exception;
+      try {
+        t1 = this.computation_0.call$0();
+        this.result_1._complete$1(t1);
+      } catch (exception) {
+        t1 = H.unwrapException(exception);
+        e = t1;
+        s = new H._StackTrace(exception, null);
+        P._completeWithErrorCallback(this.result_1, e, s);
+      }
+
+    },
     $isFunction: true
   },
   _Completer: {
-    "^": "Object;future<"
-  },
-  _AsyncCompleter: {
-    "^": "_Completer;future",
+    "^": "Object;future<",
     completeError$2: function(error, stackTrace) {
-      var t1;
       if (error == null)
         throw H.wrapException(P.ArgumentError$("Error must not be null"));
-      t1 = this.future;
-      if (t1._state !== 0)
+      if (this.future._state !== 0)
         throw H.wrapException(P.StateError$("Future already completed"));
-      t1._asyncCompleteError$2(error, stackTrace);
+      $.Zone__current.toString;
+      this._completeError$2(error, stackTrace);
     },
     completeError$1: function(error) {
       return this.completeError$2(error, null);
     }
   },
-  _SyncCompleter: {
+  _AsyncCompleter: {
     "^": "_Completer;future",
-    complete$1: [function(_, value) {
+    complete$1: function(_, value) {
       var t1 = this.future;
       if (t1._state !== 0)
         throw H.wrapException(P.StateError$("Future already completed"));
-      t1._complete$1(value);
-    }, function($receiver) {
+      t1._asyncComplete$1(value);
+    },
+    complete$0: function($receiver) {
       return this.complete$1($receiver, null);
-    }, "complete$0", "call$1", "call$0", "get$complete", 0, 2, 62, 30]
+    },
+    _completeError$2: function(error, stackTrace) {
+      this.future._asyncCompleteError$2(error, stackTrace);
+    }
   },
   _Future: {
     "^": "Object;_state,_zone<,_resultOrListeners,_nextListener@,_onValueCallback?,_errorTestCallback?,_onErrorCallback?,_whenCompleteActionCallback?",
@@ -5935,6 +5923,11 @@ var $$ = {};
       this._addListener$1(result);
       return result;
     },
+    _markPendingCompletion$0: function() {
+      if (this._state !== 0)
+        throw H.wrapException(P.StateError$("Future already completed"));
+      this._state = 1;
+    },
     get$_value: function() {
       return this._resultOrListeners;
     },
@@ -5947,7 +5940,7 @@ var $$ = {};
     },
     _setError$2: function(error, stackTrace) {
       this._state = 8;
-      this._resultOrListeners = new P._AsyncError(error, stackTrace);
+      this._resultOrListeners = new P.AsyncError(error, stackTrace);
     },
     _addListener$1: function(listener) {
       var t1;
@@ -6006,9 +5999,7 @@ var $$ = {};
           if (!!t1.$is_Future) {
             t1 = value._state;
             if (t1 >= 4 && t1 === 8) {
-              if (this._state !== 0)
-                H.throwExpression(P.StateError$("Future already completed"));
-              this._state = 1;
+              this._markPendingCompletion$0();
               t1 = this._zone;
               t1.toString;
               P._rootScheduleMicrotask(null, null, t1, new P._Future__asyncComplete_closure(this, value));
@@ -6019,18 +6010,14 @@ var $$ = {};
           return;
         }
       }
-      if (this._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      this._state = 1;
+      this._markPendingCompletion$0();
       t1 = this._zone;
       t1.toString;
       P._rootScheduleMicrotask(null, null, t1, new P._Future__asyncComplete_closure0(this, value));
     },
     _asyncCompleteError$2: function(error, stackTrace) {
       var t1;
-      if (this._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      this._state = 1;
+      this._markPendingCompletion$0();
       t1 = this._zone;
       t1.toString;
       P._rootScheduleMicrotask(null, null, t1, new P._Future__asyncCompleteError_closure(this, error, stackTrace));
@@ -6171,7 +6158,7 @@ var $$ = {};
       }}
   },
   _Future__addListener_closure: {
-    "^": "Closure:52;this_0,listener_1",
+    "^": "Closure:53;this_0,listener_1",
     call$0: function() {
       P._Future__propagateToListeners(this.this_0, this.listener_1);
     },
@@ -6185,7 +6172,7 @@ var $$ = {};
     $isFunction: true
   },
   _Future__chainForeignFuture_closure0: {
-    "^": "Closure:63;target_1",
+    "^": "Closure:62;target_1",
     call$2: [function(error, stackTrace) {
       this.target_1._completeError$2(error, stackTrace);
     }, function(error) {
@@ -6194,28 +6181,28 @@ var $$ = {};
     $isFunction: true
   },
   _Future__asyncComplete_closure: {
-    "^": "Closure:52;this_0,coreFuture_1",
+    "^": "Closure:53;this_0,coreFuture_1",
     call$0: function() {
       P._Future__chainCoreFuture(this.coreFuture_1, this.this_0);
     },
     $isFunction: true
   },
   _Future__asyncComplete_closure0: {
-    "^": "Closure:52;this_2,value_3",
+    "^": "Closure:53;this_2,value_3",
     call$0: function() {
       this.this_2._completeWithValue$1(this.value_3);
     },
     $isFunction: true
   },
   _Future__asyncCompleteError_closure: {
-    "^": "Closure:52;this_0,error_1,stackTrace_2",
+    "^": "Closure:53;this_0,error_1,stackTrace_2",
     call$0: function() {
       this.this_0._completeError$2(this.error_1, this.stackTrace_2);
     },
     $isFunction: true
   },
   _Future__propagateToListeners_handleValueCallback: {
-    "^": "Closure:64;box_1,listener_3,sourceValue_4,zone_5",
+    "^": "Closure:63;box_1,listener_3,sourceValue_4,zone_5",
     call$0: function() {
       var e, s, exception, t1;
       try {
@@ -6225,7 +6212,7 @@ var $$ = {};
         t1 = H.unwrapException(exception);
         e = t1;
         s = new H._StackTrace(exception, null);
-        this.box_1.listenerValueOrError_2 = new P._AsyncError(e, s);
+        this.box_1.listenerValueOrError_2 = new P.AsyncError(e, s);
         return false;
       }
 
@@ -6249,7 +6236,7 @@ var $$ = {};
           s = new H._StackTrace(exception, null);
           t1 = J.get$error$x(asyncError);
           t2 = e;
-          listenerValueOrError = (t1 == null ? t2 == null : t1 === t2) ? asyncError : new P._AsyncError(e, s);
+          listenerValueOrError = (t1 == null ? t2 == null : t1 === t2) ? asyncError : new P.AsyncError(e, s);
           t1 = this.box_1;
           t1.listenerValueOrError_2 = listenerValueOrError;
           t1.listenerHasValue_1 = false;
@@ -6274,7 +6261,7 @@ var $$ = {};
           s0 = new H._StackTrace(exception, null);
           t1 = J.get$error$x(asyncError);
           t2 = e0;
-          listenerValueOrError = (t1 == null ? t2 == null : t1 === t2) ? asyncError : new P._AsyncError(e0, s0);
+          listenerValueOrError = (t1 == null ? t2 == null : t1 === t2) ? asyncError : new P.AsyncError(e0, s0);
           t1 = this.box_1;
           t1.listenerValueOrError_2 = listenerValueOrError;
           t1.listenerHasValue_1 = false;
@@ -6313,7 +6300,7 @@ var $$ = {};
         if (t2)
           t3.listenerValueOrError_2 = this.box_2.source_4.get$_error();
         else
-          t3.listenerValueOrError_2 = new P._AsyncError(e, s);
+          t3.listenerValueOrError_2 = new P.AsyncError(e, s);
         t3.listenerHasValue_1 = false;
       }
 
@@ -6330,11 +6317,11 @@ var $$ = {};
     "^": "Closure:21;box_2,listener_11",
     call$1: [function(ignored) {
       P._Future__propagateToListeners(this.box_2.source_4, this.listener_11);
-    }, "call$1", null, 2, 0, null, 61, "call"],
+    }, "call$1", null, 2, 0, null, 64, "call"],
     $isFunction: true
   },
   _Future__propagateToListeners_handleWhenCompleteCallback_closure0: {
-    "^": "Closure:63;box_0,listener_12",
+    "^": "Closure:62;box_0,listener_12",
     call$2: [function(error, stackTrace) {
       var t1, completeResult;
       t1 = this.box_0;
@@ -6420,7 +6407,7 @@ var $$ = {};
     }
   },
   Stream_contains__closure: {
-    "^": "Closure:52;needle_4,element_5",
+    "^": "Closure:53;needle_4,element_5",
     call$0: function() {
       return J.$eq(this.element_5, this.needle_4);
     },
@@ -6435,7 +6422,7 @@ var $$ = {};
     $isFunction: true
   },
   Stream_contains_closure0: {
-    "^": "Closure:52;future_7",
+    "^": "Closure:53;future_7",
     call$0: [function() {
       this.future_7._complete$1(false);
     }, "call$0", null, 0, 0, null, "call"],
@@ -6454,7 +6441,7 @@ var $$ = {};
     }
   },
   Stream_forEach__closure: {
-    "^": "Closure:52;action_4,element_5",
+    "^": "Closure:53;action_4,element_5",
     call$0: function() {
       return this.action_4.call$1(this.element_5);
     },
@@ -6467,7 +6454,7 @@ var $$ = {};
     $isFunction: true
   },
   Stream_forEach_closure0: {
-    "^": "Closure:52;future_6",
+    "^": "Closure:53;future_6",
     call$0: [function() {
       this.future_6._complete$1(null);
     }, "call$0", null, 0, 0, null, "call"],
@@ -6477,11 +6464,11 @@ var $$ = {};
     "^": "Closure:21;box_0",
     call$1: [function(_) {
       ++this.box_0.count_0;
-    }, "call$1", null, 2, 0, null, 59, "call"],
+    }, "call$1", null, 2, 0, null, 60, "call"],
     $isFunction: true
   },
   Stream_length_closure0: {
-    "^": "Closure:52;box_0,future_1",
+    "^": "Closure:53;box_0,future_1",
     call$0: [function() {
       this.future_1._complete$1(this.box_0.count_0);
     }, "call$0", null, 0, 0, null, "call"],
@@ -6491,11 +6478,11 @@ var $$ = {};
     "^": "Closure:21;box_0,future_1",
     call$1: [function(_) {
       P._cancelAndValue(this.box_0.subscription_0, this.future_1, false);
-    }, "call$1", null, 2, 0, null, 59, "call"],
+    }, "call$1", null, 2, 0, null, 60, "call"],
     $isFunction: true
   },
   Stream_isEmpty_closure0: {
-    "^": "Closure:52;future_2",
+    "^": "Closure:53;future_2",
     call$0: [function() {
       this.future_2._complete$1(true);
     }, "call$0", null, 0, 0, null, "call"],
@@ -6514,7 +6501,7 @@ var $$ = {};
     }
   },
   Stream_first_closure0: {
-    "^": "Closure:52;future_3",
+    "^": "Closure:53;future_3",
     call$0: [function() {
       var e, s, t1, exception;
       try {
@@ -6524,7 +6511,7 @@ var $$ = {};
         t1 = H.unwrapException(exception);
         e = t1;
         s = new H._StackTrace(exception, null);
-        this.future_3._completeError$2(e, s);
+        P._completeWithErrorCallback(this.future_3, e, s);
       }
 
     }, "call$0", null, 0, 0, null, "call"],
@@ -6602,13 +6589,6 @@ var $$ = {};
       else if ((t1 & 3) === 0)
         this._ensurePendingEvents$0().add$1(0, new P._DelayedData(value, null));
     },
-    _addError$2: function(error, stackTrace) {
-      var t1 = this._state;
-      if ((t1 & 1) !== 0)
-        this._sendError$2(error, stackTrace);
-      else if ((t1 & 3) === 0)
-        this._ensurePendingEvents$0().add$1(0, new P._DelayedError(error, stackTrace, null));
-    },
     _subscribe$4: function(onData, onError, onDone, cancelOnError) {
       var t1, t2, subscription, pendingEvents, addState;
       if ((this._state & 3) !== 0)
@@ -6670,7 +6650,7 @@ var $$ = {};
     }
   },
   _StreamController__subscribe_closure: {
-    "^": "Closure:52;this_0",
+    "^": "Closure:53;this_0",
     call$0: function() {
       P._runGuarded(this.this_0.get$_onListen());
     },
@@ -6690,9 +6670,6 @@ var $$ = {};
     _sendData$1: function(data) {
       this.get$_subscription()._async$_add$1(data);
     },
-    _sendError$2: function(error, stackTrace) {
-      this.get$_subscription()._addError$2(error, stackTrace);
-    },
     _sendDone$0: function() {
       this.get$_subscription()._close$0();
     }
@@ -6701,9 +6678,6 @@ var $$ = {};
     "^": "Object;",
     _sendData$1: function(data) {
       this.get$_subscription()._addPending$1(new P._DelayedData(data, null));
-    },
-    _sendError$2: function(error, stackTrace) {
-      this.get$_subscription()._addPending$1(new P._DelayedError(error, stackTrace, null));
     },
     _sendDone$0: function() {
       this.get$_subscription()._addPending$1(C.C__DelayedDone);
@@ -7021,7 +6995,7 @@ var $$ = {};
   },
   _BufferingStreamSubscription__sendError_sendError: {
     "^": "Closure:26;this_0,error_1,stackTrace_2",
-    call$0: [function() {
+    call$0: function() {
       var t1, t2, t3, t4, t5, t6;
       t1 = this.this_0;
       t2 = t1._state;
@@ -7039,7 +7013,7 @@ var $$ = {};
       else
         t4.runUnaryGuarded$2(t6, t5);
       t1._state = (t1._state & 4294967263) >>> 0;
-    }, "call$0", null, 0, 0, null, "call"],
+    },
     $isFunction: true
   },
   _BufferingStreamSubscription__sendDone_sendDone: {
@@ -7117,7 +7091,7 @@ var $$ = {};
     }
   },
   _PendingEvents_schedule_closure: {
-    "^": "Closure:52;this_0,dispatch_1",
+    "^": "Closure:53;this_0,dispatch_1",
     call$0: function() {
       var t1, oldState;
       t1 = this.this_0;
@@ -7193,17 +7167,15 @@ var $$ = {};
       if (t1 >= 4)
         return;
       this._state = (t1 | 1) >>> 0;
-      t1 = this._onDone;
-      if (t1 != null)
-        this._zone.runGuarded$1(t1);
+      this._zone.runGuarded$1(this._onDone);
     }, "call$0", "get$_sendDone", 0, 0, 26],
     static: {"^": "_DoneStreamSubscription__DONE_SENT,_DoneStreamSubscription__SCHEDULED,_DoneStreamSubscription__PAUSED"}
   },
   _cancelAndError_closure: {
-    "^": "Closure:52;future_0,error_1,stackTrace_2",
-    call$0: [function() {
+    "^": "Closure:53;future_0,error_1,stackTrace_2",
+    call$0: function() {
       return this.future_0._completeError$2(this.error_1, this.stackTrace_2);
-    }, "call$0", null, 0, 0, null, "call"],
+    },
     $isFunction: true
   },
   _cancelAndErrorClosure_closure: {
@@ -7214,10 +7186,10 @@ var $$ = {};
     $isFunction: true
   },
   _cancelAndValue_closure: {
-    "^": "Closure:52;future_0,value_1",
-    call$0: [function() {
+    "^": "Closure:53;future_0,value_1",
+    call$0: function() {
       return this.future_0._complete$1(this.value_1);
-    }, "call$0", null, 0, 0, null, "call"],
+    },
     $isFunction: true
   },
   _ForwardingStream: {
@@ -7313,7 +7285,7 @@ var $$ = {};
         t1 = H.unwrapException(exception);
         e = t1;
         s = new H._StackTrace(exception, null);
-        sink._addError$2(e, s);
+        P._addErrorWithReplacement(sink, e, s);
         return;
       }
 
@@ -7339,18 +7311,25 @@ var $$ = {};
         t1 = H.unwrapException(exception);
         e = t1;
         s = new H._StackTrace(exception, null);
-        sink._addError$2(e, s);
+        P._addErrorWithReplacement(sink, e, s);
         return;
       }
 
       sink._async$_add$1(outputEvent);
     }
   },
+  AsyncError: {
+    "^": "Object;error>,stackTrace<",
+    toString$0: function(_) {
+      return J.toString$0(this.error);
+    },
+    $isError: true
+  },
   _Zone: {
     "^": "Object;"
   },
   _rootHandleUncaughtError_closure: {
-    "^": "Closure:52;error_0,stackTrace_1",
+    "^": "Closure:53;error_0,stackTrace_1",
     call$0: function() {
       throw H.wrapException(P._UncaughtAsyncError$(this.error_0, this.stackTrace_1));
     },
@@ -7451,14 +7430,14 @@ var $$ = {};
     static: {"^": "_RootZone__rootMap,_RootZone__rootDelegate"}
   },
   _RootZone_bindCallback_closure: {
-    "^": "Closure:52;this_0,f_1",
+    "^": "Closure:53;this_0,f_1",
     call$0: [function() {
       return this.this_0.runGuarded$1(this.f_1);
     }, "call$0", null, 0, 0, null, "call"],
     $isFunction: true
   },
   _RootZone_bindCallback_closure0: {
-    "^": "Closure:52;this_2,f_3",
+    "^": "Closure:53;this_2,f_3",
     call$0: [function() {
       return this.this_2.run$1(this.f_3);
     }, "call$0", null, 0, 0, null, "call"],
@@ -7516,7 +7495,8 @@ var $$ = {};
     t1 = P.StringBuffer$(leftDelimiter);
     t1.writeAll$2(parts, ", ");
     t1.write$1(rightDelimiter);
-    return t1._contents;
+    t1 = t1._contents;
+    return t1.charCodeAt(0) == 0 ? t1 : t1;
   },
   IterableBase_iterableToFullString: function(iterable, leftDelimiter, rightDelimiter) {
     var buffer, t1;
@@ -7533,7 +7513,8 @@ var $$ = {};
       t1.pop();
     }
     buffer.write$1(rightDelimiter);
-    return buffer.get$_contents();
+    t1 = buffer.get$_contents();
+    return t1.charCodeAt(0) == 0 ? t1 : t1;
   },
   IterableBase__isToStringVisiting: function(o) {
     var i, t1;
@@ -7630,7 +7611,9 @@ var $$ = {};
     return H.setRuntimeTypeInfo(new P._LinkedHashMap(0, null, null, null, null, null, 0), [$K, $V]);
   },
   LinkedHashSet_LinkedHashSet: function(equals, hashCode, isValidKey, $E) {
-    return H.setRuntimeTypeInfo(new P._LinkedHashSet(0, null, null, null, null, null, 0), [$E]);
+    var t1 = new P._LinkedHashSet(0, null, null, null, null, null, 0);
+    t1.$builtinTypeInfo = [$E];
+    return t1;
   },
   Maps_mapToString: function(m) {
     var t1, result;
@@ -7650,7 +7633,8 @@ var $$ = {};
         return H.ioore(t1, 0);
       t1.pop();
     }
-    return result.get$_contents();
+    t1 = result.get$_contents();
+    return t1.charCodeAt(0) == 0 ? t1 : t1;
   },
   _HashMap: {
     "^": "Object;_collection$_length,_strings,_nums,_rest,_keys",
@@ -8507,7 +8491,8 @@ var $$ = {};
           buffer._contents += t1;
         }
       }
-      return buffer._contents;
+      t1 = buffer._contents;
+      return t1.charCodeAt(0) == 0 ? t1 : t1;
     },
     join$0: function($receiver) {
       return this.join$1($receiver, "");
@@ -8661,24 +8646,14 @@ var $$ = {};
       return false;
     },
     _rangeCheck$2: function(receiver, start, end) {
-      if (typeof start !== "number")
-        return start.$lt();
       if (start < 0 || start > this.get$length(receiver))
         throw H.wrapException(P.RangeError$range(start, 0, this.get$length(receiver)));
-      if (typeof end !== "number")
-        return end.$lt();
       if (end < start || end > this.get$length(receiver))
         throw H.wrapException(P.RangeError$range(end, start, this.get$length(receiver)));
     },
     sublist$2: function(receiver, start, end) {
       var $length, result, i, t1;
-      if (end == null)
-        end = this.get$length(receiver);
       this._rangeCheck$2(receiver, start, end);
-      if (typeof end !== "number")
-        return end.$sub();
-      if (typeof start !== "number")
-        return H.iae(start);
       $length = end - start;
       result = H.setRuntimeTypeInfo([], [H.getRuntimeTypeArgument(receiver, "ListMixin", 0)]);
       C.JSArray_methods.set$length(result, $length);
@@ -8692,10 +8667,7 @@ var $$ = {};
     },
     setRange$4: function(receiver, start, end, iterable, skipCount) {
       var $length, t1, i;
-      if (start < 0 || start > this.get$length(receiver))
-        H.throwExpression(P.RangeError$range(start, 0, this.get$length(receiver)));
-      if (end < start || end > this.get$length(receiver))
-        H.throwExpression(P.RangeError$range(end, start, this.get$length(receiver)));
+      this._rangeCheck$2(receiver, start, end);
       $length = end - start;
       if ($length === 0)
         return;
@@ -8742,7 +8714,7 @@ var $$ = {};
     $asIterable: null
   },
   Maps_mapToString_closure: {
-    "^": "Closure:53;box_0,result_1",
+    "^": "Closure:54;box_0,result_1",
     call$2: function(k, v) {
       var t1 = this.box_0;
       if (!t1.first_0)
@@ -8913,10 +8885,12 @@ var $$ = {};
       t1 = this._collection$_table;
       t2 = this._head;
       split = t1.length - t2;
+      C.JSArray_methods.checkMutable$1(newTable, "set range");
       H.IterableMixinWorkaround_setRangeList(newTable, 0, split, t1, t2);
-      t1 = this._head;
-      t2 = this._collection$_table;
-      H.IterableMixinWorkaround_setRangeList(newTable, split, split + t1, t2, 0);
+      t2 = this._head;
+      t1 = this._collection$_table;
+      C.JSArray_methods.checkMutable$1(newTable, "set range");
+      H.IterableMixinWorkaround_setRangeList(newTable, split, split + t2, t1, 0);
       this._head = 0;
       this._tail = this._collection$_table.length;
       this._collection$_table = newTable;
@@ -8928,13 +8902,16 @@ var $$ = {};
       t3 = this._collection$_table;
       if (t1 <= t2) {
         $length = t2 - t1;
+        C.JSArray_methods.checkMutable$1(target, "set range");
         H.IterableMixinWorkaround_setRangeList(target, 0, $length, t3, t1);
         return $length;
       } else {
         firstPartSize = t3.length - t1;
+        C.JSArray_methods.checkMutable$1(target, "set range");
         H.IterableMixinWorkaround_setRangeList(target, 0, firstPartSize, t3, t1);
         t1 = this._tail;
         t2 = this._collection$_table;
+        C.JSArray_methods.checkMutable$1(target, "set range");
         H.IterableMixinWorkaround_setRangeList(target, firstPartSize, firstPartSize + t1, t2, 0);
         return this._tail + firstPartSize;
       }
@@ -8947,7 +8924,11 @@ var $$ = {};
     $isEfficientLength: true,
     $isIterable: true,
     $asIterable: null,
-    static: {"^": "ListQueue__INITIAL_CAPACITY"}
+    static: {"^": "ListQueue__INITIAL_CAPACITY", ListQueue$: function(initialCapacity, $E) {
+        var t1 = H.setRuntimeTypeInfo(new P.ListQueue(null, 0, 0, 0), [$E]);
+        t1.ListQueue$1(initialCapacity, $E);
+        return t1;
+      }}
   },
   _ListQueueIterator: {
     "^": "Object;_queue,_end,_modificationCount,_collection$_position,_collection$_current",
@@ -8981,7 +8962,7 @@ var $$ = {};
     addAll$1: function(_, elements) {
       var t1;
       for (t1 = J.get$iterator$ax(elements); t1.moveNext$0();)
-        this.add$1(0, t1._current);
+        this.add$1(0, t1.__internal$_current);
     },
     toList$1$growable: function(_, growable) {
       var result, t1, i, element, i0;
@@ -9064,16 +9045,11 @@ var $$ = {};
     convert$1: function(string) {
       var t1, t2, encoder;
       t1 = J.getInterceptor$asx(string);
-      t2 = J.$mul$ns(t1.get$length(string), 3);
-      if (typeof t2 !== "number")
-        return H.iae(t2);
-      t2 = Array(t2);
-      t2.fixed$length = init;
-      t2 = H.setRuntimeTypeInfo(t2, [P.$int]);
+      t2 = new Uint8Array(H._checkLength(J.$mul$ns(t1.get$length(string), 3)));
       encoder = new P._Utf8Encoder(0, 0, t2);
       if (encoder._fillBuffer$3(string, 0, t1.get$length(string)) !== t1.get$length(string))
         encoder._writeSurrogate$2(t1.codeUnitAt$1(string, J.$sub$n(t1.get$length(string), 1)), 0);
-      return C.JSArray_methods.sublist$2(t2, 0, encoder._bufferIndex);
+      return C.NativeUint8List_methods.sublist$2(t2, 0, encoder._bufferIndex);
     }
   },
   _Utf8Encoder: {
@@ -9186,12 +9162,13 @@ var $$ = {};
   Utf8Decoder: {
     "^": "Converter;_allowMalformed",
     convert$1: function(codeUnits) {
-      var buffer, decoder;
+      var buffer, decoder, t1;
       buffer = P.StringBuffer$("");
       decoder = new P._Utf8Decoder(this._allowMalformed, buffer, true, 0, 0, 0);
       decoder.convert$3(codeUnits, 0, J.get$length$asx(codeUnits));
       decoder.flush$0();
-      return buffer._contents;
+      t1 = buffer._contents;
+      return t1.charCodeAt(0) == 0 ? t1 : t1;
     }
   },
   _Utf8Decoder: {
@@ -9201,7 +9178,7 @@ var $$ = {};
     },
     flush$0: function() {
       if (this._expectedUnits > 0) {
-        if (this._allowMalformed !== true)
+        if (!this._allowMalformed)
           throw H.wrapException(P.FormatException$("Unfinished UTF-8 octet sequence", null, null));
         this._stringSink.write$1(H.Primitives_stringFromCharCode(65533));
         this._convert$_value = 0;
@@ -9220,7 +9197,7 @@ var $$ = {};
       t1 = new P._Utf8Decoder_convert_scanOneByteCharacters(endIndex);
       t2 = new P._Utf8Decoder_convert_addSingleBytes(this, codeUnits, startIndex, endIndex);
       $loop$0:
-        for (t3 = this._stringSink, t4 = this._allowMalformed !== true, t5 = J.getInterceptor$asx(codeUnits), i = startIndex; true; i = i0) {
+        for (t3 = this._stringSink, t4 = !this._allowMalformed, t5 = J.getInterceptor$asx(codeUnits), i = startIndex; true; i = i0) {
           $multibyte$2: {
             if (expectedUnits > 0) {
               do {
@@ -9404,7 +9381,7 @@ var $$ = {};
       }
       t1 = t2 + "\"";
       buffer._contents = t1;
-      return t1;
+      return t1.charCodeAt(0) == 0 ? t1 : t1;
     }
     return "Instance of '" + H.Primitives_objectTypeName(object) + "'";
   },
@@ -9435,7 +9412,7 @@ var $$ = {};
     return H.Primitives_stringFromCharCodes(typeof charCodes !== "object" || charCodes === null || charCodes.constructor !== Array ? P.List_List$from(charCodes, true, null) : charCodes);
   },
   Function__toMangledNames_closure: {
-    "^": "Closure:53;result_0",
+    "^": "Closure:54;result_0",
     call$2: function(symbol, value) {
       this.result_0.$indexSet(0, symbol.get$_name(), value);
     },
@@ -9664,23 +9641,61 @@ var $$ = {};
   NoSuchMethodError: {
     "^": "Error;_core$_receiver,_memberName,_core$_arguments,_namedArguments,_existingArgumentNames",
     toString$0: function(_) {
-      var t1, t2, t3, t4, t5, str;
+      var t1, t2, t3, t4, t5, str, actualParameters, i, formalParameters;
       t1 = {};
       t1.sb_0 = P.StringBuffer$("");
       t1.i_1 = 0;
-      for (t2 = this._core$_arguments, t3 = 0; t4 = t2.length, t3 < t4; t3 = ++t1.i_1) {
-        if (t3 > 0) {
+      t2 = this._core$_arguments;
+      if (t2 != null) {
+        t3 = J.getInterceptor$asx(t2);
+        t4 = 0;
+        while (true) {
+          t5 = t3.get$length(t2);
+          if (typeof t5 !== "number")
+            return H.iae(t5);
+          if (!(t4 < t5))
+            break;
+          t4 = t1.i_1;
+          if (t4 > 0) {
+            t5 = t1.sb_0;
+            t5._contents += ", ";
+          }
           t5 = t1.sb_0;
-          t5._contents += ", ";
+          str = P.Error_safeToString(t3.$index(t2, t4));
+          t5._contents += typeof str === "string" ? str : H.S(str);
+          t4 = ++t1.i_1;
         }
-        t5 = t1.sb_0;
-        if (t3 < 0)
-          return H.ioore(t2, t3);
-        str = P.Error_safeToString(t2[t3]);
-        t5._contents += typeof str === "string" ? str : H.S(str);
       }
       this._namedArguments.forEach$1(0, new P.NoSuchMethodError_toString_closure(t1));
-      return "NoSuchMethodError : method not found: '" + this._memberName.toString$0(0) + "'\nReceiver: " + H.S(P.Error_safeToString(this._core$_receiver)) + "\nArguments: [" + t1.sb_0._contents + "]";
+      t2 = this._existingArgumentNames;
+      if (t2 == null)
+        return "NoSuchMethodError : method not found: '" + this._memberName.toString$0(0) + "'\nReceiver: " + H.S(P.Error_safeToString(this._core$_receiver)) + "\nArguments: [" + H.S(t1.sb_0) + "]";
+      else {
+        t3 = t1.sb_0._contents;
+        actualParameters = t3.charCodeAt(0) == 0 ? t3 : t3;
+        t1.sb_0 = P.StringBuffer$("");
+        t3 = J.getInterceptor$asx(t2);
+        i = 0;
+        while (true) {
+          t4 = t3.get$length(t2);
+          if (typeof t4 !== "number")
+            return H.iae(t4);
+          if (!(i < t4))
+            break;
+          if (i > 0) {
+            t4 = t1.sb_0;
+            t4._contents += ", ";
+          }
+          t4 = t1.sb_0;
+          str = t3.$index(t2, i);
+          t4._contents += typeof str === "string" ? str : H.S(str);
+          ++i;
+        }
+        t1 = t1.sb_0._contents;
+        formalParameters = t1.charCodeAt(0) == 0 ? t1 : t1;
+        t1 = this._memberName;
+        return "NoSuchMethodError: incorrect number of arguments passed to method named '" + t1.toString$0(0) + "'\nReceiver: " + H.S(P.Error_safeToString(this._core$_receiver)) + "\nTried calling: " + t1.toString$0(0) + "(" + H.S(actualParameters) + ")\nFound: " + t1.toString$0(0) + "(" + H.S(formalParameters) + ")";
+      }
     },
     static: {NoSuchMethodError$: function(receiver, memberName, positionalArguments, namedArguments, existingArgumentNames) {
         return new P.NoSuchMethodError(receiver, memberName, positionalArguments, namedArguments, existingArgumentNames);
@@ -9718,10 +9733,7 @@ var $$ = {};
   ConcurrentModificationError: {
     "^": "Error;modifiedObject",
     toString$0: function(_) {
-      var t1 = this.modifiedObject;
-      if (t1 == null)
-        return "Concurrent modification during iteration.";
-      return "Concurrent modification during iteration: " + H.S(P.Error_safeToString(t1)) + ".";
+      return "Concurrent modification during iteration: " + H.S(P.Error_safeToString(this.modifiedObject)) + ".";
     },
     static: {ConcurrentModificationError$: function(modifiedObject) {
         return new P.ConcurrentModificationError(modifiedObject);
@@ -9923,7 +9935,8 @@ var $$ = {};
       }
     },
     toString$0: function(_) {
-      return this._contents;
+      var t1 = this._contents;
+      return t1.charCodeAt(0) == 0 ? t1 : t1;
     },
     StringBuffer$1: function($content) {
       this._contents = $content;
@@ -9974,7 +9987,7 @@ var $$ = {};
 
     return e;
   },
-  _JenkinsSmiHash_combine: function(hash, value) {
+  _JenkinsSmiHash_combine0: function(hash, value) {
     hash = 536870911 & hash + value;
     hash = 536870911 & hash + ((524287 & hash) << 10 >>> 0);
     return hash ^ hash >>> 6;
@@ -10006,7 +10019,7 @@ var $$ = {};
   },
   HtmlElement: {
     "^": "Element;",
-    "%": "HTMLAppletElement|HTMLBRElement|HTMLCanvasElement|HTMLContentElement|HTMLDListElement|HTMLDataListElement|HTMLDetailsElement|HTMLDialogElement|HTMLDirectoryElement|HTMLDivElement|HTMLFontElement|HTMLFrameElement|HTMLHRElement|HTMLHeadElement|HTMLHeadingElement|HTMLHtmlElement|HTMLImageElement|HTMLLabelElement|HTMLLegendElement|HTMLMarqueeElement|HTMLMenuElement|HTMLModElement|HTMLOptGroupElement|HTMLParagraphElement|HTMLPreElement|HTMLQuoteElement|HTMLShadowElement|HTMLSpanElement|HTMLTableCaptionElement|HTMLTableColElement|HTMLTitleElement|HTMLTrackElement|HTMLUListElement|HTMLUnknownElement;HTMLElement"
+    "%": "HTMLAppletElement|HTMLBRElement|HTMLCanvasElement|HTMLContentElement|HTMLDListElement|HTMLDataListElement|HTMLDetailsElement|HTMLDialogElement|HTMLDirectoryElement|HTMLDivElement|HTMLFontElement|HTMLFrameElement|HTMLHRElement|HTMLHeadElement|HTMLHeadingElement|HTMLHtmlElement|HTMLImageElement|HTMLLabelElement|HTMLLegendElement|HTMLMarqueeElement|HTMLMenuElement|HTMLModElement|HTMLOptGroupElement|HTMLParagraphElement|HTMLPictureElement|HTMLPreElement|HTMLQuoteElement|HTMLShadowElement|HTMLSpanElement|HTMLTableCaptionElement|HTMLTableColElement|HTMLTitleElement|HTMLTrackElement|HTMLUListElement|HTMLUnknownElement;HTMLElement"
   },
   AnchorElement: {
     "^": "HtmlElement;type%,host},hostname=,href},port%,protocol=",
@@ -10014,6 +10027,10 @@ var $$ = {};
       return receiver.toString();
     },
     "%": "HTMLAnchorElement"
+  },
+  ApplicationCacheErrorEvent: {
+    "^": "Event;message=",
+    "%": "ApplicationCacheErrorEvent"
   },
   AreaElement: {
     "^": "HtmlElement;host},hostname=,href},port%,protocol=",
@@ -10028,6 +10045,9 @@ var $$ = {};
   },
   Blob: {
     "^": "Interceptor;size=,type=",
+    close$0: function(receiver) {
+      return receiver.close();
+    },
     slice$3: function(receiver, start, end, contentType) {
       return receiver.slice(start, end, contentType);
     },
@@ -10063,7 +10083,7 @@ var $$ = {};
         return this._setPropertyHelper$3(receiver, propertyName, value, priority);
       else {
         t1 = P.Device_cssPrefix();
-        if (typeof t1 !== "string")
+        if (t1 == null)
           return t1.$add();
         return this._setPropertyHelper$3(receiver, t1 + propertyName, value, priority);
       }
@@ -10084,6 +10104,10 @@ var $$ = {};
 
     },
     "%": "CSS2Properties|CSSStyleDeclaration|MSStyleCSSProperties"
+  },
+  DeviceLightEvent: {
+    "^": "Event;value=",
+    "%": "DeviceLightEvent"
   },
   Document: {
     "^": "Node;",
@@ -10147,7 +10171,7 @@ var $$ = {};
     "%": "DOMException"
   },
   Element: {
-    "^": "Node;title=,tagName=",
+    "^": "Node;tabIndex=,title=,tagName=",
     get$attributes: function(receiver) {
       return new W._ElementAttributeMap(receiver);
     },
@@ -10293,14 +10317,14 @@ var $$ = {};
       return receiver.stopPropagation();
     },
     $isEvent: true,
-    "%": "AudioProcessingEvent|AutocompleteErrorEvent|BeforeLoadEvent|BeforeUnloadEvent|CSSFontFaceLoadEvent|CloseEvent|CustomEvent|DeviceMotionEvent|DeviceOrientationEvent|HashChangeEvent|IDBVersionChangeEvent|InstallEvent|InstallPhaseEvent|MIDIConnectionEvent|MediaKeyNeededEvent|MediaStreamEvent|MediaStreamTrackEvent|MutationEvent|OfflineAudioCompletionEvent|OverflowEvent|PageTransitionEvent|PopStateEvent|RTCDTMFToneChangeEvent|RTCDataChannelEvent|RTCIceCandidateEvent|SpeechInputEvent|SpeechRecognitionEvent|StorageEvent|TrackEvent|TransitionEvent|WebGLContextEvent|WebKitAnimationEvent|WebKitTransitionEvent;ClipboardEvent|Event|InputEvent"
+    "%": "AnimationPlayerEvent|AudioProcessingEvent|AutocompleteErrorEvent|BeforeUnloadEvent|CSSFontFaceLoadEvent|CloseEvent|CustomEvent|DeviceMotionEvent|DeviceOrientationEvent|FetchEvent|GamepadEvent|HashChangeEvent|IDBVersionChangeEvent|InstallEvent|InstallPhaseEvent|MIDIConnectionEvent|MediaKeyNeededEvent|MediaStreamEvent|MediaStreamTrackEvent|MutationEvent|OfflineAudioCompletionEvent|OverflowEvent|PageTransitionEvent|PopStateEvent|RTCDTMFToneChangeEvent|RTCDataChannelEvent|RTCIceCandidateEvent|SpeechRecognitionEvent|StorageEvent|TrackEvent|TransitionEvent|WebGLContextEvent|WebKitAnimationEvent|WebKitTransitionEvent;ClipboardEvent|Event|InputEvent"
   },
   EventTarget: {
     "^": "Interceptor;",
-    addEventListener$3: function(receiver, type, listener, useCapture) {
+    _addEventListener$3: function(receiver, type, listener, useCapture) {
       return receiver.addEventListener(type, H.convertDartClosureToJS(listener, 1), useCapture);
     },
-    removeEventListener$3: function(receiver, type, listener, useCapture) {
+    _removeEventListener$3: function(receiver, type, listener, useCapture) {
       return receiver.removeEventListener(type, H.convertDartClosureToJS(listener, 1), useCapture);
     },
     $isEventTarget: true,
@@ -10638,6 +10662,10 @@ var $$ = {};
     "^": "Event;",
     "%": "ProgressEvent|ResourceProgressEvent|XMLHttpRequestProgressEvent"
   },
+  PushEvent: {
+    "^": "Event;data=",
+    "%": "PushEvent"
+  },
   Range: {
     "^": "Interceptor;",
     toString$0: function(receiver) {
@@ -10825,6 +10853,9 @@ var $$ = {};
   },
   _Attr: {
     "^": "Node;name=,value=",
+    get$text: function(receiver) {
+      return receiver.textContent;
+    },
     "%": "Attr"
   },
   _ClientRect: {
@@ -10865,7 +10896,7 @@ var $$ = {};
       t2 = J.get$hashCode$(receiver.top);
       t3 = J.get$hashCode$(receiver.width);
       t4 = J.get$hashCode$(receiver.height);
-      t4 = W._JenkinsSmiHash_combine(W._JenkinsSmiHash_combine(W._JenkinsSmiHash_combine(W._JenkinsSmiHash_combine(0, t1), t2), t3), t4);
+      t4 = W._JenkinsSmiHash_combine0(W._JenkinsSmiHash_combine0(W._JenkinsSmiHash_combine0(W._JenkinsSmiHash_combine0(0, t1), t2), t3), t4);
       hash = 536870911 & t4 + ((67108863 & t4) << 3 >>> 0);
       hash ^= hash >>> 11;
       return 536870911 & hash + ((16383 & hash) << 15 >>> 0);
@@ -11223,7 +11254,7 @@ var $$ = {};
     forEach$1: function(_, f) {
       var t1, key;
       for (t1 = this.get$keys(), t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
-        key = t1._current;
+        key = t1.__internal$_current;
         f.call$2(key, this.$index(0, key));
       }
     },
@@ -11293,17 +11324,17 @@ var $$ = {};
   _DataAttributeMap: {
     "^": "Object;_attributes",
     containsKey$1: function(key) {
-      return this._attributes._html$_element.hasAttribute("data-" + this._toHyphenedName$1(key));
+      return this._attributes._html$_element.hasAttribute("data-" + H.S(this._toHyphenedName$1(key)));
     },
     $index: function(_, key) {
-      return this._attributes._html$_element.getAttribute("data-" + this._toHyphenedName$1(key));
+      return this._attributes._html$_element.getAttribute("data-" + H.S(this._toHyphenedName$1(key)));
     },
     $indexSet: function(_, key, value) {
-      this._attributes._html$_element.setAttribute("data-" + this._toHyphenedName$1(key), value);
+      this._attributes._html$_element.setAttribute("data-" + H.S(this._toHyphenedName$1(key)), value);
     },
     remove$1: function(_, key) {
       var t1, t2, value;
-      t1 = "data-" + this._toHyphenedName$1(key);
+      t1 = "data-" + H.S(this._toHyphenedName$1(key));
       t2 = this._attributes._html$_element;
       value = t2.getAttribute(t1);
       t2.removeAttribute(t1);
@@ -11364,7 +11395,8 @@ var $$ = {};
         sb._contents += lower;
         ++i;
       }
-      return sb._contents;
+      t1 = sb._contents;
+      return t1.charCodeAt(0) == 0 ? t1 : t1;
     },
     $isMap: true,
     $asMap: function() {
@@ -11459,14 +11491,26 @@ var $$ = {};
       this._tryResume$0();
     },
     _tryResume$0: function() {
-      var t1 = this._html$_onData;
-      if (t1 != null && this._pauseCount <= 0)
-        J.addEventListener$3$x(this._html$_target, this._eventType, t1, this._useCapture);
+      var t1, t2, t3;
+      t1 = this._html$_onData;
+      t2 = t1 != null;
+      if (t2 && this._pauseCount <= 0) {
+        t3 = this._html$_target;
+        t3.toString;
+        if (t2)
+          J._addEventListener$3$x(t3, this._eventType, t1, this._useCapture);
+      }
     },
     _unlisten$0: function() {
-      var t1 = this._html$_onData;
-      if (t1 != null)
-        J.removeEventListener$3$x(this._html$_target, this._eventType, t1, this._useCapture);
+      var t1, t2, t3;
+      t1 = this._html$_onData;
+      t2 = t1 != null;
+      if (t2) {
+        t3 = this._html$_target;
+        t3.toString;
+        if (t2)
+          J._removeEventListener$3$x(t3, this._eventType, t1, this._useCapture);
+      }
     }
   },
   _CustomEventStreamProvider: {
@@ -11499,9 +11543,9 @@ var $$ = {};
       t1 = $.get$_Html5NodeValidator__attributeValidators();
       if (t1.get$isEmpty(t1)) {
         for (t2 = new H.ListIterator(C.List_1GN, 261, 0, null); t2.moveNext$0();)
-          t1.$indexSet(0, t2._current, W._Html5NodeValidator__standardAttributeValidator$closure());
+          t1.$indexSet(0, t2.__internal$_current, W._Html5NodeValidator__standardAttributeValidator$closure());
         for (t2 = new H.ListIterator(C.List_yrN, 12, 0, null); t2.moveNext$0();)
-          t1.$indexSet(0, t2._current, W._Html5NodeValidator__uriAttributeValidator$closure());
+          t1.$indexSet(0, t2.__internal$_current, W._Html5NodeValidator__uriAttributeValidator$closure());
       }
     },
     static: {"^": "_Html5NodeValidator__allowedElements,_Html5NodeValidator__standardAttributes,_Html5NodeValidator__uriAttributes,_Html5NodeValidator__attributeValidators", _Html5NodeValidator$: function(uriPolicy) {
@@ -11715,26 +11759,26 @@ var $$ = {};
       return this._html$_iterator.moveNext$0();
     },
     get$current: function() {
-      return this._html$_iterator._html$_current;
+      return this._html$_iterator._current;
     }
   },
   FixedSizeListIterator: {
-    "^": "Object;_array,_html$_length,_position,_html$_current",
+    "^": "Object;_html$_array,_length,_position,_current",
     moveNext$0: function() {
       var nextPosition, t1;
       nextPosition = this._position + 1;
-      t1 = this._html$_length;
+      t1 = this._length;
       if (nextPosition < t1) {
-        this._html$_current = J.$index$asx(this._array, nextPosition);
+        this._current = J.$index$asx(this._html$_array, nextPosition);
         this._position = nextPosition;
         return true;
       }
-      this._html$_current = null;
+      this._current = null;
       this._position = t1;
       return false;
     },
     get$current: function() {
-      return this._html$_current;
+      return this._current;
     }
   },
   _DOMWindowCrossFrame: {
@@ -11894,6 +11938,9 @@ var $$ = {};
       for (; t1 = root.firstChild, t1 != null;)
         svgFragment.appendChild(t1);
       return svgFragment;
+    },
+    get$tabIndex: function(receiver) {
+      return receiver.tabIndex;
     },
     get$onChange: function(receiver) {
       return C.EventStreamProvider_change.forElement$1(receiver);
@@ -12184,23 +12231,23 @@ var $$ = {};
       return J.$index$asx(this.callMethod$2("splice", [index, 1]), 0);
     },
     setRange$4: function(_, start, end, iterable, skipCount) {
-      var t1, $length, args;
-      t1 = this.get$length(this);
-      if (start < 0 || start > t1)
-        H.throwExpression(P.RangeError$range(start, 0, t1));
-      if (end < start || end > t1)
-        H.throwExpression(P.RangeError$range(end, start, t1));
+      var $length, args;
+      P.JsArray__checkRange(start, end, this.get$length(this));
       $length = end - start;
       if ($length === 0)
         return;
       if (skipCount < 0)
         throw H.wrapException(P.ArgumentError$(skipCount));
       args = [start, $length];
-      t1 = new H.SubListIterable(iterable, skipCount, null);
-      t1.$builtinTypeInfo = [null];
-      C.JSArray_methods.addAll$1(args, t1.take$1(0, $length));
+      C.JSArray_methods.addAll$1(args, H.SubListIterable$(iterable, skipCount, null, null).take$1(0, $length));
       this.callMethod$2("splice", args);
-    }
+    },
+    static: {JsArray__checkRange: function(start, end, $length) {
+        if (start < 0 || start > $length)
+          throw H.wrapException(P.RangeError$range(start, 0, $length));
+        if (end < start || end > $length)
+          throw H.wrapException(P.RangeError$range(end, start, $length));
+      }}
   },
   JsObject_ListMixin: {
     "^": "JsObject+ListMixin;",
@@ -12254,7 +12301,7 @@ var $$ = {};
 }],
 ["dart.math", "dart:math", , P, {
   "^": "",
-  _JenkinsSmiHash_combine0: function(hash, value) {
+  _JenkinsSmiHash_combine: function(hash, value) {
     hash = 536870911 & hash + value;
     hash = 536870911 & hash + ((524287 & hash) << 10 >>> 0);
     return hash ^ hash >>> 6;
@@ -12267,6 +12314,11 @@ var $$ = {};
 }],
 ["dart.typed_data.implementation", "dart:_native_typed_data", , H, {
   "^": "",
+  _checkLength: function($length) {
+    if (typeof $length !== "number" || Math.floor($length) !== $length)
+      throw H.wrapException(P.ArgumentError$("Invalid length " + H.S($length)));
+    return $length;
+  },
   _ensureNativeList: function(list) {
     var t1, t2, result, i, t3;
     t1 = J.getInterceptor(list);
@@ -12314,11 +12366,7 @@ var $$ = {};
     _checkSublistArguments$3: function(receiver, start, end, $length) {
       var t1 = $length + 1;
       this._checkIndex$2(receiver, start, t1);
-      if (end == null)
-        return $length;
       this._checkIndex$2(receiver, end, t1);
-      if (typeof start !== "number")
-        return start.$gt();
       if (start > end)
         throw H.wrapException(P.RangeError$range(start, 0, end));
       return end;
@@ -12867,7 +12915,7 @@ var $$ = {};
     _getEventBits$1: function(elem) {
       var eventBits, t1, exception;
       elem.toString;
-      eventBits = elem.getAttribute("data-" + new W._DataAttributeMap(new W._ElementAttributeMap(elem))._toHyphenedName$1("eventBits"));
+      eventBits = elem.getAttribute("data-" + H.S(new W._DataAttributeMap(new W._ElementAttributeMap(elem))._toHyphenedName$1("eventBits")));
       if (eventBits != null)
         try {
           t1 = H.Primitives_parseInt(eventBits, null, null);
@@ -13009,7 +13057,7 @@ var $$ = {};
         return;
       elem.toString;
       t1 = C.JSInt_methods.toRadixString$1(chMask, 16);
-      elem.setAttribute("data-" + new W._DataAttributeMap(new W._ElementAttributeMap(elem))._toHyphenedName$1("eventBits"), t1);
+      elem.setAttribute("data-" + H.S(new W._DataAttributeMap(new W._ElementAttributeMap(elem))._toHyphenedName$1("eventBits")), t1);
       this._applyDispatcher$7(elem, C.EventStreamProvider_click, bits, chMask, "click", 1, $.DomImplStandard_dispatchEvent);
       this._applyDispatcher$7(elem, C.EventStreamProvider_dblclick, bits, chMask, "dblclick", 2, $.DomImplStandard_dispatchEvent);
       this._applyDispatcher$7(elem, C.EventStreamProvider_mousedown, bits, chMask, "mousedown", 4, $.DomImplStandard_dispatchEvent);
@@ -13227,7 +13275,7 @@ var $$ = {};
       if (t1 != null)
         try {
           for (t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
-            c = t1._current;
+            c = t1.__internal$_current;
             c.execute$0();
           }
         } finally {
@@ -13339,7 +13387,8 @@ var $$ = {};
           str = J.toString$0(t);
           b._contents += typeof str === "string" ? str : H.S(str);
         }
-        return b._contents;
+        t1 = b._contents;
+        return t1.charCodeAt(0) == 0 ? t1 : t1;
       }, UmbrellaException_makeCause: function(causes) {
         var iterator = new P.LinkedHashSetIterator(causes, causes._modifications, null, null);
         iterator._cell = causes._first;
@@ -13430,7 +13479,8 @@ var $$ = {};
       elem = this.element;
       if (t1)
         elem = elem.firstChild;
-      return isHtml ? J.get$innerHtml$x(elem) : elem.textContent;
+      t1 = J.getInterceptor$x(elem);
+      return isHtml ? t1.get$innerHtml(elem) : t1.get$text(elem);
     },
     setTextOrHtml$3: function($content, isHtml, dir) {
       var t1, t2;
@@ -13942,7 +13992,8 @@ var $$ = {};
       t1 = $.get$FocusWidget_impl();
       t2 = this._element;
       t1.toString;
-      if (-1 === t2.tabIndex) {
+      if (-1 === J.get$tabIndex$x(t2)) {
+        t2 = this._element;
         t1.toString;
         t2.toString;
         t2.setAttribute("tabIndex", C.JSInt_methods.toString$0(0));
@@ -14017,7 +14068,7 @@ var $$ = {};
         index = B.ElementMapperImpl_getIndex(t2);
         t2.toString;
         t2 = new W._ElementAttributeMap(t2);
-        t2.remove$1(0, "data-" + new W._DataAttributeMap(t2)._toHyphenedName$1("uiObjectID"));
+        t2.remove$1(0, "data-" + H.S(new W._DataAttributeMap(t2)._toHyphenedName$1("uiObjectID")));
         t2 = t1.uiObjectList;
         if (index >>> 0 !== index || index >= t2.length)
           return H.ioore(t2, index);
@@ -14053,7 +14104,7 @@ var $$ = {};
       t1 = widget._element;
       t1.toString;
       t2 = J.toString$0(index);
-      t1.setAttribute("data-" + new W._DataAttributeMap(new W._ElementAttributeMap(t1))._toHyphenedName$1("uiObjectID"), t2);
+      t1.setAttribute("data-" + H.S(new W._DataAttributeMap(new W._ElementAttributeMap(t1))._toHyphenedName$1("uiObjectID")), t2);
       td.appendChild(widget._element);
       widget.setParent$1(this);
     },
@@ -14215,8 +14266,8 @@ var $$ = {};
     }],
     static: {"^": "ElementMapperImpl_UI_OBJECT_ID", ElementMapperImpl_getIndex: function(elem) {
         elem.toString;
-        if (elem.hasAttribute("data-" + new W._DataAttributeMap(new W._ElementAttributeMap(elem))._toHyphenedName$1("uiObjectID")) === true)
-          return H.Primitives_parseInt(elem.getAttribute("data-" + new W._DataAttributeMap(new W._ElementAttributeMap(elem))._toHyphenedName$1("uiObjectID")), null, null);
+        if (elem.hasAttribute("data-" + H.S(new W._DataAttributeMap(new W._ElementAttributeMap(elem))._toHyphenedName$1("uiObjectID"))) === true)
+          return H.Primitives_parseInt(elem.getAttribute("data-" + H.S(new W._DataAttributeMap(new W._ElementAttributeMap(elem))._toHyphenedName$1("uiObjectID"))), null, null);
         else
           return -1;
       }}
@@ -14252,7 +14303,7 @@ var $$ = {};
     "^": "Widget;",
     set$wordWrap: function(_, wrap) {
       var t1 = this._element.style;
-      J.set$whiteSpace$x(t1, wrap === true ? C.WhiteSpace_normal._dart_web_toolkit_util$_value : C.WhiteSpace_nowrap._dart_web_toolkit_util$_value);
+      J.set$whiteSpace$x(t1, wrap ? "normal" : "nowrap");
     },
     updateHorizontalAlignment$0: function() {
       if (null != this._horzAlign) {
@@ -14405,7 +14456,7 @@ var $$ = {};
       t2.toString;
       if (t1 < 0 || t1 >= t2._size)
         H.throwExpression(P.Exception_Exception("IndexOutOfBoundsException"));
-      t2 = t2._dart_web_toolkit_ui$_array;
+      t2 = t2._array;
       if (t1 < 0 || t1 >= t2.length)
         return H.ioore(t2, t1);
       t1 = t2[t1];
@@ -14436,7 +14487,7 @@ var $$ = {};
         t2.toString;
         if (i >= t2._size)
           H.throwExpression(P.Exception_Exception("IndexOutOfBoundsException"));
-        t2 = t2._dart_web_toolkit_ui$_array;
+        t2 = t2._array;
         if (i >= t2.length)
           return H.ioore(t2, i);
         if (J.$eq(t2[i], tabWidget))
@@ -14750,16 +14801,13 @@ var $$ = {};
             H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._html$_target, t1._eventType, W._wrapZone($.DomImplStandard_dispatchDragEvent), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
             break;
           case "canplaythrough":
-            t1 = C.EventStreamProvider_canplaythrough.forTarget$1(t2);
-            H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._html$_target, t1._eventType, W._wrapZone($.DomImplStandard_dispatchEvent), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+            H.throwNoSuchMethod("", "canPlayThroughEvent", [], null).forTarget$1(t2);
             break;
           case "ended":
-            t1 = C.EventStreamProvider_ended.forTarget$1(t2);
-            H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._html$_target, t1._eventType, W._wrapZone($.DomImplStandard_dispatchEvent), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+            H.throwNoSuchMethod("", "endedEvent", [], null).forTarget$1(t2);
             break;
           case "progress":
-            t1 = C.EventStreamProvider_progress.forTarget$1(t2);
-            H.setRuntimeTypeInfo(new W._EventStreamSubscription(0, t1._html$_target, t1._eventType, W._wrapZone($.DomImplStandard_dispatchEvent), t1._useCapture), [H.getTypeArgumentByIndex(t1, 0)])._tryResume$0();
+            H.throwNoSuchMethod("", "progressEvent", [], null).forTarget$1(t2);
             break;
           default:
             H.throwExpression(P.Exception_Exception("Trying to sink unknown event type " + t1));
@@ -14856,7 +14904,7 @@ var $$ = {};
     }
   },
   WidgetCollection: {
-    "^": "Iterable;_dart_web_toolkit_ui$_array,_parent,_size",
+    "^": "Iterable;_array,_parent,_size",
     add$1: function(_, w) {
       this.insert$2(0, w, this._size);
     },
@@ -14867,7 +14915,7 @@ var $$ = {};
       var t1;
       if (index < 0 || index >= this._size)
         throw H.wrapException(P.Exception_Exception("IndexOutOfBoundsException"));
-      t1 = this._dart_web_toolkit_ui$_array;
+      t1 = this._array;
       if (index < 0 || index >= t1.length)
         return H.ioore(t1, index);
       return t1[index];
@@ -14875,7 +14923,7 @@ var $$ = {};
     indexOf$1: function(_, w) {
       var i, t1;
       for (i = 0; i < this._size; ++i) {
-        t1 = this._dart_web_toolkit_ui$_array;
+        t1 = this._array;
         if (i >= t1.length)
           return H.ioore(t1, i);
         if (J.$eq(t1[i], w))
@@ -14888,19 +14936,19 @@ var $$ = {};
       if (beforeIndex < 0 || beforeIndex > this._size)
         throw H.wrapException(P.Exception_Exception("IndexOutOfBoundsException"));
       t1 = this._size;
-      t2 = this._dart_web_toolkit_ui$_array;
+      t2 = this._array;
       t3 = t2.length;
       if (t1 === t3) {
         t1 = Array(t3 * 2);
         t1.fixed$length = init;
         newArray = H.setRuntimeTypeInfo(t1, [B.Widget]);
-        for (t1 = this._dart_web_toolkit_ui$_array, t2 = t1.length, t3 = newArray.length, i = 0; i < t2; ++i) {
+        for (t1 = this._array, t2 = t1.length, t3 = newArray.length, i = 0; i < t2; ++i) {
           t4 = t1[i];
           if (i >= t3)
             return H.ioore(newArray, i);
           newArray[i] = t4;
         }
-        this._dart_web_toolkit_ui$_array = newArray;
+        this._array = newArray;
         t1 = newArray;
       } else
         t1 = t2;
@@ -14927,7 +14975,7 @@ var $$ = {};
         throw H.wrapException(P.Exception_Exception("IndexOutOfBounds"));
       --this._size;
       for (i = index; t1 = J.getInterceptor$n(i), t1.$lt(i, this._size); ++i) {
-        t2 = this._dart_web_toolkit_ui$_array;
+        t2 = this._array;
         t1 = t1.$add(i, 1);
         t3 = t2.length;
         if (t1 >>> 0 !== t1 || t1 >= t3)
@@ -14937,7 +14985,7 @@ var $$ = {};
           return H.ioore(t2, i);
         t2[i] = t1;
       }
-      t1 = this._dart_web_toolkit_ui$_array;
+      t1 = this._array;
       t2 = this._size;
       if (t2 < 0 || t2 >= t1.length)
         return H.ioore(t1, t2);
@@ -14961,7 +15009,7 @@ var $$ = {};
     forEach$1: function(_, f) {
       var i, t1;
       for (i = 0; i < this._size; ++i) {
-        t1 = this._dart_web_toolkit_ui$_array;
+        t1 = this._array;
         if (i >= t1.length)
           return H.ioore(t1, i);
         f.call$1(t1[i]);
@@ -14975,7 +15023,7 @@ var $$ = {};
       this._parent = this._parent;
       t1 = Array($.WidgetCollection__INITIAL_SIZE);
       t1.fixed$length = init;
-      this._dart_web_toolkit_ui$_array = H.setRuntimeTypeInfo(t1, [B.Widget]);
+      this._array = H.setRuntimeTypeInfo(t1, [B.Widget]);
     },
     $asIterable: function() {
       return [B.Widget];
@@ -14997,7 +15045,7 @@ var $$ = {};
       t2 = this._widgetCollection;
       if (t1 >= t2._size)
         H.throwExpression(P.Exception_Exception("NoSuchElement"));
-      t2 = t2._dart_web_toolkit_ui$_array;
+      t2 = t2._array;
       ++t1;
       this.index = t1;
       if (t1 < 0 || t1 >= t2.length)
@@ -15011,7 +15059,7 @@ var $$ = {};
         throw H.wrapException(P.Exception_Exception("IllegalState"));
       t2 = this._widgetCollection;
       t3 = t2._parent;
-      t2 = t2._dart_web_toolkit_ui$_array;
+      t2 = t2._array;
       this.index = t1 - 1;
       if (t1 < 0 || t1 >= t2.length)
         return H.ioore(t2, t1);
@@ -15026,10 +15074,6 @@ var $$ = {};
     get$value: function(_) {
       return this._dart_web_toolkit_util$_value;
     }
-  },
-  WhiteSpace: {
-    "^": "Enum;_dart_web_toolkit_util$_value",
-    static: {"^": "WhiteSpace_NORMAL,WhiteSpace_NOWRAP,WhiteSpace_PRE,WhiteSpace_PRE_LINE,WhiteSpace_PRE_WRAP"}
   },
   TextAlign: {
     "^": "Enum;_dart_web_toolkit_util$_value",
@@ -15293,7 +15337,7 @@ var $$ = {};
         t7 = Array($.WidgetCollection__INITIAL_SIZE);
         t7.fixed$length = init;
         t7.$builtinTypeInfo = [B.Widget];
-        t6._dart_web_toolkit_ui$_array = t7;
+        t6._array = t7;
         t5._children = t6;
         t6 = document.createElement("div", null);
         t5._element = t6;
@@ -15339,17 +15383,6 @@ var $$ = {};
       result.fname = "hetima.system.player.swf";
       result.apath = "hetima.system";
       this.addFile$2("hetima.system.player.swf", result);
-      result = new U.FileSelectResult(null, null, null);
-      buffer = M._CryptoUtils_base64StringToBytes("LyohCVNXRk9iamVjdCB2Mi4yIDxodHRwOi8vY29kZS5nb29nbGUuY29tL3Avc3dmb2JqZWN0Lz4gDQoJaXMgcmVsZWFzZWQgdW5kZXIgdGhlIE1JVCBMaWNlbnNlIDxodHRwOi8vd3d3Lm9wZW5zb3VyY2Uub3JnL2xpY2Vuc2VzL21pdC1saWNlbnNlLnBocD4gDQoqLw0KDQp2YXIgc3dmb2JqZWN0ID0gZnVuY3Rpb24oKSB7DQoJDQoJdmFyIFVOREVGID0gInVuZGVmaW5lZCIsDQoJCU9CSkVDVCA9ICJvYmplY3QiLA0KCQlTSE9DS1dBVkVfRkxBU0ggPSAiU2hvY2t3YXZlIEZsYXNoIiwNCgkJU0hPQ0tXQVZFX0ZMQVNIX0FYID0gIlNob2Nrd2F2ZUZsYXNoLlNob2Nrd2F2ZUZsYXNoIiwNCgkJRkxBU0hfTUlNRV9UWVBFID0gImFwcGxpY2F0aW9uL3gtc2hvY2t3YXZlLWZsYXNoIiwNCgkJRVhQUkVTU19JTlNUQUxMX0lEID0gIlNXRk9iamVjdEV4cHJJbnN0IiwNCgkJT05fUkVBRFlfU1RBVEVfQ0hBTkdFID0gIm9ucmVhZHlzdGF0ZWNoYW5nZSIsDQoJCQ0KCQl3aW4gPSB3aW5kb3csDQoJCWRvYyA9IGRvY3VtZW50LA0KCQluYXYgPSBuYXZpZ2F0b3IsDQoJCQ0KCQlwbHVnaW4gPSBmYWxzZSwNCgkJZG9tTG9hZEZuQXJyID0gW21haW5dLA0KCQlyZWdPYmpBcnIgPSBbXSwNCgkJb2JqSWRBcnIgPSBbXSwNCgkJbGlzdGVuZXJzQXJyID0gW10sDQoJCXN0b3JlZEFsdENvbnRlbnQsDQoJCXN0b3JlZEFsdENvbnRlbnRJZCwNCgkJc3RvcmVkQ2FsbGJhY2tGbiwNCgkJc3RvcmVkQ2FsbGJhY2tPYmosDQoJCWlzRG9tTG9hZGVkID0gZmFsc2UsDQoJCWlzRXhwcmVzc0luc3RhbGxBY3RpdmUgPSBmYWxzZSwNCgkJZHluYW1pY1N0eWxlc2hlZXQsDQoJCWR5bmFtaWNTdHlsZXNoZWV0TWVkaWEsDQoJCWF1dG9IaWRlU2hvdyA9IHRydWUsDQoJDQoJLyogQ2VudHJhbGl6ZWQgZnVuY3Rpb24gZm9yIGJyb3dzZXIgZmVhdHVyZSBkZXRlY3Rpb24NCgkJLSBVc2VyIGFnZW50IHN0cmluZyBkZXRlY3Rpb24gaXMgb25seSB1c2VkIHdoZW4gbm8gZ29vZCBhbHRlcm5hdGl2ZSBpcyBwb3NzaWJsZQ0KCQktIElzIGV4ZWN1dGVkIGRpcmVjdGx5IGZvciBvcHRpbWFsIHBlcmZvcm1hbmNlDQoJKi8JDQoJdWEgPSBmdW5jdGlvbigpIHsNCgkJdmFyIHczY2RvbSA9IHR5cGVvZiBkb2MuZ2V0RWxlbWVudEJ5SWQgIT0gVU5ERUYgJiYgdHlwZW9mIGRvYy5nZXRFbGVtZW50c0J5VGFnTmFtZSAhPSBVTkRFRiAmJiB0eXBlb2YgZG9jLmNyZWF0ZUVsZW1lbnQgIT0gVU5ERUYsDQoJCQl1ID0gbmF2LnVzZXJBZ2VudC50b0xvd2VyQ2FzZSgpLA0KCQkJcCA9IG5hdi5wbGF0Zm9ybS50b0xvd2VyQ2FzZSgpLA0KCQkJd2luZG93cyA9IHAgPyAvd2luLy50ZXN0KHApIDogL3dpbi8udGVzdCh1KSwNCgkJCW1hYyA9IHAgPyAvbWFjLy50ZXN0KHApIDogL21hYy8udGVzdCh1KSwNCgkJCXdlYmtpdCA9IC93ZWJraXQvLnRlc3QodSkgPyBwYXJzZUZsb2F0KHUucmVwbGFjZSgvXi4qd2Via2l0XC8oXGQrKFwuXGQrKT8pLiokLywgIiQxIikpIDogZmFsc2UsIC8vIHJldHVybnMgZWl0aGVyIHRoZSB3ZWJraXQgdmVyc2lvbiBvciBmYWxzZSBpZiBub3Qgd2Via2l0DQoJCQlpZSA9ICErIlx2MSIsIC8vIGZlYXR1cmUgZGV0ZWN0aW9uIGJhc2VkIG9uIEFuZHJlYSBHaWFtbWFyY2hpJ3Mgc29sdXRpb246IGh0dHA6Ly93ZWJyZWZsZWN0aW9uLmJsb2dzcG90LmNvbS8yMDA5LzAxLzMyLWJ5dGVzLXRvLWtub3ctaWYteW91ci1icm93c2VyLWlzLWllLmh0bWwNCgkJCXBsYXllclZlcnNpb24gPSBbMCwwLDBdLA0KCQkJZCA9IG51bGw7DQoJCWlmICh0eXBlb2YgbmF2LnBsdWdpbnMgIT0gVU5ERUYgJiYgdHlwZW9mIG5hdi5wbHVnaW5zW1NIT0NLV0FWRV9GTEFTSF0gPT0gT0JKRUNUKSB7DQoJCQlkID0gbmF2LnBsdWdpbnNbU0hPQ0tXQVZFX0ZMQVNIXS5kZXNjcmlwdGlvbjsNCgkJCWlmIChkICYmICEodHlwZW9mIG5hdi5taW1lVHlwZXMgIT0gVU5ERUYgJiYgbmF2Lm1pbWVUeXBlc1tGTEFTSF9NSU1FX1RZUEVdICYmICFuYXYubWltZVR5cGVzW0ZMQVNIX01JTUVfVFlQRV0uZW5hYmxlZFBsdWdpbikpIHsgLy8gbmF2aWdhdG9yLm1pbWVUeXBlc1siYXBwbGljYXRpb24veC1zaG9ja3dhdmUtZmxhc2giXS5lbmFibGVkUGx1Z2luIGluZGljYXRlcyB3aGV0aGVyIHBsdWctaW5zIGFyZSBlbmFibGVkIG9yIGRpc2FibGVkIGluIFNhZmFyaSAzKw0KCQkJCXBsdWdpbiA9IHRydWU7DQoJCQkJaWUgPSBmYWxzZTsgLy8gY2FzY2FkZWQgZmVhdHVyZSBkZXRlY3Rpb24gZm9yIEludGVybmV0IEV4cGxvcmVyDQoJCQkJZCA9IGQucmVwbGFjZSgvXi4qXHMrKFxTK1xzK1xTKyQpLywgIiQxIik7DQoJCQkJcGxheWVyVmVyc2lvblswXSA9IHBhcnNlSW50KGQucmVwbGFjZSgvXiguKilcLi4qJC8sICIkMSIpLCAxMCk7DQoJCQkJcGxheWVyVmVyc2lvblsxXSA9IHBhcnNlSW50KGQucmVwbGFjZSgvXi4qXC4oLiopXHMuKiQvLCAiJDEiKSwgMTApOw0KCQkJCXBsYXllclZlcnNpb25bMl0gPSAvW2EtekEtWl0vLnRlc3QoZCkgPyBwYXJzZUludChkLnJlcGxhY2UoL14uKlthLXpBLVpdKyguKikkLywgIiQxIiksIDEwKSA6IDA7DQoJCQl9DQoJCX0NCgkJZWxzZSBpZiAodHlwZW9mIHdpbi5BY3RpdmVYT2JqZWN0ICE9IFVOREVGKSB7DQoJCQl0cnkgew0KCQkJCXZhciBhID0gbmV3IEFjdGl2ZVhPYmplY3QoU0hPQ0tXQVZFX0ZMQVNIX0FYKTsNCgkJCQlpZiAoYSkgeyAvLyBhIHdpbGwgcmV0dXJuIG51bGwgd2hlbiBBY3RpdmVYIGlzIGRpc2FibGVkDQoJCQkJCWQgPSBhLkdldFZhcmlhYmxlKCIkdmVyc2lvbiIpOw0KCQkJCQlpZiAoZCkgew0KCQkJCQkJaWUgPSB0cnVlOyAvLyBjYXNjYWRlZCBmZWF0dXJlIGRldGVjdGlvbiBmb3IgSW50ZXJuZXQgRXhwbG9yZXINCgkJCQkJCWQgPSBkLnNwbGl0KCIgIilbMV0uc3BsaXQoIiwiKTsNCgkJCQkJCXBsYXllclZlcnNpb24gPSBbcGFyc2VJbnQoZFswXSwgMTApLCBwYXJzZUludChkWzFdLCAxMCksIHBhcnNlSW50KGRbMl0sIDEwKV07DQoJCQkJCX0NCgkJCQl9DQoJCQl9DQoJCQljYXRjaChlKSB7fQ0KCQl9DQoJCXJldHVybiB7IHczOnczY2RvbSwgcHY6cGxheWVyVmVyc2lvbiwgd2s6d2Via2l0LCBpZTppZSwgd2luOndpbmRvd3MsIG1hYzptYWMgfTsNCgl9KCksDQoJDQoJLyogQ3Jvc3MtYnJvd3NlciBvbkRvbUxvYWQNCgkJLSBXaWxsIGZpcmUgYW4gZXZlbnQgYXMgc29vbiBhcyB0aGUgRE9NIG9mIGEgd2ViIHBhZ2UgaXMgbG9hZGVkDQoJCS0gSW50ZXJuZXQgRXhwbG9yZXIgd29ya2Fyb3VuZCBiYXNlZCBvbiBEaWVnbyBQZXJpbmkncyBzb2x1dGlvbjogaHR0cDovL2phdmFzY3JpcHQubndib3guY29tL0lFQ29udGVudExvYWRlZC8NCgkJLSBSZWd1bGFyIG9ubG9hZCBzZXJ2ZXMgYXMgZmFsbGJhY2sNCgkqLyANCglvbkRvbUxvYWQgPSBmdW5jdGlvbigpIHsNCgkJaWYgKCF1YS53MykgeyByZXR1cm47IH0NCgkJaWYgKCh0eXBlb2YgZG9jLnJlYWR5U3RhdGUgIT0gVU5ERUYgJiYgZG9jLnJlYWR5U3RhdGUgPT0gImNvbXBsZXRlIikgfHwgKHR5cGVvZiBkb2MucmVhZHlTdGF0ZSA9PSBVTkRFRiAmJiAoZG9jLmdldEVsZW1lbnRzQnlUYWdOYW1lKCJib2R5IilbMF0gfHwgZG9jLmJvZHkpKSkgeyAvLyBmdW5jdGlvbiBpcyBmaXJlZCBhZnRlciBvbmxvYWQsIGUuZy4gd2hlbiBzY3JpcHQgaXMgaW5zZXJ0ZWQgZHluYW1pY2FsbHkgDQoJCQljYWxsRG9tTG9hZEZ1bmN0aW9ucygpOw0KCQl9DQoJCWlmICghaXNEb21Mb2FkZWQpIHsNCgkJCWlmICh0eXBlb2YgZG9jLmFkZEV2ZW50TGlzdGVuZXIgIT0gVU5ERUYpIHsNCgkJCQlkb2MuYWRkRXZlbnRMaXN0ZW5lcigiRE9NQ29udGVudExvYWRlZCIsIGNhbGxEb21Mb2FkRnVuY3Rpb25zLCBmYWxzZSk7DQoJCQl9CQkNCgkJCWlmICh1YS5pZSAmJiB1YS53aW4pIHsNCgkJCQlkb2MuYXR0YWNoRXZlbnQoT05fUkVBRFlfU1RBVEVfQ0hBTkdFLCBmdW5jdGlvbigpIHsNCgkJCQkJaWYgKGRvYy5yZWFkeVN0YXRlID09ICJjb21wbGV0ZSIpIHsNCgkJCQkJCWRvYy5kZXRhY2hFdmVudChPTl9SRUFEWV9TVEFURV9DSEFOR0UsIGFyZ3VtZW50cy5jYWxsZWUpOw0KCQkJCQkJY2FsbERvbUxvYWRGdW5jdGlvbnMoKTsNCgkJCQkJfQ0KCQkJCX0pOw0KCQkJCWlmICh3aW4gPT0gdG9wKSB7IC8vIGlmIG5vdCBpbnNpZGUgYW4gaWZyYW1lDQoJCQkJCShmdW5jdGlvbigpew0KCQkJCQkJaWYgKGlzRG9tTG9hZGVkKSB7IHJldHVybjsgfQ0KCQkJCQkJdHJ5IHsNCgkJCQkJCQlkb2MuZG9jdW1lbnRFbGVtZW50LmRvU2Nyb2xsKCJsZWZ0Iik7DQoJCQkJCQl9DQoJCQkJCQljYXRjaChlKSB7DQoJCQkJCQkJc2V0VGltZW91dChhcmd1bWVudHMuY2FsbGVlLCAwKTsNCgkJCQkJCQlyZXR1cm47DQoJCQkJCQl9DQoJCQkJCQljYWxsRG9tTG9hZEZ1bmN0aW9ucygpOw0KCQkJCQl9KSgpOw0KCQkJCX0NCgkJCX0NCgkJCWlmICh1YS53aykgew0KCQkJCShmdW5jdGlvbigpew0KCQkJCQlpZiAoaXNEb21Mb2FkZWQpIHsgcmV0dXJuOyB9DQoJCQkJCWlmICghL2xvYWRlZHxjb21wbGV0ZS8udGVzdChkb2MucmVhZHlTdGF0ZSkpIHsNCgkJCQkJCXNldFRpbWVvdXQoYXJndW1lbnRzLmNhbGxlZSwgMCk7DQoJCQkJCQlyZXR1cm47DQoJCQkJCX0NCgkJCQkJY2FsbERvbUxvYWRGdW5jdGlvbnMoKTsNCgkJCQl9KSgpOw0KCQkJfQ0KCQkJYWRkTG9hZEV2ZW50KGNhbGxEb21Mb2FkRnVuY3Rpb25zKTsNCgkJfQ0KCX0oKTsNCgkNCglmdW5jdGlvbiBjYWxsRG9tTG9hZEZ1bmN0aW9ucygpIHsNCgkJaWYgKGlzRG9tTG9hZGVkKSB7IHJldHVybjsgfQ0KCQl0cnkgeyAvLyB0ZXN0IGlmIHdlIGNhbiByZWFsbHkgYWRkL3JlbW92ZSBlbGVtZW50cyB0by9mcm9tIHRoZSBET007IHdlIGRvbid0IHdhbnQgdG8gZmlyZSBpdCB0b28gZWFybHkNCgkJCXZhciB0ID0gZG9jLmdldEVsZW1lbnRzQnlUYWdOYW1lKCJib2R5IilbMF0uYXBwZW5kQ2hpbGQoY3JlYXRlRWxlbWVudCgic3BhbiIpKTsNCgkJCXQucGFyZW50Tm9kZS5yZW1vdmVDaGlsZCh0KTsNCgkJfQ0KCQljYXRjaCAoZSkgeyByZXR1cm47IH0NCgkJaXNEb21Mb2FkZWQgPSB0cnVlOw0KCQl2YXIgZGwgPSBkb21Mb2FkRm5BcnIubGVuZ3RoOw0KCQlmb3IgKHZhciBpID0gMDsgaSA8IGRsOyBpKyspIHsNCgkJCWRvbUxvYWRGbkFycltpXSgpOw0KCQl9DQoJfQ0KCQ0KCWZ1bmN0aW9uIGFkZERvbUxvYWRFdmVudChmbikgew0KCQlpZiAoaXNEb21Mb2FkZWQpIHsNCgkJCWZuKCk7DQoJCX0NCgkJZWxzZSB7IA0KCQkJZG9tTG9hZEZuQXJyW2RvbUxvYWRGbkFyci5sZW5ndGhdID0gZm47IC8vIEFycmF5LnB1c2goKSBpcyBvbmx5IGF2YWlsYWJsZSBpbiBJRTUuNSsNCgkJfQ0KCX0NCgkNCgkvKiBDcm9zcy1icm93c2VyIG9ubG9hZA0KCQktIEJhc2VkIG9uIEphbWVzIEVkd2FyZHMnIHNvbHV0aW9uOiBodHRwOi8vYnJvdGhlcmNha2UuY29tL3NpdGUvcmVzb3VyY2VzL3NjcmlwdHMvb25sb2FkLw0KCQktIFdpbGwgZmlyZSBhbiBldmVudCBhcyBzb29uIGFzIGEgd2ViIHBhZ2UgaW5jbHVkaW5nIGFsbCBvZiBpdHMgYXNzZXRzIGFyZSBsb2FkZWQgDQoJICovDQoJZnVuY3Rpb24gYWRkTG9hZEV2ZW50KGZuKSB7DQoJCWlmICh0eXBlb2Ygd2luLmFkZEV2ZW50TGlzdGVuZXIgIT0gVU5ERUYpIHsNCgkJCXdpbi5hZGRFdmVudExpc3RlbmVyKCJsb2FkIiwgZm4sIGZhbHNlKTsNCgkJfQ0KCQllbHNlIGlmICh0eXBlb2YgZG9jLmFkZEV2ZW50TGlzdGVuZXIgIT0gVU5ERUYpIHsNCgkJCWRvYy5hZGRFdmVudExpc3RlbmVyKCJsb2FkIiwgZm4sIGZhbHNlKTsNCgkJfQ0KCQllbHNlIGlmICh0eXBlb2Ygd2luLmF0dGFjaEV2ZW50ICE9IFVOREVGKSB7DQoJCQlhZGRMaXN0ZW5lcih3aW4sICJvbmxvYWQiLCBmbik7DQoJCX0NCgkJZWxzZSBpZiAodHlwZW9mIHdpbi5vbmxvYWQgPT0gImZ1bmN0aW9uIikgew0KCQkJdmFyIGZuT2xkID0gd2luLm9ubG9hZDsNCgkJCXdpbi5vbmxvYWQgPSBmdW5jdGlvbigpIHsNCgkJCQlmbk9sZCgpOw0KCQkJCWZuKCk7DQoJCQl9Ow0KCQl9DQoJCWVsc2Ugew0KCQkJd2luLm9ubG9hZCA9IGZuOw0KCQl9DQoJfQ0KCQ0KCS8qIE1haW4gZnVuY3Rpb24NCgkJLSBXaWxsIHByZWZlcmFibHkgZXhlY3V0ZSBvbkRvbUxvYWQsIG90aGVyd2lzZSBvbmxvYWQgKGFzIGEgZmFsbGJhY2spDQoJKi8NCglmdW5jdGlvbiBtYWluKCkgeyANCgkJaWYgKHBsdWdpbikgew0KCQkJdGVzdFBsYXllclZlcnNpb24oKTsNCgkJfQ0KCQllbHNlIHsNCgkJCW1hdGNoVmVyc2lvbnMoKTsNCgkJfQ0KCX0NCgkNCgkvKiBEZXRlY3QgdGhlIEZsYXNoIFBsYXllciB2ZXJzaW9uIGZvciBub24tSW50ZXJuZXQgRXhwbG9yZXIgYnJvd3NlcnMNCgkJLSBEZXRlY3RpbmcgdGhlIHBsdWctaW4gdmVyc2lvbiB2aWEgdGhlIG9iamVjdCBlbGVtZW50IGlzIG1vcmUgcHJlY2lzZSB0aGFuIHVzaW5nIHRoZSBwbHVnaW5zIGNvbGxlY3Rpb24gaXRlbSdzIGRlc2NyaXB0aW9uOg0KCQkgIGEuIEJvdGggcmVsZWFzZSBhbmQgYnVpbGQgbnVtYmVycyBjYW4gYmUgZGV0ZWN0ZWQNCgkJICBiLiBBdm9pZCB3cm9uZyBkZXNjcmlwdGlvbnMgYnkgY29ycnVwdCBpbnN0YWxsZXJzIHByb3ZpZGVkIGJ5IEFkb2JlDQoJCSAgYy4gQXZvaWQgd3JvbmcgZGVzY3JpcHRpb25zIGJ5IG11bHRpcGxlIEZsYXNoIFBsYXllciBlbnRyaWVzIGluIHRoZSBwbHVnaW4gQXJyYXksIGNhdXNlZCBieSBpbmNvcnJlY3QgYnJvd3NlciBpbXBvcnRzDQoJCS0gRGlzYWR2YW50YWdlIG9mIHRoaXMgbWV0aG9kIGlzIHRoYXQgaXQgZGVwZW5kcyBvbiB0aGUgYXZhaWxhYmlsaXR5IG9mIHRoZSBET00sIHdoaWxlIHRoZSBwbHVnaW5zIGNvbGxlY3Rpb24gaXMgaW1tZWRpYXRlbHkgYXZhaWxhYmxlDQoJKi8NCglmdW5jdGlvbiB0ZXN0UGxheWVyVmVyc2lvbigpIHsNCgkJdmFyIGIgPSBkb2MuZ2V0RWxlbWVudHNCeVRhZ05hbWUoImJvZHkiKVswXTsNCgkJdmFyIG8gPSBjcmVhdGVFbGVtZW50KE9CSkVDVCk7DQoJCW8uc2V0QXR0cmlidXRlKCJ0eXBlIiwgRkxBU0hfTUlNRV9UWVBFKTsNCgkJdmFyIHQgPSBiLmFwcGVuZENoaWxkKG8pOw0KCQlpZiAodCkgew0KCQkJdmFyIGNvdW50ZXIgPSAwOw0KCQkJKGZ1bmN0aW9uKCl7DQoJCQkJaWYgKHR5cGVvZiB0LkdldFZhcmlhYmxlICE9IFVOREVGKSB7DQoJCQkJCXZhciBkID0gdC5HZXRWYXJpYWJsZSgiJHZlcnNpb24iKTsNCgkJCQkJaWYgKGQpIHsNCgkJCQkJCWQgPSBkLnNwbGl0KCIgIilbMV0uc3BsaXQoIiwiKTsNCgkJCQkJCXVhLnB2ID0gW3BhcnNlSW50KGRbMF0sIDEwKSwgcGFyc2VJbnQoZFsxXSwgMTApLCBwYXJzZUludChkWzJdLCAxMCldOw0KCQkJCQl9DQoJCQkJfQ0KCQkJCWVsc2UgaWYgKGNvdW50ZXIgPCAxMCkgew0KCQkJCQljb3VudGVyKys7DQoJCQkJCXNldFRpbWVvdXQoYXJndW1lbnRzLmNhbGxlZSwgMTApOw0KCQkJCQlyZXR1cm47DQoJCQkJfQ0KCQkJCWIucmVtb3ZlQ2hpbGQobyk7DQoJCQkJdCA9IG51bGw7DQoJCQkJbWF0Y2hWZXJzaW9ucygpOw0KCQkJfSkoKTsNCgkJfQ0KCQllbHNlIHsNCgkJCW1hdGNoVmVyc2lvbnMoKTsNCgkJfQ0KCX0NCgkNCgkvKiBQZXJmb3JtIEZsYXNoIFBsYXllciBhbmQgU1dGIHZlcnNpb24gbWF0Y2hpbmc7IHN0YXRpYyBwdWJsaXNoaW5nIG9ubHkNCgkqLw0KCWZ1bmN0aW9uIG1hdGNoVmVyc2lvbnMoKSB7DQoJCXZhciBybCA9IHJlZ09iakFyci5sZW5ndGg7DQoJCWlmIChybCA+IDApIHsNCgkJCWZvciAodmFyIGkgPSAwOyBpIDwgcmw7IGkrKykgeyAvLyBmb3IgZWFjaCByZWdpc3RlcmVkIG9iamVjdCBlbGVtZW50DQoJCQkJdmFyIGlkID0gcmVnT2JqQXJyW2ldLmlkOw0KCQkJCXZhciBjYiA9IHJlZ09iakFycltpXS5jYWxsYmFja0ZuOw0KCQkJCXZhciBjYk9iaiA9IHtzdWNjZXNzOmZhbHNlLCBpZDppZH07DQoJCQkJaWYgKHVhLnB2WzBdID4gMCkgew0KCQkJCQl2YXIgb2JqID0gZ2V0RWxlbWVudEJ5SWQoaWQpOw0KCQkJCQlpZiAob2JqKSB7DQoJCQkJCQlpZiAoaGFzUGxheWVyVmVyc2lvbihyZWdPYmpBcnJbaV0uc3dmVmVyc2lvbikgJiYgISh1YS53ayAmJiB1YS53ayA8IDMxMikpIHsgLy8gRmxhc2ggUGxheWVyIHZlcnNpb24gPj0gcHVibGlzaGVkIFNXRiB2ZXJzaW9uOiBIb3VzdG9uLCB3ZSBoYXZlIGEgbWF0Y2ghDQoJCQkJCQkJc2V0VmlzaWJpbGl0eShpZCwgdHJ1ZSk7DQoJCQkJCQkJaWYgKGNiKSB7DQoJCQkJCQkJCWNiT2JqLnN1Y2Nlc3MgPSB0cnVlOw0KCQkJCQkJCQljYk9iai5yZWYgPSBnZXRPYmplY3RCeUlkKGlkKTsNCgkJCQkJCQkJY2IoY2JPYmopOw0KCQkJCQkJCX0NCgkJCQkJCX0NCgkJCQkJCWVsc2UgaWYgKHJlZ09iakFycltpXS5leHByZXNzSW5zdGFsbCAmJiBjYW5FeHByZXNzSW5zdGFsbCgpKSB7IC8vIHNob3cgdGhlIEFkb2JlIEV4cHJlc3MgSW5zdGFsbCBkaWFsb2cgaWYgc2V0IGJ5IHRoZSB3ZWIgcGFnZSBhdXRob3IgYW5kIGlmIHN1cHBvcnRlZA0KCQkJCQkJCXZhciBhdHQgPSB7fTsNCgkJCQkJCQlhdHQuZGF0YSA9IHJlZ09iakFycltpXS5leHByZXNzSW5zdGFsbDsNCgkJCQkJCQlhdHQud2lkdGggPSBvYmouZ2V0QXR0cmlidXRlKCJ3aWR0aCIpIHx8ICIwIjsNCgkJCQkJCQlhdHQuaGVpZ2h0ID0gb2JqLmdldEF0dHJpYnV0ZSgiaGVpZ2h0IikgfHwgIjAiOw0KCQkJCQkJCWlmIChvYmouZ2V0QXR0cmlidXRlKCJjbGFzcyIpKSB7IGF0dC5zdHlsZWNsYXNzID0gb2JqLmdldEF0dHJpYnV0ZSgiY2xhc3MiKTsgfQ0KCQkJCQkJCWlmIChvYmouZ2V0QXR0cmlidXRlKCJhbGlnbiIpKSB7IGF0dC5hbGlnbiA9IG9iai5nZXRBdHRyaWJ1dGUoImFsaWduIik7IH0NCgkJCQkJCQkvLyBwYXJzZSBIVE1MIG9iamVjdCBwYXJhbSBlbGVtZW50J3MgbmFtZS12YWx1ZSBwYWlycw0KCQkJCQkJCXZhciBwYXIgPSB7fTsNCgkJCQkJCQl2YXIgcCA9IG9iai5nZXRFbGVtZW50c0J5VGFnTmFtZSgicGFyYW0iKTsNCgkJCQkJCQl2YXIgcGwgPSBwLmxlbmd0aDsNCgkJCQkJCQlmb3IgKHZhciBqID0gMDsgaiA8IHBsOyBqKyspIHsNCgkJCQkJCQkJaWYgKHBbal0uZ2V0QXR0cmlidXRlKCJuYW1lIikudG9Mb3dlckNhc2UoKSAhPSAibW92aWUiKSB7DQoJCQkJCQkJCQlwYXJbcFtqXS5nZXRBdHRyaWJ1dGUoIm5hbWUiKV0gPSBwW2pdLmdldEF0dHJpYnV0ZSgidmFsdWUiKTsNCgkJCQkJCQkJfQ0KCQkJCQkJCX0NCgkJCQkJCQlzaG93RXhwcmVzc0luc3RhbGwoYXR0LCBwYXIsIGlkLCBjYik7DQoJCQkJCQl9DQoJCQkJCQllbHNlIHsgLy8gRmxhc2ggUGxheWVyIGFuZCBTV0YgdmVyc2lvbiBtaXNtYXRjaCBvciBhbiBvbGRlciBXZWJraXQgZW5naW5lIHRoYXQgaWdub3JlcyB0aGUgSFRNTCBvYmplY3QgZWxlbWVudCdzIG5lc3RlZCBwYXJhbSBlbGVtZW50czogZGlzcGxheSBhbHRlcm5hdGl2ZSBjb250ZW50IGluc3RlYWQgb2YgU1dGDQoJCQkJCQkJZGlzcGxheUFsdENvbnRlbnQob2JqKTsNCgkJCQkJCQlpZiAoY2IpIHsgY2IoY2JPYmopOyB9DQoJCQkJCQl9DQoJCQkJCX0NCgkJCQl9DQoJCQkJZWxzZSB7CS8vIGlmIG5vIEZsYXNoIFBsYXllciBpcyBpbnN0YWxsZWQgb3IgdGhlIGZwIHZlcnNpb24gY2Fubm90IGJlIGRldGVjdGVkIHdlIGxldCB0aGUgSFRNTCBvYmplY3QgZWxlbWVudCBkbyBpdHMgam9iIChlaXRoZXIgc2hvdyBhIFNXRiBvciBhbHRlcm5hdGl2ZSBjb250ZW50KQ0KCQkJCQlzZXRWaXNpYmlsaXR5KGlkLCB0cnVlKTsNCgkJCQkJaWYgKGNiKSB7DQoJCQkJCQl2YXIgbyA9IGdldE9iamVjdEJ5SWQoaWQpOyAvLyB0ZXN0IHdoZXRoZXIgdGhlcmUgaXMgYW4gSFRNTCBvYmplY3QgZWxlbWVudCBvciBub3QNCgkJCQkJCWlmIChvICYmIHR5cGVvZiBvLlNldFZhcmlhYmxlICE9IFVOREVGKSB7IA0KCQkJCQkJCWNiT2JqLnN1Y2Nlc3MgPSB0cnVlOw0KCQkJCQkJCWNiT2JqLnJlZiA9IG87DQoJCQkJCQl9DQoJCQkJCQljYihjYk9iaik7DQoJCQkJCX0NCgkJCQl9DQoJCQl9DQoJCX0NCgl9DQoJDQoJZnVuY3Rpb24gZ2V0T2JqZWN0QnlJZChvYmplY3RJZFN0cikgew0KCQl2YXIgciA9IG51bGw7DQoJCXZhciBvID0gZ2V0RWxlbWVudEJ5SWQob2JqZWN0SWRTdHIpOw0KCQlpZiAobyAmJiBvLm5vZGVOYW1lID09ICJPQkpFQ1QiKSB7DQoJCQlpZiAodHlwZW9mIG8uU2V0VmFyaWFibGUgIT0gVU5ERUYpIHsNCgkJCQlyID0gbzsNCgkJCX0NCgkJCWVsc2Ugew0KCQkJCXZhciBuID0gby5nZXRFbGVtZW50c0J5VGFnTmFtZShPQkpFQ1QpWzBdOw0KCQkJCWlmIChuKSB7DQoJCQkJCXIgPSBuOw0KCQkJCX0NCgkJCX0NCgkJfQ0KCQlyZXR1cm4gcjsNCgl9DQoJDQoJLyogUmVxdWlyZW1lbnRzIGZvciBBZG9iZSBFeHByZXNzIEluc3RhbGwNCgkJLSBvbmx5IG9uZSBpbnN0YW5jZSBjYW4gYmUgYWN0aXZlIGF0IGEgdGltZQ0KCQktIGZwIDYuMC42NSBvciBoaWdoZXINCgkJLSBXaW4vTWFjIE9TIG9ubHkNCgkJLSBubyBXZWJraXQgZW5naW5lcyBvbGRlciB0aGFuIHZlcnNpb24gMzEyDQoJKi8NCglmdW5jdGlvbiBjYW5FeHByZXNzSW5zdGFsbCgpIHsNCgkJcmV0dXJuICFpc0V4cHJlc3NJbnN0YWxsQWN0aXZlICYmIGhhc1BsYXllclZlcnNpb24oIjYuMC42NSIpICYmICh1YS53aW4gfHwgdWEubWFjKSAmJiAhKHVhLndrICYmIHVhLndrIDwgMzEyKTsNCgl9DQoJDQoJLyogU2hvdyB0aGUgQWRvYmUgRXhwcmVzcyBJbnN0YWxsIGRpYWxvZw0KCQktIFJlZmVyZW5jZTogaHR0cDovL3d3dy5hZG9iZS5jb20vY2Z1c2lvbi9rbm93bGVkZ2ViYXNlL2luZGV4LmNmbT9pZD02YTI1M2I3NQ0KCSovDQoJZnVuY3Rpb24gc2hvd0V4cHJlc3NJbnN0YWxsKGF0dCwgcGFyLCByZXBsYWNlRWxlbUlkU3RyLCBjYWxsYmFja0ZuKSB7DQoJCWlzRXhwcmVzc0luc3RhbGxBY3RpdmUgPSB0cnVlOw0KCQlzdG9yZWRDYWxsYmFja0ZuID0gY2FsbGJhY2tGbiB8fCBudWxsOw0KCQlzdG9yZWRDYWxsYmFja09iaiA9IHtzdWNjZXNzOmZhbHNlLCBpZDpyZXBsYWNlRWxlbUlkU3RyfTsNCgkJdmFyIG9iaiA9IGdldEVsZW1lbnRCeUlkKHJlcGxhY2VFbGVtSWRTdHIpOw0KCQlpZiAob2JqKSB7DQoJCQlpZiAob2JqLm5vZGVOYW1lID09ICJPQkpFQ1QiKSB7IC8vIHN0YXRpYyBwdWJsaXNoaW5nDQoJCQkJc3RvcmVkQWx0Q29udGVudCA9IGFic3RyYWN0QWx0Q29udGVudChvYmopOw0KCQkJCXN0b3JlZEFsdENvbnRlbnRJZCA9IG51bGw7DQoJCQl9DQoJCQllbHNlIHsgLy8gZHluYW1pYyBwdWJsaXNoaW5nDQoJCQkJc3RvcmVkQWx0Q29udGVudCA9IG9iajsNCgkJCQlzdG9yZWRBbHRDb250ZW50SWQgPSByZXBsYWNlRWxlbUlkU3RyOw0KCQkJfQ0KCQkJYXR0LmlkID0gRVhQUkVTU19JTlNUQUxMX0lEOw0KCQkJaWYgKHR5cGVvZiBhdHQud2lkdGggPT0gVU5ERUYgfHwgKCEvJSQvLnRlc3QoYXR0LndpZHRoKSAmJiBwYXJzZUludChhdHQud2lkdGgsIDEwKSA8IDMxMCkpIHsgYXR0LndpZHRoID0gIjMxMCI7IH0NCgkJCWlmICh0eXBlb2YgYXR0LmhlaWdodCA9PSBVTkRFRiB8fCAoIS8lJC8udGVzdChhdHQuaGVpZ2h0KSAmJiBwYXJzZUludChhdHQuaGVpZ2h0LCAxMCkgPCAxMzcpKSB7IGF0dC5oZWlnaHQgPSAiMTM3IjsgfQ0KCQkJZG9jLnRpdGxlID0gZG9jLnRpdGxlLnNsaWNlKDAsIDQ3KSArICIgLSBGbGFzaCBQbGF5ZXIgSW5zdGFsbGF0aW9uIjsNCgkJCXZhciBwdCA9IHVhLmllICYmIHVhLndpbiA/ICJBY3RpdmVYIiA6ICJQbHVnSW4iLA0KCQkJCWZ2ID0gIk1NcmVkaXJlY3RVUkw9IiArIGVuY29kZVVSSSh3aW5kb3cubG9jYXRpb24pLnRvU3RyaW5nKCkucmVwbGFjZSgvJi9nLCIlMjYiKSArICImTU1wbGF5ZXJUeXBlPSIgKyBwdCArICImTU1kb2N0aXRsZT0iICsgZG9jLnRpdGxlOw0KCQkJaWYgKHR5cGVvZiBwYXIuZmxhc2h2YXJzICE9IFVOREVGKSB7DQoJCQkJcGFyLmZsYXNodmFycyArPSAiJiIgKyBmdjsNCgkJCX0NCgkJCWVsc2Ugew0KCQkJCXBhci5mbGFzaHZhcnMgPSBmdjsNCgkJCX0NCgkJCS8vIElFIG9ubHk6IHdoZW4gYSBTV0YgaXMgbG9hZGluZyAoQU5EOiBub3QgYXZhaWxhYmxlIGluIGNhY2hlKSB3YWl0IGZvciB0aGUgcmVhZHlTdGF0ZSBvZiB0aGUgb2JqZWN0IGVsZW1lbnQgdG8gYmVjb21lIDQgYmVmb3JlIHJlbW92aW5nIGl0LA0KCQkJLy8gYmVjYXVzZSB5b3UgY2Fubm90IHByb3Blcmx5IGNhbmNlbCBhIGxvYWRpbmcgU1dGIGZpbGUgd2l0aG91dCBicmVha2luZyBicm93c2VyIGxvYWQgcmVmZXJlbmNlcywgYWxzbyBvYmoub25yZWFkeXN0YXRlY2hhbmdlIGRvZXNuJ3Qgd29yaw0KCQkJaWYgKHVhLmllICYmIHVhLndpbiAmJiBvYmoucmVhZHlTdGF0ZSAhPSA0KSB7DQoJCQkJdmFyIG5ld09iaiA9IGNyZWF0ZUVsZW1lbnQoImRpdiIpOw0KCQkJCXJlcGxhY2VFbGVtSWRTdHIgKz0gIlNXRk9iamVjdE5ldyI7DQoJCQkJbmV3T2JqLnNldEF0dHJpYnV0ZSgiaWQiLCByZXBsYWNlRWxlbUlkU3RyKTsNCgkJCQlvYmoucGFyZW50Tm9kZS5pbnNlcnRCZWZvcmUobmV3T2JqLCBvYmopOyAvLyBpbnNlcnQgcGxhY2Vob2xkZXIgZGl2IHRoYXQgd2lsbCBiZSByZXBsYWNlZCBieSB0aGUgb2JqZWN0IGVsZW1lbnQgdGhhdCBsb2FkcyBleHByZXNzaW5zdGFsbC5zd2YNCgkJCQlvYmouc3R5bGUuZGlzcGxheSA9ICJub25lIjsNCgkJCQkoZnVuY3Rpb24oKXsNCgkJCQkJaWYgKG9iai5yZWFkeVN0YXRlID09IDQpIHsNCgkJCQkJCW9iai5wYXJlbnROb2RlLnJlbW92ZUNoaWxkKG9iaik7DQoJCQkJCX0NCgkJCQkJZWxzZSB7DQoJCQkJCQlzZXRUaW1lb3V0KGFyZ3VtZW50cy5jYWxsZWUsIDEwKTsNCgkJCQkJfQ0KCQkJCX0pKCk7DQoJCQl9DQoJCQljcmVhdGVTV0YoYXR0LCBwYXIsIHJlcGxhY2VFbGVtSWRTdHIpOw0KCQl9DQoJfQ0KCQ0KCS8qIEZ1bmN0aW9ucyB0byBhYnN0cmFjdCBhbmQgZGlzcGxheSBhbHRlcm5hdGl2ZSBjb250ZW50DQoJKi8NCglmdW5jdGlvbiBkaXNwbGF5QWx0Q29udGVudChvYmopIHsNCgkJaWYgKHVhLmllICYmIHVhLndpbiAmJiBvYmoucmVhZHlTdGF0ZSAhPSA0KSB7DQoJCQkvLyBJRSBvbmx5OiB3aGVuIGEgU1dGIGlzIGxvYWRpbmcgKEFORDogbm90IGF2YWlsYWJsZSBpbiBjYWNoZSkgd2FpdCBmb3IgdGhlIHJlYWR5U3RhdGUgb2YgdGhlIG9iamVjdCBlbGVtZW50IHRvIGJlY29tZSA0IGJlZm9yZSByZW1vdmluZyBpdCwNCgkJCS8vIGJlY2F1c2UgeW91IGNhbm5vdCBwcm9wZXJseSBjYW5jZWwgYSBsb2FkaW5nIFNXRiBmaWxlIHdpdGhvdXQgYnJlYWtpbmcgYnJvd3NlciBsb2FkIHJlZmVyZW5jZXMsIGFsc28gb2JqLm9ucmVhZHlzdGF0ZWNoYW5nZSBkb2Vzbid0IHdvcmsNCgkJCXZhciBlbCA9IGNyZWF0ZUVsZW1lbnQoImRpdiIpOw0KCQkJb2JqLnBhcmVudE5vZGUuaW5zZXJ0QmVmb3JlKGVsLCBvYmopOyAvLyBpbnNlcnQgcGxhY2Vob2xkZXIgZGl2IHRoYXQgd2lsbCBiZSByZXBsYWNlZCBieSB0aGUgYWx0ZXJuYXRpdmUgY29udGVudA0KCQkJZWwucGFyZW50Tm9kZS5yZXBsYWNlQ2hpbGQoYWJzdHJhY3RBbHRDb250ZW50KG9iaiksIGVsKTsNCgkJCW9iai5zdHlsZS5kaXNwbGF5ID0gIm5vbmUiOw0KCQkJKGZ1bmN0aW9uKCl7DQoJCQkJaWYgKG9iai5yZWFkeVN0YXRlID09IDQpIHsNCgkJCQkJb2JqLnBhcmVudE5vZGUucmVtb3ZlQ2hpbGQob2JqKTsNCgkJCQl9DQoJCQkJZWxzZSB7DQoJCQkJCXNldFRpbWVvdXQoYXJndW1lbnRzLmNhbGxlZSwgMTApOw0KCQkJCX0NCgkJCX0pKCk7DQoJCX0NCgkJZWxzZSB7DQoJCQlvYmoucGFyZW50Tm9kZS5yZXBsYWNlQ2hpbGQoYWJzdHJhY3RBbHRDb250ZW50KG9iaiksIG9iaik7DQoJCX0NCgl9IA0KDQoJZnVuY3Rpb24gYWJzdHJhY3RBbHRDb250ZW50KG9iaikgew0KCQl2YXIgYWMgPSBjcmVhdGVFbGVtZW50KCJkaXYiKTsNCgkJaWYgKHVhLndpbiAmJiB1YS5pZSkgew0KCQkJYWMuaW5uZXJIVE1MID0gb2JqLmlubmVySFRNTDsNCgkJfQ0KCQllbHNlIHsNCgkJCXZhciBuZXN0ZWRPYmogPSBvYmouZ2V0RWxlbWVudHNCeVRhZ05hbWUoT0JKRUNUKVswXTsNCgkJCWlmIChuZXN0ZWRPYmopIHsNCgkJCQl2YXIgYyA9IG5lc3RlZE9iai5jaGlsZE5vZGVzOw0KCQkJCWlmIChjKSB7DQoJCQkJCXZhciBjbCA9IGMubGVuZ3RoOw0KCQkJCQlmb3IgKHZhciBpID0gMDsgaSA8IGNsOyBpKyspIHsNCgkJCQkJCWlmICghKGNbaV0ubm9kZVR5cGUgPT0gMSAmJiBjW2ldLm5vZGVOYW1lID09ICJQQVJBTSIpICYmICEoY1tpXS5ub2RlVHlwZSA9PSA4KSkgew0KCQkJCQkJCWFjLmFwcGVuZENoaWxkKGNbaV0uY2xvbmVOb2RlKHRydWUpKTsNCgkJCQkJCX0NCgkJCQkJfQ0KCQkJCX0NCgkJCX0NCgkJfQ0KCQlyZXR1cm4gYWM7DQoJfQ0KCQ0KCS8qIENyb3NzLWJyb3dzZXIgZHluYW1pYyBTV0YgY3JlYXRpb24NCgkqLw0KCWZ1bmN0aW9uIGNyZWF0ZVNXRihhdHRPYmosIHBhck9iaiwgaWQpIHsNCgkJdmFyIHIsIGVsID0gZ2V0RWxlbWVudEJ5SWQoaWQpOw0KCQlpZiAodWEud2sgJiYgdWEud2sgPCAzMTIpIHsgcmV0dXJuIHI7IH0NCgkJaWYgKGVsKSB7DQoJCQlpZiAodHlwZW9mIGF0dE9iai5pZCA9PSBVTkRFRikgeyAvLyBpZiBubyAnaWQnIGlzIGRlZmluZWQgZm9yIHRoZSBvYmplY3QgZWxlbWVudCwgaXQgd2lsbCBpbmhlcml0IHRoZSAnaWQnIGZyb20gdGhlIGFsdGVybmF0aXZlIGNvbnRlbnQNCgkJCQlhdHRPYmouaWQgPSBpZDsNCgkJCX0NCgkJCWlmICh1YS5pZSAmJiB1YS53aW4pIHsgLy8gSW50ZXJuZXQgRXhwbG9yZXIgKyB0aGUgSFRNTCBvYmplY3QgZWxlbWVudCArIFczQyBET00gbWV0aG9kcyBkbyBub3QgY29tYmluZTogZmFsbCBiYWNrIHRvIG91dGVySFRNTA0KCQkJCXZhciBhdHQgPSAiIjsNCgkJCQlmb3IgKHZhciBpIGluIGF0dE9iaikgew0KCQkJCQlpZiAoYXR0T2JqW2ldICE9IE9iamVjdC5wcm90b3R5cGVbaV0pIHsgLy8gZmlsdGVyIG91dCBwcm90b3R5cGUgYWRkaXRpb25zIGZyb20gb3RoZXIgcG90ZW50aWFsIGxpYnJhcmllcw0KCQkJCQkJaWYgKGkudG9Mb3dlckNhc2UoKSA9PSAiZGF0YSIpIHsNCgkJCQkJCQlwYXJPYmoubW92aWUgPSBhdHRPYmpbaV07DQoJCQkJCQl9DQoJCQkJCQllbHNlIGlmIChpLnRvTG93ZXJDYXNlKCkgPT0gInN0eWxlY2xhc3MiKSB7IC8vICdjbGFzcycgaXMgYW4gRUNNQTQgcmVzZXJ2ZWQga2V5d29yZA0KCQkJCQkJCWF0dCArPSAnIGNsYXNzPSInICsgYXR0T2JqW2ldICsgJyInOw0KCQkJCQkJfQ0KCQkJCQkJZWxzZSBpZiAoaS50b0xvd2VyQ2FzZSgpICE9ICJjbGFzc2lkIikgew0KCQkJCQkJCWF0dCArPSAnICcgKyBpICsgJz0iJyArIGF0dE9ialtpXSArICciJzsNCgkJCQkJCX0NCgkJCQkJfQ0KCQkJCX0NCgkJCQl2YXIgcGFyID0gIiI7DQoJCQkJZm9yICh2YXIgaiBpbiBwYXJPYmopIHsNCgkJCQkJaWYgKHBhck9ialtqXSAhPSBPYmplY3QucHJvdG90eXBlW2pdKSB7IC8vIGZpbHRlciBvdXQgcHJvdG90eXBlIGFkZGl0aW9ucyBmcm9tIG90aGVyIHBvdGVudGlhbCBsaWJyYXJpZXMNCgkJCQkJCXBhciArPSAnPHBhcmFtIG5hbWU9IicgKyBqICsgJyIgdmFsdWU9IicgKyBwYXJPYmpbal0gKyAnIiAvPic7DQoJCQkJCX0NCgkJCQl9DQoJCQkJZWwub3V0ZXJIVE1MID0gJzxvYmplY3QgY2xhc3NpZD0iY2xzaWQ6RDI3Q0RCNkUtQUU2RC0xMWNmLTk2QjgtNDQ0NTUzNTQwMDAwIicgKyBhdHQgKyAnPicgKyBwYXIgKyAnPC9vYmplY3Q+JzsNCgkJCQlvYmpJZEFycltvYmpJZEFyci5sZW5ndGhdID0gYXR0T2JqLmlkOyAvLyBzdG9yZWQgdG8gZml4IG9iamVjdCAnbGVha3MnIG9uIHVubG9hZCAoZHluYW1pYyBwdWJsaXNoaW5nIG9ubHkpDQoJCQkJciA9IGdldEVsZW1lbnRCeUlkKGF0dE9iai5pZCk7CQ0KCQkJfQ0KCQkJZWxzZSB7IC8vIHdlbGwtYmVoYXZpbmcgYnJvd3NlcnMNCgkJCQl2YXIgbyA9IGNyZWF0ZUVsZW1lbnQoT0JKRUNUKTsNCgkJCQlvLnNldEF0dHJpYnV0ZSgidHlwZSIsIEZMQVNIX01JTUVfVFlQRSk7DQoJCQkJZm9yICh2YXIgbSBpbiBhdHRPYmopIHsNCgkJCQkJaWYgKGF0dE9ialttXSAhPSBPYmplY3QucHJvdG90eXBlW21dKSB7IC8vIGZpbHRlciBvdXQgcHJvdG90eXBlIGFkZGl0aW9ucyBmcm9tIG90aGVyIHBvdGVudGlhbCBsaWJyYXJpZXMNCgkJCQkJCWlmIChtLnRvTG93ZXJDYXNlKCkgPT0gInN0eWxlY2xhc3MiKSB7IC8vICdjbGFzcycgaXMgYW4gRUNNQTQgcmVzZXJ2ZWQga2V5d29yZA0KCQkJCQkJCW8uc2V0QXR0cmlidXRlKCJjbGFzcyIsIGF0dE9ialttXSk7DQoJCQkJCQl9DQoJCQkJCQllbHNlIGlmIChtLnRvTG93ZXJDYXNlKCkgIT0gImNsYXNzaWQiKSB7IC8vIGZpbHRlciBvdXQgSUUgc3BlY2lmaWMgYXR0cmlidXRlDQoJCQkJCQkJby5zZXRBdHRyaWJ1dGUobSwgYXR0T2JqW21dKTsNCgkJCQkJCX0NCgkJCQkJfQ0KCQkJCX0NCgkJCQlmb3IgKHZhciBuIGluIHBhck9iaikgew0KCQkJCQlpZiAocGFyT2JqW25dICE9IE9iamVjdC5wcm90b3R5cGVbbl0gJiYgbi50b0xvd2VyQ2FzZSgpICE9ICJtb3ZpZSIpIHsgLy8gZmlsdGVyIG91dCBwcm90b3R5cGUgYWRkaXRpb25zIGZyb20gb3RoZXIgcG90ZW50aWFsIGxpYnJhcmllcyBhbmQgSUUgc3BlY2lmaWMgcGFyYW0gZWxlbWVudA0KCQkJCQkJY3JlYXRlT2JqUGFyYW0obywgbiwgcGFyT2JqW25dKTsNCgkJCQkJfQ0KCQkJCX0NCgkJCQllbC5wYXJlbnROb2RlLnJlcGxhY2VDaGlsZChvLCBlbCk7DQoJCQkJciA9IG87DQoJCQl9DQoJCX0NCgkJcmV0dXJuIHI7DQoJfQ0KCQ0KCWZ1bmN0aW9uIGNyZWF0ZU9ialBhcmFtKGVsLCBwTmFtZSwgcFZhbHVlKSB7DQoJCXZhciBwID0gY3JlYXRlRWxlbWVudCgicGFyYW0iKTsNCgkJcC5zZXRBdHRyaWJ1dGUoIm5hbWUiLCBwTmFtZSk7CQ0KCQlwLnNldEF0dHJpYnV0ZSgidmFsdWUiLCBwVmFsdWUpOw0KCQllbC5hcHBlbmRDaGlsZChwKTsNCgl9DQoJDQoJLyogQ3Jvc3MtYnJvd3NlciBTV0YgcmVtb3ZhbA0KCQktIEVzcGVjaWFsbHkgbmVlZGVkIHRvIHNhZmVseSBhbmQgY29tcGxldGVseSByZW1vdmUgYSBTV0YgaW4gSW50ZXJuZXQgRXhwbG9yZXINCgkqLw0KCWZ1bmN0aW9uIHJlbW92ZVNXRihpZCkgew0KCQl2YXIgb2JqID0gZ2V0RWxlbWVudEJ5SWQoaWQpOw0KCQlpZiAob2JqICYmIG9iai5ub2RlTmFtZSA9PSAiT0JKRUNUIikgew0KCQkJaWYgKHVhLmllICYmIHVhLndpbikgew0KCQkJCW9iai5zdHlsZS5kaXNwbGF5ID0gIm5vbmUiOw0KCQkJCShmdW5jdGlvbigpew0KCQkJCQlpZiAob2JqLnJlYWR5U3RhdGUgPT0gNCkgew0KCQkJCQkJcmVtb3ZlT2JqZWN0SW5JRShpZCk7DQoJCQkJCX0NCgkJCQkJZWxzZSB7DQoJCQkJCQlzZXRUaW1lb3V0KGFyZ3VtZW50cy5jYWxsZWUsIDEwKTsNCgkJCQkJfQ0KCQkJCX0pKCk7DQoJCQl9DQoJCQllbHNlIHsNCgkJCQlvYmoucGFyZW50Tm9kZS5yZW1vdmVDaGlsZChvYmopOw0KCQkJfQ0KCQl9DQoJfQ0KCQ0KCWZ1bmN0aW9uIHJlbW92ZU9iamVjdEluSUUoaWQpIHsNCgkJdmFyIG9iaiA9IGdldEVsZW1lbnRCeUlkKGlkKTsNCgkJaWYgKG9iaikgew0KCQkJZm9yICh2YXIgaSBpbiBvYmopIHsNCgkJCQlpZiAodHlwZW9mIG9ialtpXSA9PSAiZnVuY3Rpb24iKSB7DQoJCQkJCW9ialtpXSA9IG51bGw7DQoJCQkJfQ0KCQkJfQ0KCQkJb2JqLnBhcmVudE5vZGUucmVtb3ZlQ2hpbGQob2JqKTsNCgkJfQ0KCX0NCgkNCgkvKiBGdW5jdGlvbnMgdG8gb3B0aW1pemUgSmF2YVNjcmlwdCBjb21wcmVzc2lvbg0KCSovDQoJZnVuY3Rpb24gZ2V0RWxlbWVudEJ5SWQoaWQpIHsNCgkJdmFyIGVsID0gbnVsbDsNCgkJdHJ5IHsNCgkJCWVsID0gZG9jLmdldEVsZW1lbnRCeUlkKGlkKTsNCgkJfQ0KCQljYXRjaCAoZSkge30NCgkJcmV0dXJuIGVsOw0KCX0NCgkNCglmdW5jdGlvbiBjcmVhdGVFbGVtZW50KGVsKSB7DQoJCXJldHVybiBkb2MuY3JlYXRlRWxlbWVudChlbCk7DQoJfQ0KCQ0KCS8qIFVwZGF0ZWQgYXR0YWNoRXZlbnQgZnVuY3Rpb24gZm9yIEludGVybmV0IEV4cGxvcmVyDQoJCS0gU3RvcmVzIGF0dGFjaEV2ZW50IGluZm9ybWF0aW9uIGluIGFuIEFycmF5LCBzbyBvbiB1bmxvYWQgdGhlIGRldGFjaEV2ZW50IGZ1bmN0aW9ucyBjYW4gYmUgY2FsbGVkIHRvIGF2b2lkIG1lbW9yeSBsZWFrcw0KCSovCQ0KCWZ1bmN0aW9uIGFkZExpc3RlbmVyKHRhcmdldCwgZXZlbnRUeXBlLCBmbikgew0KCQl0YXJnZXQuYXR0YWNoRXZlbnQoZXZlbnRUeXBlLCBmbik7DQoJCWxpc3RlbmVyc0FycltsaXN0ZW5lcnNBcnIubGVuZ3RoXSA9IFt0YXJnZXQsIGV2ZW50VHlwZSwgZm5dOw0KCX0NCgkNCgkvKiBGbGFzaCBQbGF5ZXIgYW5kIFNXRiBjb250ZW50IHZlcnNpb24gbWF0Y2hpbmcNCgkqLw0KCWZ1bmN0aW9uIGhhc1BsYXllclZlcnNpb24ocnYpIHsNCgkJdmFyIHB2ID0gdWEucHYsIHYgPSBydi5zcGxpdCgiLiIpOw0KCQl2WzBdID0gcGFyc2VJbnQodlswXSwgMTApOw0KCQl2WzFdID0gcGFyc2VJbnQodlsxXSwgMTApIHx8IDA7IC8vIHN1cHBvcnRzIHNob3J0IG5vdGF0aW9uLCBlLmcuICI5IiBpbnN0ZWFkIG9mICI5LjAuMCINCgkJdlsyXSA9IHBhcnNlSW50KHZbMl0sIDEwKSB8fCAwOw0KCQlyZXR1cm4gKHB2WzBdID4gdlswXSB8fCAocHZbMF0gPT0gdlswXSAmJiBwdlsxXSA+IHZbMV0pIHx8IChwdlswXSA9PSB2WzBdICYmIHB2WzFdID09IHZbMV0gJiYgcHZbMl0gPj0gdlsyXSkpID8gdHJ1ZSA6IGZhbHNlOw0KCX0NCgkNCgkvKiBDcm9zcy1icm93c2VyIGR5bmFtaWMgQ1NTIGNyZWF0aW9uDQoJCS0gQmFzZWQgb24gQm9iYnkgdmFuIGRlciBTbHVpcycgc29sdXRpb246IGh0dHA6Ly93d3cuYm9iYnl2YW5kZXJzbHVpcy5jb20vYXJ0aWNsZXMvZHluYW1pY0NTUy5waHANCgkqLwkNCglmdW5jdGlvbiBjcmVhdGVDU1Moc2VsLCBkZWNsLCBtZWRpYSwgbmV3U3R5bGUpIHsNCgkJaWYgKHVhLmllICYmIHVhLm1hYykgeyByZXR1cm47IH0NCgkJdmFyIGggPSBkb2MuZ2V0RWxlbWVudHNCeVRhZ05hbWUoImhlYWQiKVswXTsNCgkJaWYgKCFoKSB7IHJldHVybjsgfSAvLyB0byBhbHNvIHN1cHBvcnQgYmFkbHkgYXV0aG9yZWQgSFRNTCBwYWdlcyB0aGF0IGxhY2sgYSBoZWFkIGVsZW1lbnQNCgkJdmFyIG0gPSAobWVkaWEgJiYgdHlwZW9mIG1lZGlhID09ICJzdHJpbmciKSA/IG1lZGlhIDogInNjcmVlbiI7DQoJCWlmIChuZXdTdHlsZSkgew0KCQkJZHluYW1pY1N0eWxlc2hlZXQgPSBudWxsOw0KCQkJZHluYW1pY1N0eWxlc2hlZXRNZWRpYSA9IG51bGw7DQoJCX0NCgkJaWYgKCFkeW5hbWljU3R5bGVzaGVldCB8fCBkeW5hbWljU3R5bGVzaGVldE1lZGlhICE9IG0pIHsgDQoJCQkvLyBjcmVhdGUgZHluYW1pYyBzdHlsZXNoZWV0ICsgZ2V0IGEgZ2xvYmFsIHJlZmVyZW5jZSB0byBpdA0KCQkJdmFyIHMgPSBjcmVhdGVFbGVtZW50KCJzdHlsZSIpOw0KCQkJcy5zZXRBdHRyaWJ1dGUoInR5cGUiLCAidGV4dC9jc3MiKTsNCgkJCXMuc2V0QXR0cmlidXRlKCJtZWRpYSIsIG0pOw0KCQkJZHluYW1pY1N0eWxlc2hlZXQgPSBoLmFwcGVuZENoaWxkKHMpOw0KCQkJaWYgKHVhLmllICYmIHVhLndpbiAmJiB0eXBlb2YgZG9jLnN0eWxlU2hlZXRzICE9IFVOREVGICYmIGRvYy5zdHlsZVNoZWV0cy5sZW5ndGggPiAwKSB7DQoJCQkJZHluYW1pY1N0eWxlc2hlZXQgPSBkb2Muc3R5bGVTaGVldHNbZG9jLnN0eWxlU2hlZXRzLmxlbmd0aCAtIDFdOw0KCQkJfQ0KCQkJZHluYW1pY1N0eWxlc2hlZXRNZWRpYSA9IG07DQoJCX0NCgkJLy8gYWRkIHN0eWxlIHJ1bGUNCgkJaWYgKHVhLmllICYmIHVhLndpbikgew0KCQkJaWYgKGR5bmFtaWNTdHlsZXNoZWV0ICYmIHR5cGVvZiBkeW5hbWljU3R5bGVzaGVldC5hZGRSdWxlID09IE9CSkVDVCkgew0KCQkJCWR5bmFtaWNTdHlsZXNoZWV0LmFkZFJ1bGUoc2VsLCBkZWNsKTsNCgkJCX0NCgkJfQ0KCQllbHNlIHsNCgkJCWlmIChkeW5hbWljU3R5bGVzaGVldCAmJiB0eXBlb2YgZG9jLmNyZWF0ZVRleHROb2RlICE9IFVOREVGKSB7DQoJCQkJZHluYW1pY1N0eWxlc2hlZXQuYXBwZW5kQ2hpbGQoZG9jLmNyZWF0ZVRleHROb2RlKHNlbCArICIgeyIgKyBkZWNsICsgIn0iKSk7DQoJCQl9DQoJCX0NCgl9DQoJDQoJZnVuY3Rpb24gc2V0VmlzaWJpbGl0eShpZCwgaXNWaXNpYmxlKSB7DQoJCWlmICghYXV0b0hpZGVTaG93KSB7IHJldHVybjsgfQ0KCQl2YXIgdiA9IGlzVmlzaWJsZSA/ICJ2aXNpYmxlIiA6ICJoaWRkZW4iOw0KCQlpZiAoaXNEb21Mb2FkZWQgJiYgZ2V0RWxlbWVudEJ5SWQoaWQpKSB7DQoJCQlnZXRFbGVtZW50QnlJZChpZCkuc3R5bGUudmlzaWJpbGl0eSA9IHY7DQoJCX0NCgkJZWxzZSB7DQoJCQljcmVhdGVDU1MoIiMiICsgaWQsICJ2aXNpYmlsaXR5OiIgKyB2KTsNCgkJfQ0KCX0NCg0KCS8qIEZpbHRlciB0byBhdm9pZCBYU1MgYXR0YWNrcw0KCSovDQoJZnVuY3Rpb24gdXJsRW5jb2RlSWZOZWNlc3Nhcnkocykgew0KCQl2YXIgcmVnZXggPSAvW1xcXCI8PlwuO10vOw0KCQl2YXIgaGFzQmFkQ2hhcnMgPSByZWdleC5leGVjKHMpICE9IG51bGw7DQoJCXJldHVybiBoYXNCYWRDaGFycyAmJiB0eXBlb2YgZW5jb2RlVVJJQ29tcG9uZW50ICE9IFVOREVGID8gZW5jb2RlVVJJQ29tcG9uZW50KHMpIDogczsNCgl9DQoJDQoJLyogUmVsZWFzZSBtZW1vcnkgdG8gYXZvaWQgbWVtb3J5IGxlYWtzIGNhdXNlZCBieSBjbG9zdXJlcywgZml4IGhhbmdpbmcgYXVkaW8vdmlkZW8gdGhyZWFkcyBhbmQgZm9yY2Ugb3BlbiBzb2NrZXRzL05ldENvbm5lY3Rpb25zIHRvIGRpc2Nvbm5lY3QgKEludGVybmV0IEV4cGxvcmVyIG9ubHkpDQoJKi8NCgl2YXIgY2xlYW51cCA9IGZ1bmN0aW9uKCkgew0KCQlpZiAodWEuaWUgJiYgdWEud2luKSB7DQoJCQl3aW5kb3cuYXR0YWNoRXZlbnQoIm9udW5sb2FkIiwgZnVuY3Rpb24oKSB7DQoJCQkJLy8gcmVtb3ZlIGxpc3RlbmVycyB0byBhdm9pZCBtZW1vcnkgbGVha3MNCgkJCQl2YXIgbGwgPSBsaXN0ZW5lcnNBcnIubGVuZ3RoOw0KCQkJCWZvciAodmFyIGkgPSAwOyBpIDwgbGw7IGkrKykgew0KCQkJCQlsaXN0ZW5lcnNBcnJbaV1bMF0uZGV0YWNoRXZlbnQobGlzdGVuZXJzQXJyW2ldWzFdLCBsaXN0ZW5lcnNBcnJbaV1bMl0pOw0KCQkJCX0NCgkJCQkvLyBjbGVhbnVwIGR5bmFtaWNhbGx5IGVtYmVkZGVkIG9iamVjdHMgdG8gZml4IGF1ZGlvL3ZpZGVvIHRocmVhZHMgYW5kIGZvcmNlIG9wZW4gc29ja2V0cyBhbmQgTmV0Q29ubmVjdGlvbnMgdG8gZGlzY29ubmVjdA0KCQkJCXZhciBpbCA9IG9iaklkQXJyLmxlbmd0aDsNCgkJCQlmb3IgKHZhciBqID0gMDsgaiA8IGlsOyBqKyspIHsNCgkJCQkJcmVtb3ZlU1dGKG9iaklkQXJyW2pdKTsNCgkJCQl9DQoJCQkJLy8gY2xlYW51cCBsaWJyYXJ5J3MgbWFpbiBjbG9zdXJlcyB0byBhdm9pZCBtZW1vcnkgbGVha3MNCgkJCQlmb3IgKHZhciBrIGluIHVhKSB7DQoJCQkJCXVhW2tdID0gbnVsbDsNCgkJCQl9DQoJCQkJdWEgPSBudWxsOw0KCQkJCWZvciAodmFyIGwgaW4gc3dmb2JqZWN0KSB7DQoJCQkJCXN3Zm9iamVjdFtsXSA9IG51bGw7DQoJCQkJfQ0KCQkJCXN3Zm9iamVjdCA9IG51bGw7DQoJCQl9KTsNCgkJfQ0KCX0oKTsNCgkNCglyZXR1cm4gew0KCQkvKiBQdWJsaWMgQVBJDQoJCQktIFJlZmVyZW5jZTogaHR0cDovL2NvZGUuZ29vZ2xlLmNvbS9wL3N3Zm9iamVjdC93aWtpL2RvY3VtZW50YXRpb24NCgkJKi8gDQoJCXJlZ2lzdGVyT2JqZWN0OiBmdW5jdGlvbihvYmplY3RJZFN0ciwgc3dmVmVyc2lvblN0ciwgeGlTd2ZVcmxTdHIsIGNhbGxiYWNrRm4pIHsNCgkJCWlmICh1YS53MyAmJiBvYmplY3RJZFN0ciAmJiBzd2ZWZXJzaW9uU3RyKSB7DQoJCQkJdmFyIHJlZ09iaiA9IHt9Ow0KCQkJCXJlZ09iai5pZCA9IG9iamVjdElkU3RyOw0KCQkJCXJlZ09iai5zd2ZWZXJzaW9uID0gc3dmVmVyc2lvblN0cjsNCgkJCQlyZWdPYmouZXhwcmVzc0luc3RhbGwgPSB4aVN3ZlVybFN0cjsNCgkJCQlyZWdPYmouY2FsbGJhY2tGbiA9IGNhbGxiYWNrRm47DQoJCQkJcmVnT2JqQXJyW3JlZ09iakFyci5sZW5ndGhdID0gcmVnT2JqOw0KCQkJCXNldFZpc2liaWxpdHkob2JqZWN0SWRTdHIsIGZhbHNlKTsNCgkJCX0NCgkJCWVsc2UgaWYgKGNhbGxiYWNrRm4pIHsNCgkJCQljYWxsYmFja0ZuKHtzdWNjZXNzOmZhbHNlLCBpZDpvYmplY3RJZFN0cn0pOw0KCQkJfQ0KCQl9LA0KCQkNCgkJZ2V0T2JqZWN0QnlJZDogZnVuY3Rpb24ob2JqZWN0SWRTdHIpIHsNCgkJCWlmICh1YS53Mykgew0KCQkJCXJldHVybiBnZXRPYmplY3RCeUlkKG9iamVjdElkU3RyKTsNCgkJCX0NCgkJfSwNCgkJDQoJCWVtYmVkU1dGOiBmdW5jdGlvbihzd2ZVcmxTdHIsIHJlcGxhY2VFbGVtSWRTdHIsIHdpZHRoU3RyLCBoZWlnaHRTdHIsIHN3ZlZlcnNpb25TdHIsIHhpU3dmVXJsU3RyLCBmbGFzaHZhcnNPYmosIHBhck9iaiwgYXR0T2JqLCBjYWxsYmFja0ZuKSB7DQoJCQl2YXIgY2FsbGJhY2tPYmogPSB7c3VjY2VzczpmYWxzZSwgaWQ6cmVwbGFjZUVsZW1JZFN0cn07DQoJCQlpZiAodWEudzMgJiYgISh1YS53ayAmJiB1YS53ayA8IDMxMikgJiYgc3dmVXJsU3RyICYmIHJlcGxhY2VFbGVtSWRTdHIgJiYgd2lkdGhTdHIgJiYgaGVpZ2h0U3RyICYmIHN3ZlZlcnNpb25TdHIpIHsNCgkJCQlzZXRWaXNpYmlsaXR5KHJlcGxhY2VFbGVtSWRTdHIsIGZhbHNlKTsNCgkJCQlhZGREb21Mb2FkRXZlbnQoZnVuY3Rpb24oKSB7DQoJCQkJCXdpZHRoU3RyICs9ICIiOyAvLyBhdXRvLWNvbnZlcnQgdG8gc3RyaW5nDQoJCQkJCWhlaWdodFN0ciArPSAiIjsNCgkJCQkJdmFyIGF0dCA9IHt9Ow0KCQkJCQlpZiAoYXR0T2JqICYmIHR5cGVvZiBhdHRPYmogPT09IE9CSkVDVCkgew0KCQkJCQkJZm9yICh2YXIgaSBpbiBhdHRPYmopIHsgLy8gY29weSBvYmplY3QgdG8gYXZvaWQgdGhlIHVzZSBvZiByZWZlcmVuY2VzLCBiZWNhdXNlIHdlYiBhdXRob3JzIG9mdGVuIHJldXNlIGF0dE9iaiBmb3IgbXVsdGlwbGUgU1dGcw0KCQkJCQkJCWF0dFtpXSA9IGF0dE9ialtpXTsNCgkJCQkJCX0NCgkJCQkJfQ0KCQkJCQlhdHQuZGF0YSA9IHN3ZlVybFN0cjsNCgkJCQkJYXR0LndpZHRoID0gd2lkdGhTdHI7DQoJCQkJCWF0dC5oZWlnaHQgPSBoZWlnaHRTdHI7DQoJCQkJCXZhciBwYXIgPSB7fTsgDQoJCQkJCWlmIChwYXJPYmogJiYgdHlwZW9mIHBhck9iaiA9PT0gT0JKRUNUKSB7DQoJCQkJCQlmb3IgKHZhciBqIGluIHBhck9iaikgeyAvLyBjb3B5IG9iamVjdCB0byBhdm9pZCB0aGUgdXNlIG9mIHJlZmVyZW5jZXMsIGJlY2F1c2Ugd2ViIGF1dGhvcnMgb2Z0ZW4gcmV1c2UgcGFyT2JqIGZvciBtdWx0aXBsZSBTV0ZzDQoJCQkJCQkJcGFyW2pdID0gcGFyT2JqW2pdOw0KCQkJCQkJfQ0KCQkJCQl9DQoJCQkJCWlmIChmbGFzaHZhcnNPYmogJiYgdHlwZW9mIGZsYXNodmFyc09iaiA9PT0gT0JKRUNUKSB7DQoJCQkJCQlmb3IgKHZhciBrIGluIGZsYXNodmFyc09iaikgeyAvLyBjb3B5IG9iamVjdCB0byBhdm9pZCB0aGUgdXNlIG9mIHJlZmVyZW5jZXMsIGJlY2F1c2Ugd2ViIGF1dGhvcnMgb2Z0ZW4gcmV1c2UgZmxhc2h2YXJzT2JqIGZvciBtdWx0aXBsZSBTV0ZzDQoJCQkJCQkJaWYgKHR5cGVvZiBwYXIuZmxhc2h2YXJzICE9IFVOREVGKSB7DQoJCQkJCQkJCXBhci5mbGFzaHZhcnMgKz0gIiYiICsgayArICI9IiArIGZsYXNodmFyc09ialtrXTsNCgkJCQkJCQl9DQoJCQkJCQkJZWxzZSB7DQoJCQkJCQkJCXBhci5mbGFzaHZhcnMgPSBrICsgIj0iICsgZmxhc2h2YXJzT2JqW2tdOw0KCQkJCQkJCX0NCgkJCQkJCX0NCgkJCQkJfQ0KCQkJCQlpZiAoaGFzUGxheWVyVmVyc2lvbihzd2ZWZXJzaW9uU3RyKSkgeyAvLyBjcmVhdGUgU1dGDQoJCQkJCQl2YXIgb2JqID0gY3JlYXRlU1dGKGF0dCwgcGFyLCByZXBsYWNlRWxlbUlkU3RyKTsNCgkJCQkJCWlmIChhdHQuaWQgPT0gcmVwbGFjZUVsZW1JZFN0cikgew0KCQkJCQkJCXNldFZpc2liaWxpdHkocmVwbGFjZUVsZW1JZFN0ciwgdHJ1ZSk7DQoJCQkJCQl9DQoJCQkJCQljYWxsYmFja09iai5zdWNjZXNzID0gdHJ1ZTsNCgkJCQkJCWNhbGxiYWNrT2JqLnJlZiA9IG9iajsNCgkJCQkJfQ0KCQkJCQllbHNlIGlmICh4aVN3ZlVybFN0ciAmJiBjYW5FeHByZXNzSW5zdGFsbCgpKSB7IC8vIHNob3cgQWRvYmUgRXhwcmVzcyBJbnN0YWxsDQoJCQkJCQlhdHQuZGF0YSA9IHhpU3dmVXJsU3RyOw0KCQkJCQkJc2hvd0V4cHJlc3NJbnN0YWxsKGF0dCwgcGFyLCByZXBsYWNlRWxlbUlkU3RyLCBjYWxsYmFja0ZuKTsNCgkJCQkJCXJldHVybjsNCgkJCQkJfQ0KCQkJCQllbHNlIHsgLy8gc2hvdyBhbHRlcm5hdGl2ZSBjb250ZW50DQoJCQkJCQlzZXRWaXNpYmlsaXR5KHJlcGxhY2VFbGVtSWRTdHIsIHRydWUpOw0KCQkJCQl9DQoJCQkJCWlmIChjYWxsYmFja0ZuKSB7IGNhbGxiYWNrRm4oY2FsbGJhY2tPYmopOyB9DQoJCQkJfSk7DQoJCQl9DQoJCQllbHNlIGlmIChjYWxsYmFja0ZuKSB7IGNhbGxiYWNrRm4oY2FsbGJhY2tPYmopOwl9DQoJCX0sDQoJCQ0KCQlzd2l0Y2hPZmZBdXRvSGlkZVNob3c6IGZ1bmN0aW9uKCkgew0KCQkJYXV0b0hpZGVTaG93ID0gZmFsc2U7DQoJCX0sDQoJCQ0KCQl1YTogdWEsDQoJCQ0KCQlnZXRGbGFzaFBsYXllclZlcnNpb246IGZ1bmN0aW9uKCkgew0KCQkJcmV0dXJuIHsgbWFqb3I6dWEucHZbMF0sIG1pbm9yOnVhLnB2WzFdLCByZWxlYXNlOnVhLnB2WzJdIH07DQoJCX0sDQoJCQ0KCQloYXNGbGFzaFBsYXllclZlcnNpb246IGhhc1BsYXllclZlcnNpb24sDQoJCQ0KCQljcmVhdGVTV0Y6IGZ1bmN0aW9uKGF0dE9iaiwgcGFyT2JqLCByZXBsYWNlRWxlbUlkU3RyKSB7DQoJCQlpZiAodWEudzMpIHsNCgkJCQlyZXR1cm4gY3JlYXRlU1dGKGF0dE9iaiwgcGFyT2JqLCByZXBsYWNlRWxlbUlkU3RyKTsNCgkJCX0NCgkJCWVsc2Ugew0KCQkJCXJldHVybiB1bmRlZmluZWQ7DQoJCQl9DQoJCX0sDQoJCQ0KCQlzaG93RXhwcmVzc0luc3RhbGw6IGZ1bmN0aW9uKGF0dCwgcGFyLCByZXBsYWNlRWxlbUlkU3RyLCBjYWxsYmFja0ZuKSB7DQoJCQlpZiAodWEudzMgJiYgY2FuRXhwcmVzc0luc3RhbGwoKSkgew0KCQkJCXNob3dFeHByZXNzSW5zdGFsbChhdHQsIHBhciwgcmVwbGFjZUVsZW1JZFN0ciwgY2FsbGJhY2tGbik7DQoJCQl9DQoJCX0sDQoJCQ0KCQlyZW1vdmVTV0Y6IGZ1bmN0aW9uKG9iakVsZW1JZFN0cikgew0KCQkJaWYgKHVhLnczKSB7DQoJCQkJcmVtb3ZlU1dGKG9iakVsZW1JZFN0cik7DQoJCQl9DQoJCX0sDQoJCQ0KCQljcmVhdGVDU1M6IGZ1bmN0aW9uKHNlbFN0ciwgZGVjbFN0ciwgbWVkaWFTdHIsIG5ld1N0eWxlQm9vbGVhbikgew0KCQkJaWYgKHVhLnczKSB7DQoJCQkJY3JlYXRlQ1NTKHNlbFN0ciwgZGVjbFN0ciwgbWVkaWFTdHIsIG5ld1N0eWxlQm9vbGVhbik7DQoJCQl9DQoJCX0sDQoJCQ0KCQlhZGREb21Mb2FkRXZlbnQ6IGFkZERvbUxvYWRFdmVudCwNCgkJDQoJCWFkZExvYWRFdmVudDogYWRkTG9hZEV2ZW50LA0KCQkNCgkJZ2V0UXVlcnlQYXJhbVZhbHVlOiBmdW5jdGlvbihwYXJhbSkgew0KCQkJdmFyIHEgPSBkb2MubG9jYXRpb24uc2VhcmNoIHx8IGRvYy5sb2NhdGlvbi5oYXNoOw0KCQkJaWYgKHEpIHsNCgkJCQlpZiAoL1w/Ly50ZXN0KHEpKSB7IHEgPSBxLnNwbGl0KCI/IilbMV07IH0gLy8gc3RyaXAgcXVlc3Rpb24gbWFyaw0KCQkJCWlmIChwYXJhbSA9PSBudWxsKSB7DQoJCQkJCXJldHVybiB1cmxFbmNvZGVJZk5lY2Vzc2FyeShxKTsNCgkJCQl9DQoJCQkJdmFyIHBhaXJzID0gcS5zcGxpdCgiJiIpOw0KCQkJCWZvciAodmFyIGkgPSAwOyBpIDwgcGFpcnMubGVuZ3RoOyBpKyspIHsNCgkJCQkJaWYgKHBhaXJzW2ldLnN1YnN0cmluZygwLCBwYWlyc1tpXS5pbmRleE9mKCI9IikpID09IHBhcmFtKSB7DQoJCQkJCQlyZXR1cm4gdXJsRW5jb2RlSWZOZWNlc3NhcnkocGFpcnNbaV0uc3Vic3RyaW5nKChwYWlyc1tpXS5pbmRleE9mKCI9IikgKyAxKSkpOw0KCQkJCQl9DQoJCQkJfQ0KCQkJfQ0KCQkJcmV0dXJuICIiOw0KCQl9LA0KCQkNCgkJLy8gRm9yIGludGVybmFsIHVzYWdlIG9ubHkNCgkJZXhwcmVzc0luc3RhbGxDYWxsYmFjazogZnVuY3Rpb24oKSB7DQoJCQlpZiAoaXNFeHByZXNzSW5zdGFsbEFjdGl2ZSkgew0KCQkJCXZhciBvYmogPSBnZXRFbGVtZW50QnlJZChFWFBSRVNTX0lOU1RBTExfSUQpOw0KCQkJCWlmIChvYmogJiYgc3RvcmVkQWx0Q29udGVudCkgew0KCQkJCQlvYmoucGFyZW50Tm9kZS5yZXBsYWNlQ2hpbGQoc3RvcmVkQWx0Q29udGVudCwgb2JqKTsNCgkJCQkJaWYgKHN0b3JlZEFsdENvbnRlbnRJZCkgew0KCQkJCQkJc2V0VmlzaWJpbGl0eShzdG9yZWRBbHRDb250ZW50SWQsIHRydWUpOw0KCQkJCQkJaWYgKHVhLmllICYmIHVhLndpbikgeyBzdG9yZWRBbHRDb250ZW50LnN0eWxlLmRpc3BsYXkgPSAiYmxvY2siOyB9DQoJCQkJCX0NCgkJCQkJaWYgKHN0b3JlZENhbGxiYWNrRm4pIHsgc3RvcmVkQ2FsbGJhY2tGbihzdG9yZWRDYWxsYmFja09iaik7IH0NCgkJCQl9DQoJCQkJaXNFeHByZXNzSW5zdGFsbEFjdGl2ZSA9IGZhbHNlOw0KCQkJfSANCgkJfQ0KCX07DQp9KCk7DQo=");
-      builder = new V.ArrayBuilder(1024, null, 0, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
-      builder._buffer8 = buffer;
-      builder._hetima$_length = buffer.length;
-      t1 = new V.HetimaBuilderToFile(null);
-      t1.mBuilder = builder;
-      result.file = t1;
-      result.fname = "hetima.system.swfobject.js";
-      result.apath = "hetima.system";
-      this.addFile$2("hetima.system.swfobject.js", result);
     },
     addFile$2: function($name, fileinfo) {
       var t1 = C.Utf8Codec_false.get$encoder().convert$1($name);
@@ -15380,7 +15413,7 @@ var $$ = {};
         J.close$0$x(req.get$socket());
         return;
       }
-      if ("/" + this.dataPath + "/index.html" === req.get$info().get$line().get$requestTarget() || "/" + this.dataPath + "/" === req.get$info().get$line().get$requestTarget() || "/" + this.dataPath === req.get$info().get$line().get$requestTarget()) {
+      if ("/" + this.dataPath + "/index.html" === req.get$info().get$line().get$requestTarget() || "/" + this.dataPath + "/" === req.get$info().get$line().get$requestTarget()) {
         this._startResponseHomePage$1(req.get$socket());
         return;
       }
@@ -15433,6 +15466,9 @@ var $$ = {};
       $content.write$1("</body>");
       $content.write$1("</html>");
       t1 = $content._contents;
+      t1.charCodeAt(0) == 0 ? t1 : t1;
+      t1 = $content._contents;
+      t1 = t1.charCodeAt(0) == 0 ? t1 : t1;
       b = C.Utf8Codec_false.get$encoder().convert$1(t1);
       response = P.StringBuffer$("");
       response.write$1("HTTP/1.1 200 OK\r\n");
@@ -15441,13 +15477,14 @@ var $$ = {};
       response.write$1("Content-Type: text/html\r\n");
       response.write$1("\r\n");
       t1 = response._contents;
+      t1 = t1.charCodeAt(0) == 0 ? t1 : t1;
       return J.send$1$x(socket, C.Utf8Codec_false.get$encoder().convert$1(t1)).then$1(new U.HttpServer__startResponseHomePage_closure(socket, b)).then$1(new U.HttpServer__startResponseHomePage_closure0(socket)).catchError$1(new U.HttpServer__startResponseHomePage_closure1(socket));
     },
     _startResponsePreviewPage$2: function(socket, path) {
       var $content, t1, b, response;
       $content = P.StringBuffer$("");
       if (this.isFlvFile$1(path))
-        $content.write$1("<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\"><head><title></title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /> <style type=\"text/css\" media=\"screen\">  html, body  { height:100%; } \n body { margin:0; padding:0; overflow:auto; text-align:center; background-color: #ffffff; }  object:focus { outline:none; } \n #flashContent { display:none; } \n </style><script type=\"text/javascript\" src=\"hetima.system.swfobject.js\"></script><script type=\"text/javascript\"> \n var swfVersionStr = \"0.0.0\"; \n var xiSwfUrlStr = \"\";\n" + (" var flashvars = {flvaddr:\"" + path + "\"};\n") + " var params = {b:4}; \n params.quality = \"high\"; \n params.bgcolor = \"#ffffff\"; \n params.allowscriptaccess = \"sameDomain\"; \n params.allowfullscreen = \"true\"; \n var attributes = {}; \n attributes.id = \"Player\"; \n attributes.name = \"Player\"; \n attributes.align = \"middle\"; \n swfobject.embedSWF( \n \"hetima.system.player.swf\", \"flashContent\", \n \"100%\", \"100%\", \n swfVersionStr, xiSwfUrlStr, \n flashvars, params, attributes); \n swfobject.createCSS(\"#flashContent\", \"display:block;text-align:left;\");\n </script></head><body><div id=\"flashContent\"></div></body></html>\n");
+        $content.write$1("<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\"><body><object type=\"application/x-shockwave-flash\" data=\"hetima.system.player.swf\" width=\"100%\" height=\"100%\">" + ("<param name=\"FlashVars\" value=\"flvaddr=" + path + "\" />") + "<param name=\"quality\" value=\"high\"/><param name=\"bgcolor\" value=\"#ffffff\"/><param name=\"allowScriptAccess\" value=\"sameDomain\" /><param name=\"allowFullScreen\" value=\"true\" /></object></object></body></html>");
       else {
         $content.write$1("<html>");
         $content.write$1("<body>");
@@ -15459,6 +15496,9 @@ var $$ = {};
         $content.write$1("</html>");
       }
       t1 = $content._contents;
+      t1.charCodeAt(0) == 0 ? t1 : t1;
+      t1 = $content._contents;
+      t1 = t1.charCodeAt(0) == 0 ? t1 : t1;
       b = C.Utf8Codec_false.get$encoder().convert$1(t1);
       response = P.StringBuffer$("");
       response.write$1("HTTP/1.1 200 OK\r\n");
@@ -15467,6 +15507,7 @@ var $$ = {};
       response.write$1("Content-Type: text/html\r\n");
       response.write$1("\r\n");
       t1 = response._contents;
+      t1 = t1.charCodeAt(0) == 0 ? t1 : t1;
       return J.send$1$x(socket, C.Utf8Codec_false.get$encoder().convert$1(t1)).then$1(new U.HttpServer__startResponsePreviewPage_closure(socket, b)).then$1(new U.HttpServer__startResponsePreviewPage_closure0(socket)).catchError$1(new U.HttpServer__startResponsePreviewPage_closure1(socket));
     },
     _startResponseRangeFile$5: function(socket, file, contentType, start, end) {
@@ -15474,12 +15515,12 @@ var $$ = {};
       t1 = {};
       t1.end_0 = end;
       response = new V.ArrayBuilder(1024, null, 0, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
-      response._buffer8 = new Uint8Array(1024);
+      response._buffer8 = new Uint8Array(H._checkLength(1024));
       file.getLength$0().then$1(new U.HttpServer__startResponseRangeFile_closure(t1, this, socket, file, contentType, start, response));
     },
     _startResponseFile$2: function(socket, file) {
       var response = new V.ArrayBuilder(1024, null, 0, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
-      response._buffer8 = new Uint8Array(1024);
+      response._buffer8 = new Uint8Array(H._checkLength(1024));
       file.getLength$0().then$1(new U.HttpServer__startResponseFile_closure(this, socket, file, response));
     },
     _startResponseBuffer$4: function(socket, file, index, $length) {
@@ -15535,10 +15576,7 @@ var $$ = {};
         H.throwExpression(t2._addEventError$0());
       t2._sendData$1(t3);
       t1._server = server;
-      t2 = this.completer_1.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(0);
+      this.completer_1.complete$1(0, 0);
       server.onNewRequest$0().listen$1(t1.get$_hundleRequest());
     }, "call$1", null, 2, 0, null, 98, "call"],
     $isFunction: true
@@ -15667,7 +15705,7 @@ var $$ = {};
     $isFunction: true
   },
   HttpServer__startResponseBuffer_responseTask: {
-    "^": "Closure:52;box_1,socket_2,file_3,index_4,length_5",
+    "^": "Closure:53;box_1,socket_2,file_3,index_4,length_5",
     call$0: function() {
       var t1, t2, end, t3, t4, t5;
       t1 = {};
@@ -15719,7 +15757,7 @@ var $$ = {};
     $isFunction: true
   },
   HttpServer__retryBind_bindFunc: {
-    "^": "Closure:52;this_0,completer_1,portMax_2",
+    "^": "Closure:53;this_0,completer_1,portMax_2",
     call$0: function() {
       var t1, t2;
       t1 = this.this_0;
@@ -15731,10 +15769,7 @@ var $$ = {};
   HttpServer__retryBind_bindFunc_closure: {
     "^": "Closure:99;completer_3",
     call$1: [function(server) {
-      var t1 = this.completer_3.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(server);
+      this.completer_3.complete$1(0, server);
     }, "call$1", null, 2, 0, null, 98, "call"],
     $isFunction: true
   },
@@ -15757,22 +15792,22 @@ var $$ = {};
       var t1, t2;
       this._downloadPath = path;
       t1 = this._globalAccessPoint;
-      t2 = "http://" + H.S(this._globalIP.directionalTextHelper.getTextOrHtml$1(false)) + ":" + H.S(this._globalPort.directionalTextHelper.getTextOrHtml$1(false)) + "/" + H.S(this._downloadPath);
+      t2 = "http://" + H.S(this._globalIP.directionalTextHelper.getTextOrHtml$1(false)) + ":" + H.S(this._globalPort.directionalTextHelper.getTextOrHtml$1(false)) + "/" + H.S(this._downloadPath) + "/";
       t1.directionalTextHelper.setTextOrHtml$2(t2, false);
       t1.updateHorizontalAlignment$0();
       t1 = this._localAccessPoint;
-      t2 = "http://" + H.S(this._localIP.directionalTextHelper.getTextOrHtml$1(false)) + ":" + H.S(this._localPort.directionalTextHelper.getTextOrHtml$1(false)) + "/" + H.S(this._downloadPath);
+      t2 = "http://" + H.S(this._localIP.directionalTextHelper.getTextOrHtml$1(false)) + ":" + H.S(this._localPort.directionalTextHelper.getTextOrHtml$1(false)) + "/" + H.S(this._downloadPath) + "/";
       t1.directionalTextHelper.setTextOrHtml$2(t2, false);
       t1.updateHorizontalAlignment$0();
     },
     updateAccessPointer$0: function() {
       var t1, t2;
       t1 = this._globalAccessPoint;
-      t2 = "http://" + H.S(this._globalIP.directionalTextHelper.getTextOrHtml$1(false)) + ":" + H.S(this._globalPort.directionalTextHelper.getTextOrHtml$1(false)) + "/" + H.S(this._downloadPath);
+      t2 = "http://" + H.S(this._globalIP.directionalTextHelper.getTextOrHtml$1(false)) + ":" + H.S(this._globalPort.directionalTextHelper.getTextOrHtml$1(false)) + "/" + H.S(this._downloadPath) + "/";
       t1.directionalTextHelper.setTextOrHtml$2(t2, false);
       t1.updateHorizontalAlignment$0();
       t1 = this._localAccessPoint;
-      t2 = "http://" + H.S(this._localIP.directionalTextHelper.getTextOrHtml$1(false)) + ":" + H.S(this._localPort.directionalTextHelper.getTextOrHtml$1(false)) + "/" + H.S(this._downloadPath);
+      t2 = "http://" + H.S(this._localIP.directionalTextHelper.getTextOrHtml$1(false)) + ":" + H.S(this._localPort.directionalTextHelper.getTextOrHtml$1(false)) + "/" + H.S(this._downloadPath) + "/";
       t1.directionalTextHelper.setTextOrHtml$2(t2, false);
       t1.updateHorizontalAlignment$0();
     },
@@ -15869,7 +15904,7 @@ var $$ = {};
       P.print("##" + H.S(J.get$title$x(t2._element)));
       path = J.get$value$x(t2._element);
       for (t2 = C.FileList_methods.get$iterator(H.interceptedTypeCast(t2._element, "$isInputElement").files); t2.moveNext$0();) {
-        f = t2._html$_current;
+        f = t2._current;
         file = new N.HetimaFileBlob(null);
         file._mBlob = f;
         t3 = new P._Future(0, $.Zone__current, null, null, null, null, null, null);
@@ -16045,7 +16080,7 @@ var $$ = {};
     $isFunction: true
   },
   PortMap_startPortMap___tryAddPortMap: {
-    "^": "Closure:52;this_4,searcher_5,pppDevice_6,baseExternalPort_7",
+    "^": "Closure:53;this_4,searcher_5,pppDevice_6,baseExternalPort_7",
     call$0: function() {
       var t1, t2;
       t1 = this.this_4;
@@ -16114,20 +16149,20 @@ var $$ = {};
     call$1: function(pppDevice) {
       var t1;
       for (t1 = this.deletePortList_3, t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();)
-        pppDevice.requestDeletePortMapping$2(t1._current, "TCP");
+        pppDevice.requestDeletePortMapping$2(t1.__internal$_current, "TCP");
       P.Future_Future$delayed(P.Duration$(0, 0, 0, 0, 0, 5), new U.PortMap_deleteAllPortMap___deletePortMap_closure(this.searcher_2), null);
     },
     $isFunction: true
   },
   PortMap_deleteAllPortMap___deletePortMap_closure: {
-    "^": "Closure:52;searcher_4",
+    "^": "Closure:53;searcher_4",
     call$0: function() {
       J.close$0$x(this.searcher_4);
     },
     $isFunction: true
   },
   PortMap_deleteAllPortMap___tryGetPortMapInfo: {
-    "^": "Closure:52;box_0,searcher_5,deletePortList_6,deletePortMap_7",
+    "^": "Closure:53;box_0,searcher_5,deletePortList_6,deletePortMap_7",
     call$0: function() {
       var t1, pppDevice;
       t1 = this.searcher_5;
@@ -16149,7 +16184,7 @@ var $$ = {};
       ip = res.getValue$2("NewInternalClient", "");
       if (J.$eq(description, "HetimaDelphinium"))
         this.deletePortList_8.push(H.Primitives_parseInt(port, null, null));
-      if (J.replaceAll$2$s(port, " |\t|\r|\n", "") === "" && J.replaceAll$2$s(ip, " |\t|\r|\n", "") === "") {
+      if (J.$eq(J.replaceAll$2$s(port, " |\t|\r|\n", ""), "") && J.$eq(J.replaceAll$2$s(ip, " |\t|\r|\n", ""), "")) {
         this.deletePortMap_9.call$1(this.pppDevice_11);
         return;
       }
@@ -16365,431 +16400,6 @@ var $$ = {};
     parser.nextString$1("bytes=").then$1(new V.HetiHttpResponse_decodeRequestRangeValue_closure(parser)).then$1(new V.HetiHttpResponse_decodeRequestRangeValue_closure0(parser, ret)).then$1(new V.HetiHttpResponse_decodeRequestRangeValue_closure1(parser)).then$1(new V.HetiHttpResponse_decodeRequestRangeValue_closure2(ret, completer)).catchError$1(new V.HetiHttpResponse_decodeRequestRangeValue_closure3(completer));
     return completer.future;
   },
-  ArrayBuilder: {
-    "^": "HetimaBuilder;_max,_buffer8,_hetima$_length,completer,mGetByteFutreList,completerFin,_immutable",
-    getByteFuture$2: function(index, $length) {
-      var info, t1, index0, t2, t3;
-      info = new V.GetByteFutureInfo([], 0);
-      info.completerResult = [];
-      info.completerResultLength = $length;
-      if (this.completer.future._state !== 0)
-        this.completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      t1 = J.getInterceptor$ns($length);
-      index0 = index;
-      while (true) {
-        t2 = J.getInterceptor$n(index0);
-        if (!(t2.$lt(index0, this._hetima$_length) && t2.$lt(index0, t1.$add($length, index))))
-          break;
-        t2 = info.completerResult;
-        t3 = this._buffer8;
-        if (index0 >>> 0 !== index0 || index0 >= t3.length)
-          return H.ioore(t3, index0);
-        t3 = t3[index0];
-        if (typeof t3 !== "number")
-          return H.iae(t3);
-        t2.push(255 & t3);
-        ++index0;
-      }
-      if (J.$le$n(info.completerResultLength, info.completerResult.length) || this._immutable) {
-        t1 = this.completer;
-        t2 = info.completerResult;
-        t1 = t1.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(t2);
-        info.completerResult = null;
-        info.completerResultLength = 0;
-      } else
-        this.mGetByteFutreList.push(info);
-      return this.completer.future;
-    },
-    getLength$0: function() {
-      var completer, t1, t2;
-      completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      t1 = this._hetima$_length;
-      t2 = completer.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
-      return t2;
-    },
-    update$1: function(plusLength) {
-      var t1, t2, nextMax, next, t3, i, t4;
-      t1 = this._hetima$_length;
-      if (typeof plusLength !== "number")
-        return H.iae(plusLength);
-      t1 += plusLength;
-      t2 = this._max;
-      if (t1 < t2)
-        return;
-      else {
-        nextMax = t1 + t2;
-        if (typeof nextMax !== "number" || Math.floor(nextMax) !== nextMax)
-          H.throwExpression(P.ArgumentError$("Invalid length " + H.S(nextMax)));
-        next = new Uint8Array(nextMax);
-        for (t1 = this._hetima$_length, t2 = this._buffer8, t3 = next.length, i = 0; i < t1; ++i) {
-          if (i >= t2.length)
-            return H.ioore(t2, i);
-          t4 = t2[i];
-          if (i >= t3)
-            return H.ioore(next, i);
-          next[i] = t4;
-        }
-        this._buffer8 = null;
-        this._buffer8 = next;
-        this._max = nextMax;
-      }
-    },
-    fin$0: function() {
-      var t1, t2, f, t3, t4;
-      for (t1 = this.mGetByteFutreList, t2 = new H.ListIterator(t1, t1.length, 0, null); t2.moveNext$0();) {
-        f = t2._current;
-        if (f.get$completerResult() != null) {
-          t3 = this.completer;
-          t4 = f.get$completerResult();
-          t3 = t3.future;
-          if (t3._state !== 0)
-            H.throwExpression(P.StateError$("Future already completed"));
-          t3._asyncComplete$1(t4);
-          f.set$completerResult(null);
-          f.set$completerResultLength(0);
-        }
-      }
-      C.JSArray_methods.set$length(t1, 0);
-      this.set$immutable(true);
-    },
-    appendByte$1: function(v) {
-      var t1, t2, removeList, f, t3, t4;
-      if (this._immutable)
-        return;
-      this.update$1(1);
-      t1 = this._buffer8;
-      t2 = this._hetima$_length;
-      if (t2 >= t1.length)
-        return H.ioore(t1, t2);
-      t1[t2] = v;
-      this._hetima$_length = t2 + 1;
-      removeList = [];
-      for (t1 = this.mGetByteFutreList, t2 = new H.ListIterator(t1, t1.length, 0, null); t2.moveNext$0();) {
-        f = t2._current;
-        if (this.completer.future._state === 0 && f.get$completerResult() != null)
-          f.get$completerResult().push(v);
-        if (f.get$completerResult() != null && J.$le$n(f.get$completerResultLength(), f.get$completerResult().length)) {
-          t3 = this.completer;
-          t4 = f.get$completerResult();
-          t3 = t3.future;
-          if (t3._state !== 0)
-            H.throwExpression(P.StateError$("Future already completed"));
-          t3._asyncComplete$1(t4);
-          f.set$completerResult(null);
-          f.set$completerResultLength(0);
-          removeList.push(f);
-        }
-      }
-      for (t2 = new H.ListIterator(removeList, removeList.length, 0, null); t2.moveNext$0();)
-        C.JSArray_methods.remove$1(t1, t2._current);
-    },
-    appendString$1: function(text) {
-      var code, i;
-      code = C.Utf8Codec_false.get$encoder().convert$1(text);
-      this.update$1(code.length);
-      for (i = 0; i < code.length; ++i)
-        this.appendByte$1(code[i]);
-    },
-    appendIntList$3: function(buffer, index, $length) {
-      var t1, i;
-      this.update$1($length);
-      if (typeof $length !== "number")
-        return H.iae($length);
-      t1 = J.getInterceptor$asx(buffer);
-      i = 0;
-      for (; i < $length; ++i)
-        this.appendByte$1(t1.$index(buffer, index + i));
-    }
-  },
-  GetByteFutureInfo: {
-    "^": "Object;completerResult@,completerResultLength@"
-  },
-  EasyParser: {
-    "^": "Object;index*,stack,buffer>",
-    pop$0: function() {
-      var t1, ret;
-      t1 = this.stack;
-      ret = C.JSArray_methods.get$last(t1);
-      C.JSArray_methods.remove$1(t1, ret);
-      return ret;
-    },
-    nextString$1: function(value) {
-      var completer, encoded;
-      completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      encoded = C.Utf8Codec_false.get$encoder().convert$1(value);
-      this.buffer.getByteFuture$2(this.index, encoded.length).then$1(new V.EasyParser_nextString_closure(this, value, completer, encoded));
-      return completer.future;
-    },
-    nextBytePattern$1: function(matcher) {
-      var completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      this.buffer.getByteFuture$2(this.index, 1).then$1(new V.EasyParser_nextBytePattern_closure(this, matcher, completer));
-      return completer.future;
-    },
-    nextBytePatternWithLength$2: function(matcher, $length) {
-      var completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      this.buffer.getByteFuture$2(this.index, $length).then$1(new V.EasyParser_nextBytePatternWithLength_closure(this, matcher, $length, completer));
-      return completer.future;
-    },
-    nextBytePatternByUnmatch$1: function(matcher) {
-      var completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      new V.EasyParser_nextBytePatternByUnmatch_p(this, matcher, completer, H.setRuntimeTypeInfo([], [P.$int])).call$0();
-      return completer.future;
-    }
-  },
-  EasyParser_nextString_closure: {
-    "^": "Closure:118;this_0,value_1,completer_2,encoded_3",
-    call$1: [function(v) {
-      var t1, t2, t3, i;
-      t1 = J.getInterceptor$asx(v);
-      t2 = this.encoded_3;
-      if (!J.$eq(t1.get$length(v), t2.length)) {
-        this.completer_2.completeError$1(new V.EasyParseError());
-        return;
-      }
-      for (t2 = new H.ListIterator(t2, t2.length, 0, null), t3 = this.this_0, i = 0; t2.moveNext$0();) {
-        if (!J.$eq(t2._current, t1.$index(v, i))) {
-          t1 = this.completer_2.future;
-          if (t1._state !== 0)
-            H.throwExpression(P.StateError$("Future already completed"));
-          t1._asyncCompleteError$2(new V.EasyParseError(), null);
-          return;
-        }
-        ++i;
-        ++t3.index;
-      }
-      t1 = this.completer_2.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(this.value_1);
-    }, "call$1", null, 2, 0, null, 89, "call"],
-    $isFunction: true
-  },
-  EasyParser_nextBytePattern_closure: {
-    "^": "Closure:118;this_0,matcher_1,completer_2",
-    call$1: [function(v) {
-      var t1, t2;
-      t1 = J.getInterceptor$asx(v);
-      if (J.$lt$n(t1.get$length(v), 1))
-        throw H.wrapException(V.EasyParseError$());
-      t2 = t1.$index(v, 0);
-      if (J.contains$1$asx(this.matcher_1.include, t2)) {
-        ++this.this_0.index;
-        t1 = t1.$index(v, 0);
-        t2 = this.completer_2.future;
-        if (t2._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t2._asyncComplete$1(t1);
-      } else
-        throw H.wrapException(V.EasyParseError$());
-    }, "call$1", null, 2, 0, null, 89, "call"],
-    $isFunction: true
-  },
-  EasyParser_nextBytePatternWithLength_closure: {
-    "^": "Closure:118;this_0,matcher_1,length_2,completer_3",
-    call$1: [function(va) {
-      var t1, t2, t3, t4, v, t5;
-      t1 = J.getInterceptor$asx(va);
-      if (J.$lt$n(t1.get$length(va), this.length_2))
-        this.completer_3.completeError$1(new V.EasyParseError());
-      for (t1 = t1.get$iterator(va), t2 = this.this_0, t3 = this.matcher_1, t4 = this.completer_3; t1.moveNext$0();) {
-        v = t1.get$current();
-        if (!J.contains$1$asx(t3.include, v)) {
-          t5 = t4.future;
-          if (t5._state !== 0)
-            H.throwExpression(P.StateError$("Future already completed"));
-          t5._asyncCompleteError$2(new V.EasyParseError(), null);
-        }
-        ++t2.index;
-      }
-      t1 = t4.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(va);
-    }, "call$1", null, 2, 0, null, 119, "call"],
-    $isFunction: true
-  },
-  EasyParser_nextBytePatternByUnmatch_p: {
-    "^": "Closure:120;this_0,matcher_1,completer_2,ret_3",
-    call$0: function() {
-      var t1 = this.this_0;
-      return t1.buffer.getByteFuture$2(t1.index, 1).then$1(new V.EasyParser_nextBytePatternByUnmatch_p_closure(t1, this.matcher_1, this.completer_2, this.ret_3, this));
-    },
-    $isFunction: true
-  },
-  EasyParser_nextBytePatternByUnmatch_p_closure: {
-    "^": "Closure:118;this_4,matcher_5,completer_6,ret_7,p_8",
-    call$1: [function(va) {
-      var t1, t2;
-      t1 = J.getInterceptor$asx(va);
-      if (J.$lt$n(t1.get$length(va), 1)) {
-        t1 = this.completer_6.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(this.ret_7);
-      } else if (this.matcher_5.match$1(t1.$index(va, 0))) {
-        this.ret_7.push(t1.$index(va, 0));
-        ++this.this_4.index;
-        return this.p_8.call$0();
-      } else {
-        t1 = this.completer_6;
-        t2 = this.ret_7;
-        if (this.this_4.buffer.get$immutable()) {
-          t1 = t1.future;
-          if (t1._state !== 0)
-            H.throwExpression(P.StateError$("Future already completed"));
-          t1._asyncComplete$1(t2);
-        } else {
-          t1 = t1.future;
-          if (t1._state !== 0)
-            H.throwExpression(P.StateError$("Future already completed"));
-          t1._asyncComplete$1(t2);
-        }
-      }
-    }, "call$1", null, 2, 0, null, 119, "call"],
-    $isFunction: true
-  },
-  EasyParserMatcher: {
-    "^": "Object;"
-  },
-  EasyParserIncludeMatcher: {
-    "^": "EasyParserMatcher;include",
-    match$1: function(target) {
-      return J.contains$1$asx(this.include, target);
-    }
-  },
-  EasyParseError: {
-    "^": "Error;",
-    static: {EasyParseError$: function() {
-        return new V.EasyParseError();
-      }}
-  },
-  HetimaBuilder: {
-    "^": "Object;",
-    onFin$0: function() {
-      if (this._immutable) {
-        var t1 = this.completerFin.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(true);
-      }
-      return this.completerFin.future;
-    },
-    get$immutable: function() {
-      return this._immutable;
-    },
-    set$immutable: function(v) {
-      var prev, t1;
-      prev = this._immutable;
-      this._immutable = v;
-      if (!prev && v) {
-        t1 = this.completerFin.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(v);
-      }
-    }
-  },
-  HetimaBuilderAdapter: {
-    "^": "HetimaBuilder;_base,_startIndex,completerFin,_immutable",
-    getLength$0: function() {
-      var completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      this._base.getLength$0().then$1(new V.HetimaBuilderAdapter_getLength_closure(this, completer)).catchError$1(new V.HetimaBuilderAdapter_getLength_closure0(completer));
-      return completer.future;
-    },
-    onFin$0: function() {
-      return this._base.onFin$0();
-    },
-    getByteFuture$2: function(index, $length) {
-      var completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      this._base.getByteFuture$2(J.$add$ns(index, this._startIndex), $length).then$1(new V.HetimaBuilderAdapter_getByteFuture_closure(completer)).catchError$1(new V.HetimaBuilderAdapter_getByteFuture_closure0(completer));
-      return completer.future;
-    }
-  },
-  HetimaBuilderAdapter_getLength_closure: {
-    "^": "Closure:90;this_0,completer_1",
-    call$1: [function(v) {
-      var t1, t2;
-      t1 = J.$sub$n(v, this.this_0._startIndex);
-      t2 = this.completer_1.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
-    }, "call$1", null, 2, 0, null, 89, "call"],
-    $isFunction: true
-  },
-  HetimaBuilderAdapter_getLength_closure0: {
-    "^": "Closure:21;completer_2",
-    call$1: [function(e) {
-      this.completer_2.completeError$1(e);
-    }, "call$1", null, 2, 0, null, 2, "call"],
-    $isFunction: true
-  },
-  HetimaBuilderAdapter_getByteFuture_closure: {
-    "^": "Closure:118;completer_0",
-    call$1: [function(d) {
-      var t1 = this.completer_0.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(d);
-    }, "call$1", null, 2, 0, null, 94, "call"],
-    $isFunction: true
-  },
-  HetimaBuilderAdapter_getByteFuture_closure0: {
-    "^": "Closure:21;completer_1",
-    call$1: [function(e) {
-      this.completer_1.completeError$1(e);
-    }, "call$1", null, 2, 0, null, 2, "call"],
-    $isFunction: true
-  },
-  HetimaFile: {
-    "^": "HetimaReadBuffer;"
-  },
-  HetimaReadBuffer: {
-    "^": "Object;"
-  },
-  ReadResult: {
-    "^": "Object;status,buffer>",
-    static: {"^": "ReadResult_OK,ReadResult_NG"}
-  },
-  HetimaBuilderToFile: {
-    "^": "HetimaFile;mBuilder",
-    getLength$0: function() {
-      return this.mBuilder.getLength$0();
-    },
-    read$2: function(start, end) {
-      var cc = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      this.mBuilder.getByteFuture$2(start, J.$sub$n(end, start)).then$1(new V.HetimaBuilderToFile_read_closure(cc)).catchError$1(new V.HetimaBuilderToFile_read_closure0(cc));
-      return cc.future;
-    }
-  },
-  HetimaBuilderToFile_read_closure: {
-    "^": "Closure:118;cc_0",
-    call$1: [function(b) {
-      var t1, result;
-      t1 = new Uint8Array(H._ensureNativeList(b));
-      result = new V.ReadResult(-1, null);
-      result.status = 1;
-      result.buffer = t1;
-      t1 = this.cc_0.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(result);
-    }, "call$1", null, 2, 0, null, 121, "call"],
-    $isFunction: true
-  },
-  HetimaBuilderToFile_read_closure0: {
-    "^": "Closure:21;cc_1",
-    call$1: [function(e) {
-      this.cc_1.completeError$1(e);
-    }, "call$1", null, 2, 0, null, 2, "call"],
-    $isFunction: true
-  },
   HetiHttpClientResponse: {
     "^": "Object;message>,body>"
   },
@@ -16803,23 +16413,20 @@ var $$ = {};
       this._builder.toString;
       t1 = P.StreamController_StreamController(null, null, null, null, false, null);
       t2 = new V.ArrayBuilder(1024, null, 0, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
-      t2._buffer8 = new Uint8Array(1024);
-      t1 = new N.HetiSocketChrome(null, t1, false, 0, t2, false);
-      this.socket = t1;
-      t1.connect$2(this.host, this.port).then$1(new V.HetiHttpClient_connect_closure(completer));
+      t2._buffer8 = new Uint8Array(H._checkLength(1024));
+      t2 = new N.HetiSocketChrome(null, t1, false, 0, t2, false);
+      this.socket = t2;
+      t2.connect$2(this.host, this.port).then$1(new V.HetiHttpClient_connect_closure(completer));
       return completer.future;
     },
     get$2: function(path, header) {
-      var completer, headerTmp, t1, builder, t2, key;
+      var completer, headerTmp, builder, t1, t2, key;
       completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
       headerTmp = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
-      t1 = this.host;
-      if (typeof t1 !== "string")
-        return t1.$add();
-      headerTmp.$indexSet(0, "Host", C.JSString_methods.$add(t1 + ":", J.toString$0(this.port)));
+      headerTmp.$indexSet(0, "Host", J.$add$ns(J.$add$ns(this.host, ":"), J.toString$0(this.port)));
       headerTmp.$indexSet(0, "Connection", "Close");
       builder = new V.ArrayBuilder(1024, null, 0, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
-      builder._buffer8 = new Uint8Array(1024);
+      builder._buffer8 = new Uint8Array(H._checkLength(1024));
       builder.appendString$1(C.JSString_methods.$add("GET ", path) + " HTTP/1.1\r\n");
       for (t1 = headerTmp.get$keys()._map, t2 = new P.LinkedHashMapKeyIterator(t1, t1._modifications, null, null), t2._cell = t1._first; t2.moveNext$0();) {
         key = t2._collection$_current;
@@ -16835,28 +16442,26 @@ var $$ = {};
       return this.get$2(path, null);
     },
     post$3: function(path, body, header) {
-      var completer, headerTmp, t1, t2, key, builder;
+      var completer, headerTmp, t1, t2, key, builder, t3;
       completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
       headerTmp = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
-      t1 = this.host;
-      if (typeof t1 !== "string")
-        return t1.$add();
-      headerTmp.$indexSet(0, "Host", C.JSString_methods.$add(t1 + ":", J.toString$0(this.port)));
+      headerTmp.$indexSet(0, "Host", J.$add$ns(J.$add$ns(this.host, ":"), J.toString$0(this.port)));
       headerTmp.$indexSet(0, "Connection", "Close");
       for (t1 = header.get$keys()._map, t2 = new P.LinkedHashMapKeyIterator(t1, t1._modifications, null, null), t2._cell = t1._first; t2.moveNext$0();) {
         key = t2._collection$_current;
         headerTmp.$indexSet(0, key, header.$index(0, key));
       }
-      headerTmp.$indexSet(0, "Content-Length", C.JSInt_methods.toString$0(body.length));
+      t1 = body.length;
+      headerTmp.$indexSet(0, "Content-Length", C.JSInt_methods.toString$0(t1));
       builder = new V.ArrayBuilder(1024, null, 0, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
-      builder._buffer8 = new Uint8Array(1024);
+      builder._buffer8 = new Uint8Array(H._checkLength(1024));
       builder.appendString$1(C.JSString_methods.$add("POST ", path) + " HTTP/1.1\r\n");
-      for (t1 = headerTmp.get$keys()._map, t2 = new P.LinkedHashMapKeyIterator(t1, t1._modifications, null, null), t2._cell = t1._first; t2.moveNext$0();) {
-        key = t2._collection$_current;
+      for (t2 = headerTmp.get$keys()._map, t3 = new P.LinkedHashMapKeyIterator(t2, t2._modifications, null, null), t3._cell = t2._first; t3.moveNext$0();) {
+        key = t3._collection$_current;
         builder.appendString$1(C.JSString_methods.$add(C.JSString_methods.$add("", key) + ": ", headerTmp.$index(0, key)) + "\r\n");
       }
       builder.appendString$1("\r\n");
-      builder.appendIntList$3(body, 0, body.length);
+      builder.appendIntList$3(body, 0, t1);
       builder.getLength$0().then$1(new V.HetiHttpClient_post_closure(builder));
       H.setRuntimeTypeInfo(new P._ControllerStream(this.socket._hetima_cl$_controller), [null]).listen$1(new V.HetiHttpClient_post_closure0());
       this.socket.send$1(0, J.sublist$2$ax(builder._buffer8, 0, builder._hetima$_length)).then$1(new V.HetiHttpClient_post_closure1());
@@ -16864,28 +16469,26 @@ var $$ = {};
       return completer.future;
     },
     mpost$3: function(path, body, header) {
-      var completer, headerTmp, t1, t2, key, builder;
+      var completer, headerTmp, t1, t2, key, builder, t3;
       completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
       headerTmp = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
-      t1 = this.host;
-      if (typeof t1 !== "string")
-        return t1.$add();
-      headerTmp.$indexSet(0, "Host", C.JSString_methods.$add(t1 + ":", J.toString$0(this.port)));
+      headerTmp.$indexSet(0, "Host", J.$add$ns(J.$add$ns(this.host, ":"), J.toString$0(this.port)));
       headerTmp.$indexSet(0, "Connection", "Close");
       for (t1 = header.get$keys()._map, t2 = new P.LinkedHashMapKeyIterator(t1, t1._modifications, null, null), t2._cell = t1._first; t2.moveNext$0();) {
         key = t2._collection$_current;
         headerTmp.$indexSet(0, key, header.$index(0, key));
       }
-      headerTmp.$indexSet(0, "Content-Length", C.JSInt_methods.toString$0(body.length));
+      t1 = body.length;
+      headerTmp.$indexSet(0, "Content-Length", C.JSInt_methods.toString$0(t1));
       builder = new V.ArrayBuilder(1024, null, 0, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
-      builder._buffer8 = new Uint8Array(1024);
+      builder._buffer8 = new Uint8Array(H._checkLength(1024));
       builder.appendString$1(C.JSString_methods.$add("M-POST ", path) + " HTTP/1.1\r\n");
-      for (t1 = headerTmp.get$keys()._map, t2 = new P.LinkedHashMapKeyIterator(t1, t1._modifications, null, null), t2._cell = t1._first; t2.moveNext$0();) {
-        key = t2._collection$_current;
+      for (t2 = headerTmp.get$keys()._map, t3 = new P.LinkedHashMapKeyIterator(t2, t2._modifications, null, null), t3._cell = t2._first; t3.moveNext$0();) {
+        key = t3._collection$_current;
         builder.appendString$1(C.JSString_methods.$add(C.JSString_methods.$add("", key) + ": ", headerTmp.$index(0, key)) + "\r\n");
       }
       builder.appendString$1("\r\n");
-      builder.appendIntList$3(body, 0, body.length);
+      builder.appendIntList$3(body, 0, t1);
       builder.getLength$0().then$1(new V.HetiHttpClient_mpost_closure(builder));
       H.setRuntimeTypeInfo(new P._ControllerStream(this.socket._hetima_cl$_controller), [null]).listen$1(new V.HetiHttpClient_mpost_closure0());
       this.socket.send$1(0, J.sublist$2$ax(builder._buffer8, 0, builder._hetima$_length)).then$1(new V.HetiHttpClient_mpost_closure1());
@@ -16904,90 +16507,83 @@ var $$ = {};
     }
   },
   HetiHttpClient_connect_closure: {
-    "^": "Closure:123;completer_0",
+    "^": "Closure:119;completer_0",
     call$1: [function(socket) {
       var t1 = this.completer_0;
-      if (socket == null) {
-        t1 = t1.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(-999);
-      } else {
-        t1 = t1.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(1);
-      }
-    }, "call$1", null, 2, 0, null, 122, "call"],
+      if (socket == null)
+        t1.complete$1(0, -999);
+      else
+        t1.complete$1(0, 1);
+    }, "call$1", null, 2, 0, null, 118, "call"],
     $isFunction: true
   },
   HetiHttpClient_get_closure: {
-    "^": "Closure:125;path_0",
+    "^": "Closure:121;path_0",
     call$1: [function(info) {
       P.print(C.JSString_methods.$add(C.JSString_methods.$add("Length", this.path_0) + ":", J.toString$0(J.get$length$asx(J.get$data$x(info)))));
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiHttpClient_get_closure0: {
     "^": "Closure:103;",
     call$1: [function(info) {
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiHttpClient_post_closure: {
     "^": "Closure:90;builder_0",
     call$1: [function(len) {
       this.builder_0.getByteFuture$2(0, len).then$1(new V.HetiHttpClient_post__closure());
-    }, "call$1", null, 2, 0, null, 126, "call"],
+    }, "call$1", null, 2, 0, null, 122, "call"],
     $isFunction: true
   },
   HetiHttpClient_post__closure: {
-    "^": "Closure:118;",
+    "^": "Closure:123;",
     call$1: [function(data) {
-      P.print("request\r\n" + C.Utf8Codec_false.decode$1(data));
+      P.print(C.JSString_methods.$add("request\r\n", C.Utf8Codec_false.decode$1(data)));
     }, "call$1", null, 2, 0, null, 67, "call"],
     $isFunction: true
   },
   HetiHttpClient_post_closure0: {
-    "^": "Closure:125;",
+    "^": "Closure:121;",
     call$1: [function(info) {
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiHttpClient_post_closure1: {
     "^": "Closure:103;",
     call$1: [function(info) {
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiHttpClient_mpost_closure: {
     "^": "Closure:90;builder_0",
     call$1: [function(len) {
       this.builder_0.getByteFuture$2(0, len).then$1(new V.HetiHttpClient_mpost__closure());
-    }, "call$1", null, 2, 0, null, 126, "call"],
+    }, "call$1", null, 2, 0, null, 122, "call"],
     $isFunction: true
   },
   HetiHttpClient_mpost__closure: {
-    "^": "Closure:118;",
+    "^": "Closure:123;",
     call$1: [function(data) {
-      P.print("request\r\n" + C.Utf8Codec_false.decode$1(data));
+      P.print(C.JSString_methods.$add("request\r\n", C.Utf8Codec_false.decode$1(data)));
     }, "call$1", null, 2, 0, null, 67, "call"],
     $isFunction: true
   },
   HetiHttpClient_mpost_closure0: {
-    "^": "Closure:125;",
+    "^": "Closure:121;",
     call$1: [function(info) {
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiHttpClient_mpost_closure1: {
     "^": "Closure:103;",
     call$1: [function(info) {
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiHttpClient_handleResponse_closure: {
-    "^": "Closure:128;this_0,completer_1",
+    "^": "Closure:125;this_0,completer_1",
     call$1: [function(message) {
       var result, t1, t2, transferEncodingField, t3, t4;
       result = new V.HetiHttpClientResponse(null, null);
@@ -17016,24 +16612,21 @@ var $$ = {};
         t3._base = t1;
         t3._startIndex = t2;
         t2 = new V.ArrayBuilder(1024, null, 0, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
-        t2._buffer8 = new Uint8Array(1024);
-        t1 = new V.ChunkedBuilderAdapter(false, t2, null, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
-        t1._base = t3;
-        t1.start$0(0);
-        result.body = t1.start$0(0);
+        t2._buffer8 = new Uint8Array(H._checkLength(1024));
+        t2 = new V.ChunkedBuilderAdapter(false, t2, null, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
+        t2._base = t3;
+        t2.start$0(0);
+        result.body = t2.start$0(0);
       }
-      t1 = this.completer_1.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(result);
-    }, "call$1", null, 2, 0, null, 127, "call"],
+      this.completer_1.complete$1(0, result);
+    }, "call$1", null, 2, 0, null, 124, "call"],
     $isFunction: true
   },
   HetiHttpClient_handleResponse__closure: {
-    "^": "Closure:118;",
+    "^": "Closure:123;",
     call$1: [function(buffer) {
-      P.print("response\r\n" + C.Utf8Codec_false.decode$1(buffer));
-    }, "call$1", null, 2, 0, null, 129, "call"],
+      P.print(C.JSString_methods.$add("response\r\n", C.Utf8Codec_false.decode$1(buffer)));
+    }, "call$1", null, 2, 0, null, 126, "call"],
     $isFunction: true
   },
   HetiHttpClient_handleResponse__closure0: {
@@ -17051,25 +16644,21 @@ var $$ = {};
     $isFunction: true
   },
   HetiHttpResponse_decodeHttpMessage_closure: {
-    "^": "Closure:131;parser_0,result_1",
+    "^": "Closure:128;parser_0,result_1",
     call$1: [function(line) {
       this.result_1.line = line;
       return V.HetiHttpResponse_decodeHeaderFields(this.parser_0);
-    }, "call$1", null, 2, 0, null, 130, "call"],
+    }, "call$1", null, 2, 0, null, 127, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeHttpMessage_closure0: {
-    "^": "Closure:133;parser_2,completer_3,result_4",
+    "^": "Closure:130;parser_2,completer_3,result_4",
     call$1: [function(httpfields) {
-      var t1, t2;
-      t1 = this.result_4;
+      var t1 = this.result_4;
       t1.headerField = httpfields;
       t1.index = this.parser_2.index;
-      t2 = this.completer_3.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
-    }, "call$1", null, 2, 0, null, 132, "call"],
+      this.completer_3.complete$1(0, t1);
+    }, "call$1", null, 2, 0, null, 129, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeHttpMessage_closure1: {
@@ -17080,14 +16669,14 @@ var $$ = {};
     $isFunction: true
   },
   HetiHttpResponse_decodeHeaderFields_p: {
-    "^": "Closure:134;parser_0,result_1",
+    "^": "Closure:131;parser_0,result_1",
     call$0: function() {
       return V.HetiHttpResponse_decodeHeaderField(this.parser_0).then$1(new V.HetiHttpResponse_decodeHeaderFields_p_closure(this.result_1, this));
     },
     $isFunction: true
   },
   HetiHttpResponse_decodeHeaderFields_p_closure: {
-    "^": "Closure:135;result_2,p_3",
+    "^": "Closure:132;result_2,p_3",
     call$1: [function(v) {
       this.result_2.push(v);
       return this.p_3.call$0();
@@ -17104,10 +16693,7 @@ var $$ = {};
   HetiHttpResponse_decodeHeaderFields_closure0: {
     "^": "Closure:21;completer_5,result_6",
     call$1: [function(e) {
-      var t1 = this.completer_5.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(this.result_6);
+      this.completer_5.complete$1(0, this.result_6);
     }, "call$1", null, 2, 0, null, 2, "call"],
     $isFunction: true
   },
@@ -17151,10 +16737,7 @@ var $$ = {};
   HetiHttpResponse_decodeHeaderField_closure3: {
     "^": "Closure:3;result_6,completer_7",
     call$1: [function(v) {
-      var t1 = this.completer_7.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(this.result_6);
+      this.completer_7.complete$1(0, this.result_6);
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
@@ -17166,26 +16749,16 @@ var $$ = {};
     $isFunction: true
   },
   HetiHttpResponse_decodeFieldName_closure: {
-    "^": "Closure:118;completer_0",
+    "^": "Closure:123;completer_0",
     call$1: [function(v) {
-      var t1, t2;
-      t1 = C.Utf8Codec_false.decode$1(v);
-      t2 = this.completer_0.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
+      this.completer_0.complete$1(0, C.Utf8Codec_false.decode$1(v));
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeFieldValue_closure: {
-    "^": "Closure:118;completer_0",
+    "^": "Closure:123;completer_0",
     call$1: [function(v) {
-      var t1, t2;
-      t1 = C.Utf8Codec_false.decode$1(v);
-      t2 = this.completer_0.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
+      this.completer_0.complete$1(0, C.Utf8Codec_false.decode$1(v));
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
@@ -17224,20 +16797,14 @@ var $$ = {};
   HetiHttpResponse_decodeHttpVersion_closure3: {
     "^": "Closure:90;box_0,completer_4",
     call$1: [function(v) {
-      var t1, t2;
-      t1 = this.box_0;
+      var t1 = this.box_0;
       t1.minor_1 = J.$sub$n(v, 48);
-      t1 = "HTTP/" + J.toString$0(t1.major_0) + "." + J.toString$0(t1.minor_1);
-      t2 = this.completer_4.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
-      return;
+      return this.completer_4.complete$1(0, "HTTP/" + J.toString$0(t1.major_0) + "." + J.toString$0(t1.minor_1));
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeStatusCode_closure: {
-    "^": "Closure:118;box_0,completer_1",
+    "^": "Closure:123;box_0,completer_1",
     call$1: [function(v) {
       var t1, t2, t3, ret;
       t1 = J.$sub$n(J.$index$asx(v, 0), 48);
@@ -17251,24 +16818,15 @@ var $$ = {};
         return H.iae(t3);
       ret = 100 * t1 + 10 * t2 + t3;
       this.box_0.ret_0 = ret;
-      t3 = C.JSNumber_methods.toString$0(ret);
-      t1 = this.completer_1.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(t3);
+      this.completer_1.complete$1(0, C.JSNumber_methods.toString$0(ret));
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeReasonPhrase_closure: {
-    "^": "Closure:118;completer_0",
+    "^": "Closure:123;completer_0",
     call$1: [function(vv) {
-      var v, t1;
-      v = C.Utf8Codec_false.decode$1(vv);
-      t1 = this.completer_0.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(v);
-    }, "call$1", null, 2, 0, null, 136, "call"],
+      this.completer_0.complete$1(0, C.Utf8Codec_false.decode$1(vv));
+    }, "call$1", null, 2, 0, null, 133, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeStatusline_closure: {
@@ -17298,7 +16856,7 @@ var $$ = {};
     "^": "Closure:21;parser_5",
     call$1: [function(onValue) {
       return V.HetiHttpResponse_decodeReasonPhrase(this.parser_5);
-    }, "call$1", null, 2, 0, null, 137, "call"],
+    }, "call$1", null, 2, 0, null, 134, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeStatusline_closure3: {
@@ -17312,22 +16870,14 @@ var $$ = {};
   HetiHttpResponse_decodeStatusline_closure4: {
     "^": "Closure:3;result_8,completer_9",
     call$1: [function(v) {
-      var t1 = this.completer_9.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(this.result_8);
+      this.completer_9.complete$1(0, this.result_8);
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeOWS_closure: {
-    "^": "Closure:118;completer_0",
+    "^": "Closure:123;completer_0",
     call$1: [function(v) {
-      var t1, t2;
-      t1 = C.Utf8Codec_false.decode$1(v);
-      t2 = this.completer_0.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
+      this.completer_0.complete$1(0, C.Utf8Codec_false.decode$1(v));
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
@@ -17339,14 +16889,9 @@ var $$ = {};
     $isFunction: true
   },
   HetiHttpResponse_decodeSP_closure: {
-    "^": "Closure:118;completer_0",
+    "^": "Closure:123;completer_0",
     call$1: [function(v) {
-      var t1, t2;
-      t1 = C.Utf8Codec_false.decode$1(v);
-      t2 = this.completer_0.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
+      this.completer_0.complete$1(0, C.Utf8Codec_false.decode$1(v));
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
@@ -17375,17 +16920,10 @@ var $$ = {};
     "^": "Closure:21;box_0,completer_2",
     call$1: [function(e) {
       var t1 = this.completer_2;
-      if (this.box_0.crlf_0) {
-        t1 = t1.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1("\r\n");
-      } else {
-        t1 = t1.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1("\n");
-      }
+      if (this.box_0.crlf_0)
+        t1.complete$1(0, "\r\n");
+      else
+        t1.complete$1(0, "\n");
     }, "call$1", null, 2, 0, null, 2, "call"],
     $isFunction: true
   },
@@ -17397,14 +16935,14 @@ var $$ = {};
     $isFunction: true
   },
   HetiHttpResponse_decodeCrlf_closure2: {
-    "^": "Closure:52;parser_4",
-    call$0: [function() {
+    "^": "Closure:53;parser_4",
+    call$0: function() {
       this.parser_4.pop$0();
-    }, "call$0", null, 0, 0, null, "call"],
+    },
     $isFunction: true
   },
   HetiHttpResponse_decodeChunkedSize_closure: {
-    "^": "Closure:118;box_0,parser_1",
+    "^": "Closure:123;box_0,parser_1",
     call$1: [function(n) {
       if (J.$eq(J.get$length$asx(n), 0))
         throw H.wrapException(V.EasyParseError$());
@@ -17412,18 +16950,13 @@ var $$ = {};
         this.box_0.v_0 = H.Primitives_parseInt(C.Utf8Codec_false.decode$1(n), 16, null);
         return V.HetiHttpResponse_decodeCrlf(this.parser_1);
       }
-    }, "call$1", null, 2, 0, null, 138, "call"],
+    }, "call$1", null, 2, 0, null, 135, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeChunkedSize_closure0: {
     "^": "Closure:21;box_0,completer_2",
     call$1: [function(d) {
-      var t1, t2;
-      t1 = this.box_0.v_0;
-      t2 = this.completer_2.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
+      this.completer_2.complete$1(0, this.box_0.v_0);
     }, "call$1", null, 2, 0, null, 94, "call"],
     $isFunction: true
   },
@@ -17439,14 +16972,14 @@ var $$ = {};
     call$1: [function(method) {
       this.result_1.method = method;
       return V.HetiHttpResponse_decodeSP(this.parser_0);
-    }, "call$1", null, 2, 0, null, 139, "call"],
+    }, "call$1", null, 2, 0, null, 136, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestLine_closure0: {
     "^": "Closure:21;parser_2",
     call$1: [function(t) {
       return V.HetiHttpResponse_decodeRequestTarget(this.parser_2);
-    }, "call$1", null, 2, 0, null, 140, "call"],
+    }, "call$1", null, 2, 0, null, 137, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestLine_closure1: {
@@ -17454,14 +16987,14 @@ var $$ = {};
     call$1: [function(requestTarget) {
       this.result_4.requestTarget = requestTarget;
       return V.HetiHttpResponse_decodeSP(this.parser_3);
-    }, "call$1", null, 2, 0, null, 141, "call"],
+    }, "call$1", null, 2, 0, null, 138, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestLine_closure2: {
     "^": "Closure:21;parser_5",
     call$1: [function(t) {
       return V.HetiHttpResponse_decodeHttpVersion(this.parser_5);
-    }, "call$1", null, 2, 0, null, 140, "call"],
+    }, "call$1", null, 2, 0, null, 137, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestLine_closure3: {
@@ -17469,17 +17002,14 @@ var $$ = {};
     call$1: [function(httpVersion) {
       this.result_7.httpVersion = httpVersion;
       return V.HetiHttpResponse_decodeCrlf(this.parser_6);
-    }, "call$1", null, 2, 0, null, 142, "call"],
+    }, "call$1", null, 2, 0, null, 139, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestLine_closure4: {
     "^": "Closure:3;completer_8,result_9",
     call$1: [function(crlf) {
-      var t1 = this.completer_8.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(this.result_9);
-    }, "call$1", null, 2, 0, null, 143, "call"],
+      this.completer_8.complete$1(0, this.result_9);
+    }, "call$1", null, 2, 0, null, 140, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestLine_closure5: {
@@ -17490,25 +17020,21 @@ var $$ = {};
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestMessage_closure: {
-    "^": "Closure:144;parser_0,result_1",
+    "^": "Closure:141;parser_0,result_1",
     call$1: [function(line) {
       this.result_1.line = line;
       return V.HetiHttpResponse_decodeHeaderFields(this.parser_0);
-    }, "call$1", null, 2, 0, null, 130, "call"],
+    }, "call$1", null, 2, 0, null, 127, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestMessage_closure0: {
-    "^": "Closure:133;parser_2,completer_3,result_4",
+    "^": "Closure:130;parser_2,completer_3,result_4",
     call$1: [function(httpfields) {
-      var t1, t2;
-      t1 = this.result_4;
+      var t1 = this.result_4;
       t1.headerField = httpfields;
       t1.index = this.parser_2.index;
-      t2 = this.completer_3.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
-    }, "call$1", null, 2, 0, null, 132, "call"],
+      this.completer_3.complete$1(0, t1);
+    }, "call$1", null, 2, 0, null, 129, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestMessage_closure1: {
@@ -17519,26 +17045,16 @@ var $$ = {};
     $isFunction: true
   },
   HetiHttpResponse_decodeMethod_closure: {
-    "^": "Closure:118;completer_0",
+    "^": "Closure:123;completer_0",
     call$1: [function(v) {
-      var t1, t2;
-      t1 = C.Utf8Codec_false.decode$1(v);
-      t2 = this.completer_0.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
+      this.completer_0.complete$1(0, C.Utf8Codec_false.decode$1(v));
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestTarget_closure: {
-    "^": "Closure:118;completer_0",
+    "^": "Closure:123;completer_0",
     call$1: [function(v) {
-      var t1, t2;
-      t1 = C.Utf8Codec_false.decode$1(v);
-      t2 = this.completer_0.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
+      this.completer_0.complete$1(0, C.Utf8Codec_false.decode$1(v));
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
@@ -17552,7 +17068,7 @@ var $$ = {};
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestRangeValue_closure0: {
-    "^": "Closure:118;parser_1,ret_2",
+    "^": "Closure:123;parser_1,ret_2",
     call$1: [function(startAsList) {
       var t1, t2;
       t1 = this.ret_2;
@@ -17560,7 +17076,7 @@ var $$ = {};
       for (t2 = J.get$iterator$ax(startAsList); t2.moveNext$0();)
         t1.start = J.$add$ns(J.$sub$n(t2.get$current(), 48), J.$mul$ns(t1.start, 10));
       return this.parser_1.nextString$1("-");
-    }, "call$1", null, 2, 0, null, 145, "call"],
+    }, "call$1", null, 2, 0, null, 142, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestRangeValue_closure1: {
@@ -17573,7 +17089,7 @@ var $$ = {};
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestRangeValue_closure2: {
-    "^": "Closure:118;ret_4,completer_5",
+    "^": "Closure:123;ret_4,completer_5",
     call$1: [function(endAsList) {
       var t1, t2;
       t1 = J.getInterceptor$asx(endAsList);
@@ -17585,11 +17101,8 @@ var $$ = {};
         for (t1 = t1.get$iterator(endAsList); t1.moveNext$0();)
           t2.end = J.$add$ns(J.$sub$n(t1.get$current(), 48), J.$mul$ns(t2.end, 10));
       }
-      t1 = this.completer_5.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(this.ret_4);
-    }, "call$1", null, 2, 0, null, 146, "call"],
+      this.completer_5.complete$1(0, this.ret_4);
+    }, "call$1", null, 2, 0, null, 143, "call"],
     $isFunction: true
   },
   HetiHttpResponse_decodeRequestRangeValue_closure3: {
@@ -17687,7 +17200,7 @@ var $$ = {};
       t1.buffer = this._base;
       this._decodeChunked$1(t1).catchError$1(new V.ChunkedBuilderAdapter_start_closure()).then$1(new V.ChunkedBuilderAdapter_start_closure0(this));
       return this;
-    }, "call$0", "get$start", 0, 0, 147],
+    }, "call$0", "get$start", 0, 0, 144],
     _decodeChunked$1: function(parser) {
       var complter = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
       V.HetiHttpResponse_decodeChunkedSize(parser).then$1(new V.ChunkedBuilderAdapter__decodeChunked_closure(this, parser, complter)).catchError$1(new V.ChunkedBuilderAdapter__decodeChunked_closure0(complter));
@@ -17721,11 +17234,11 @@ var $$ = {};
     call$1: [function(size) {
       var t1 = this.parser_1;
       return t1.buffer.getByteFuture$2(t1.index, size).then$1(new V.ChunkedBuilderAdapter__decodeChunked__closure(this.this_0, t1, this.complter_2));
-    }, "call$1", null, 2, 0, null, 148, "call"],
+    }, "call$1", null, 2, 0, null, 145, "call"],
     $isFunction: true
   },
   ChunkedBuilderAdapter__decodeChunked__closure: {
-    "^": "Closure:118;this_3,parser_4,complter_5",
+    "^": "Closure:123;this_3,parser_4,complter_5",
     call$1: [function(v) {
       var t1, t2, t3, t4, t5, t6;
       t1 = this.this_3;
@@ -17739,12 +17252,9 @@ var $$ = {};
         return H.iae(t6);
       t4.set$index(t3, t5 + t6);
       t4 = this.complter_5;
-      if (J.$eq(t2.get$length(v), 0)) {
-        t1 = t4.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(true);
-      } else
+      if (J.$eq(t2.get$length(v), 0))
+        t4.complete$1(0, true);
+      else
         return V.HetiHttpResponse_decodeCrlf(t3).then$1(new V.ChunkedBuilderAdapter__decodeChunked___closure(t1, t3)).then$1(new V.ChunkedBuilderAdapter__decodeChunked___closure0(t4));
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
@@ -17759,10 +17269,7 @@ var $$ = {};
   ChunkedBuilderAdapter__decodeChunked___closure0: {
     "^": "Closure:21;complter_8",
     call$1: [function(v) {
-      var t1 = this.complter_8.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(true);
+      this.complter_8.complete$1(0, true);
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
@@ -17796,34 +17303,31 @@ var $$ = {};
       }}
   },
   HetiHttpServer_bind_closure: {
-    "^": "Closure:150;completer_0",
+    "^": "Closure:147;completer_0",
     call$1: [function(serverSocket) {
-      var server, t1;
+      var server;
       if (serverSocket == null) {
         this.completer_0.completeError$1(P.LinkedHashMap_LinkedHashMap$_empty(null, null));
         return;
       }
       server = new V.HetiHttpServer(P.StreamController_StreamController$broadcast(null, null, false, null), null, null, null, null);
       server._serverSocket = serverSocket;
-      t1 = this.completer_0.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(server);
+      this.completer_0.complete$1(0, server);
       serverSocket.onAccept$0().listen$1(new V.HetiHttpServer_bind__closure(server));
-    }, "call$1", null, 2, 0, null, 149, "call"],
+    }, "call$1", null, 2, 0, null, 146, "call"],
     $isFunction: true
   },
   HetiHttpServer_bind__closure: {
-    "^": "Closure:123;server_1",
+    "^": "Closure:119;server_1",
     call$1: [function(socket) {
       var parser = new V.EasyParser(0, [], null);
       parser.buffer = J.get$buffer$x(socket);
       V.HetiHttpResponse_decodeRequestMessage(parser).then$1(new V.HetiHttpServer_bind___closure(this.server_1, socket, parser));
-    }, "call$1", null, 2, 0, null, 122, "call"],
+    }, "call$1", null, 2, 0, null, 118, "call"],
     $isFunction: true
   },
   HetiHttpServer_bind___closure: {
-    "^": "Closure:152;server_2,socket_3,parser_4",
+    "^": "Closure:149;server_2,socket_3,parser_4",
     call$1: [function(body) {
       var request, t1;
       request = new V.HetiHttpServerRequest(null, null);
@@ -17834,11 +17338,11 @@ var $$ = {};
         H.throwExpression(t1._addEventError$0());
       t1._sendData$1(request);
       this.parser_4.buffer.getByteFuture$2(0, J.get$index$x(body)).then$1(new V.HetiHttpServer_bind____closure()).catchError$1(new V.HetiHttpServer_bind____closure0());
-    }, "call$1", null, 2, 0, null, 151, "call"],
+    }, "call$1", null, 2, 0, null, 148, "call"],
     $isFunction: true
   },
   HetiHttpServer_bind____closure: {
-    "^": "Closure:153;",
+    "^": "Closure:150;",
     call$1: [function(v) {
       P.print(C.Utf8Codec_false.decode$1(v));
     }, "call$1", null, 2, 0, null, 89, "call"],
@@ -17859,6 +17363,374 @@ var $$ = {};
   },
   HetiHttpServerRequest: {
     "^": "Object;socket<,info<"
+  },
+  ArrayBuilder: {
+    "^": "HetimaBuilder;_max,_buffer8,_hetima$_length,completer,mGetByteFutreList,completerFin,_immutable",
+    getByteFuture$2: function(index, $length) {
+      var info, t1, index0, t2, t3;
+      info = new V.GetByteFutureInfo([], 0);
+      info.completerResult = [];
+      info.completerResultLength = $length;
+      if (this.completer.future._state !== 0)
+        this.completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
+      t1 = J.getInterceptor$ns($length);
+      index0 = index;
+      while (true) {
+        t2 = J.getInterceptor$n(index0);
+        if (!(t2.$lt(index0, this._hetima$_length) && t2.$lt(index0, t1.$add($length, index))))
+          break;
+        t2 = info.completerResult;
+        t3 = this._buffer8;
+        if (index0 >>> 0 !== index0 || index0 >= t3.length)
+          return H.ioore(t3, index0);
+        t3 = t3[index0];
+        if (typeof t3 !== "number")
+          return H.iae(t3);
+        t2.push(255 & t3);
+        ++index0;
+      }
+      if (J.$le$n(info.completerResultLength, info.completerResult.length) || this._immutable) {
+        this.completer.complete$1(0, info.completerResult);
+        info.completerResult = null;
+        info.completerResultLength = 0;
+      } else
+        this.mGetByteFutreList.push(info);
+      return this.completer.future;
+    },
+    getLength$0: function() {
+      var completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
+      completer.complete$1(0, this._hetima$_length);
+      return completer.future;
+    },
+    update$1: function(plusLength) {
+      var t1, t2, nextMax, next, t3, i, t4;
+      t1 = this._hetima$_length;
+      if (typeof plusLength !== "number")
+        return H.iae(plusLength);
+      t1 += plusLength;
+      t2 = this._max;
+      if (t1 < t2)
+        return;
+      else {
+        nextMax = t1 + t2;
+        t1 = H._checkLength(nextMax);
+        next = new Uint8Array(t1);
+        for (t2 = this._hetima$_length, t3 = this._buffer8, i = 0; i < t2; ++i) {
+          if (i >= t3.length)
+            return H.ioore(t3, i);
+          t4 = t3[i];
+          if (i >= t1)
+            return H.ioore(next, i);
+          next[i] = t4;
+        }
+        this._buffer8 = null;
+        this._buffer8 = next;
+        this._max = nextMax;
+      }
+    },
+    fin$0: function() {
+      var t1, t2, f, t3, t4;
+      for (t1 = this.mGetByteFutreList, t2 = new H.ListIterator(t1, t1.length, 0, null); t2.moveNext$0();) {
+        f = t2.__internal$_current;
+        if (f.get$completerResult() != null) {
+          t3 = this.completer;
+          t4 = f.get$completerResult();
+          t3 = t3.future;
+          if (t3._state !== 0)
+            H.throwExpression(P.StateError$("Future already completed"));
+          t3._asyncComplete$1(t4);
+          f.set$completerResult(null);
+          f.set$completerResultLength(0);
+        }
+      }
+      C.JSArray_methods.set$length(t1, 0);
+      this.set$immutable(true);
+    },
+    appendByte$1: function(v) {
+      var t1, t2, removeList, f, t3, t4;
+      if (this._immutable)
+        return;
+      this.update$1(1);
+      t1 = this._buffer8;
+      t2 = this._hetima$_length;
+      if (t2 >= t1.length)
+        return H.ioore(t1, t2);
+      t1[t2] = v;
+      this._hetima$_length = t2 + 1;
+      removeList = [];
+      for (t1 = this.mGetByteFutreList, t2 = new H.ListIterator(t1, t1.length, 0, null); t2.moveNext$0();) {
+        f = t2.__internal$_current;
+        if (this.completer.future._state === 0 && f.get$completerResult() != null)
+          f.get$completerResult().push(v);
+        if (f.get$completerResult() != null && J.$le$n(f.get$completerResultLength(), f.get$completerResult().length)) {
+          t3 = this.completer;
+          t4 = f.get$completerResult();
+          t3 = t3.future;
+          if (t3._state !== 0)
+            H.throwExpression(P.StateError$("Future already completed"));
+          t3._asyncComplete$1(t4);
+          f.set$completerResult(null);
+          f.set$completerResultLength(0);
+          removeList.push(f);
+        }
+      }
+      for (t2 = new H.ListIterator(removeList, removeList.length, 0, null); t2.moveNext$0();)
+        C.JSArray_methods.remove$1(t1, t2.__internal$_current);
+    },
+    appendString$1: function(text) {
+      var code, t1, i;
+      code = C.Utf8Codec_false.get$encoder().convert$1(text);
+      t1 = code.length;
+      this.update$1(t1);
+      for (i = 0; i < t1; ++i)
+        this.appendByte$1(code[i]);
+    },
+    appendIntList$3: function(buffer, index, $length) {
+      var t1, i;
+      this.update$1($length);
+      if (typeof $length !== "number")
+        return H.iae($length);
+      t1 = J.getInterceptor$asx(buffer);
+      i = 0;
+      for (; i < $length; ++i)
+        this.appendByte$1(t1.$index(buffer, index + i));
+    }
+  },
+  GetByteFutureInfo: {
+    "^": "Object;completerResult@,completerResultLength@"
+  },
+  EasyParser: {
+    "^": "Object;index*,stack,buffer>",
+    pop$0: function() {
+      var t1, ret;
+      t1 = this.stack;
+      ret = C.JSArray_methods.get$last(t1);
+      C.JSArray_methods.remove$1(t1, ret);
+      return ret;
+    },
+    nextString$1: function(value) {
+      var completer, encoded;
+      completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
+      encoded = C.Utf8Codec_false.get$encoder().convert$1(value);
+      this.buffer.getByteFuture$2(this.index, encoded.length).then$1(new V.EasyParser_nextString_closure(this, value, completer, encoded));
+      return completer.future;
+    },
+    nextBytePattern$1: function(matcher) {
+      var completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
+      this.buffer.getByteFuture$2(this.index, 1).then$1(new V.EasyParser_nextBytePattern_closure(this, matcher, completer));
+      return completer.future;
+    },
+    nextBytePatternWithLength$2: function(matcher, $length) {
+      var completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
+      this.buffer.getByteFuture$2(this.index, $length).then$1(new V.EasyParser_nextBytePatternWithLength_closure(this, matcher, $length, completer));
+      return completer.future;
+    },
+    nextBytePatternByUnmatch$1: function(matcher) {
+      var completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
+      new V.EasyParser_nextBytePatternByUnmatch_p(this, matcher, completer, H.setRuntimeTypeInfo([], [P.$int])).call$0();
+      return completer.future;
+    }
+  },
+  EasyParser_nextString_closure: {
+    "^": "Closure:123;this_0,value_1,completer_2,encoded_3",
+    call$1: [function(v) {
+      var t1, t2, t3, i;
+      t1 = J.getInterceptor$asx(v);
+      t2 = this.encoded_3;
+      if (!J.$eq(t1.get$length(v), t2.length)) {
+        this.completer_2.completeError$1(new V.EasyParseError());
+        return;
+      }
+      for (t2 = C.NativeUint8List_methods.get$iterator(t2), t3 = this.this_0, i = 0; t2.moveNext$0();) {
+        if (!J.$eq(t2.__internal$_current, t1.$index(v, i))) {
+          this.completer_2.completeError$1(new V.EasyParseError());
+          return;
+        }
+        ++i;
+        ++t3.index;
+      }
+      this.completer_2.complete$1(0, this.value_1);
+    }, "call$1", null, 2, 0, null, 89, "call"],
+    $isFunction: true
+  },
+  EasyParser_nextBytePattern_closure: {
+    "^": "Closure:123;this_0,matcher_1,completer_2",
+    call$1: [function(v) {
+      var t1, t2;
+      t1 = J.getInterceptor$asx(v);
+      if (J.$lt$n(t1.get$length(v), 1))
+        throw H.wrapException(V.EasyParseError$());
+      t2 = t1.$index(v, 0);
+      if (J.contains$1$asx(this.matcher_1.include, t2)) {
+        ++this.this_0.index;
+        this.completer_2.complete$1(0, t1.$index(v, 0));
+      } else
+        throw H.wrapException(V.EasyParseError$());
+    }, "call$1", null, 2, 0, null, 89, "call"],
+    $isFunction: true
+  },
+  EasyParser_nextBytePatternWithLength_closure: {
+    "^": "Closure:123;this_0,matcher_1,length_2,completer_3",
+    call$1: [function(va) {
+      var t1, t2, t3, t4, v;
+      t1 = J.getInterceptor$asx(va);
+      if (J.$lt$n(t1.get$length(va), this.length_2))
+        this.completer_3.completeError$1(new V.EasyParseError());
+      for (t1 = t1.get$iterator(va), t2 = this.this_0, t3 = this.matcher_1, t4 = this.completer_3; t1.moveNext$0();) {
+        v = t1.get$current();
+        if (!J.contains$1$asx(t3.include, v))
+          t4.completeError$1(new V.EasyParseError());
+        ++t2.index;
+      }
+      t4.complete$1(0, va);
+    }, "call$1", null, 2, 0, null, 151, "call"],
+    $isFunction: true
+  },
+  EasyParser_nextBytePatternByUnmatch_p: {
+    "^": "Closure:152;this_0,matcher_1,completer_2,ret_3",
+    call$0: function() {
+      var t1 = this.this_0;
+      return t1.buffer.getByteFuture$2(t1.index, 1).then$1(new V.EasyParser_nextBytePatternByUnmatch_p_closure(t1, this.matcher_1, this.completer_2, this.ret_3, this));
+    },
+    $isFunction: true
+  },
+  EasyParser_nextBytePatternByUnmatch_p_closure: {
+    "^": "Closure:123;this_4,matcher_5,completer_6,ret_7,p_8",
+    call$1: [function(va) {
+      var t1, t2;
+      t1 = J.getInterceptor$asx(va);
+      if (J.$lt$n(t1.get$length(va), 1))
+        this.completer_6.complete$1(0, this.ret_7);
+      else if (this.matcher_5.match$1(t1.$index(va, 0))) {
+        this.ret_7.push(t1.$index(va, 0));
+        ++this.this_4.index;
+        return this.p_8.call$0();
+      } else {
+        t1 = this.completer_6;
+        t2 = this.ret_7;
+        if (this.this_4.buffer.get$immutable())
+          t1.complete$1(0, t2);
+        else
+          t1.complete$1(0, t2);
+      }
+    }, "call$1", null, 2, 0, null, 151, "call"],
+    $isFunction: true
+  },
+  EasyParserMatcher: {
+    "^": "Object;"
+  },
+  EasyParserIncludeMatcher: {
+    "^": "EasyParserMatcher;include",
+    match$1: function(target) {
+      return J.contains$1$asx(this.include, target);
+    }
+  },
+  EasyParseError: {
+    "^": "Error;",
+    static: {EasyParseError$: function() {
+        return new V.EasyParseError();
+      }}
+  },
+  HetimaBuilder: {
+    "^": "Object;",
+    onFin$0: function() {
+      if (this._immutable)
+        this.completerFin.complete$1(0, true);
+      return this.completerFin.future;
+    },
+    get$immutable: function() {
+      return this._immutable;
+    },
+    set$immutable: function(v) {
+      var prev = this._immutable;
+      this._immutable = v;
+      if (!prev && v)
+        this.completerFin.complete$1(0, v);
+    }
+  },
+  HetimaBuilderAdapter: {
+    "^": "HetimaBuilder;_base,_startIndex,completerFin,_immutable",
+    getLength$0: function() {
+      var completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
+      this._base.getLength$0().then$1(new V.HetimaBuilderAdapter_getLength_closure(this, completer)).catchError$1(new V.HetimaBuilderAdapter_getLength_closure0(completer));
+      return completer.future;
+    },
+    onFin$0: function() {
+      return this._base.onFin$0();
+    },
+    getByteFuture$2: function(index, $length) {
+      var completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
+      this._base.getByteFuture$2(J.$add$ns(index, this._startIndex), $length).then$1(new V.HetimaBuilderAdapter_getByteFuture_closure(completer)).catchError$1(new V.HetimaBuilderAdapter_getByteFuture_closure0(completer));
+      return completer.future;
+    }
+  },
+  HetimaBuilderAdapter_getLength_closure: {
+    "^": "Closure:90;this_0,completer_1",
+    call$1: [function(v) {
+      this.completer_1.complete$1(0, J.$sub$n(v, this.this_0._startIndex));
+    }, "call$1", null, 2, 0, null, 89, "call"],
+    $isFunction: true
+  },
+  HetimaBuilderAdapter_getLength_closure0: {
+    "^": "Closure:21;completer_2",
+    call$1: [function(e) {
+      this.completer_2.completeError$1(e);
+    }, "call$1", null, 2, 0, null, 2, "call"],
+    $isFunction: true
+  },
+  HetimaBuilderAdapter_getByteFuture_closure: {
+    "^": "Closure:123;completer_0",
+    call$1: [function(d) {
+      this.completer_0.complete$1(0, d);
+    }, "call$1", null, 2, 0, null, 94, "call"],
+    $isFunction: true
+  },
+  HetimaBuilderAdapter_getByteFuture_closure0: {
+    "^": "Closure:21;completer_1",
+    call$1: [function(e) {
+      this.completer_1.completeError$1(e);
+    }, "call$1", null, 2, 0, null, 2, "call"],
+    $isFunction: true
+  },
+  HetimaFile: {
+    "^": "HetimaReadBuffer;"
+  },
+  HetimaReadBuffer: {
+    "^": "Object;"
+  },
+  ReadResult: {
+    "^": "Object;status,buffer>",
+    static: {"^": "ReadResult_OK,ReadResult_NG"}
+  },
+  HetimaBuilderToFile: {
+    "^": "HetimaFile;mBuilder",
+    getLength$0: function() {
+      return this.mBuilder.getLength$0();
+    },
+    read$2: function(start, end) {
+      var cc = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
+      this.mBuilder.getByteFuture$2(start, J.$sub$n(end, start)).then$1(new V.HetimaBuilderToFile_read_closure(cc)).catchError$1(new V.HetimaBuilderToFile_read_closure0(cc));
+      return cc.future;
+    }
+  },
+  HetimaBuilderToFile_read_closure: {
+    "^": "Closure:123;cc_0",
+    call$1: [function(b) {
+      var t1, result;
+      t1 = new Uint8Array(H._ensureNativeList(b));
+      result = new V.ReadResult(-1, null);
+      result.status = 1;
+      result.buffer = t1;
+      this.cc_0.complete$1(0, result);
+    }, "call$1", null, 2, 0, null, 153, "call"],
+    $isFunction: true
+  },
+  HetimaBuilderToFile_read_closure0: {
+    "^": "Closure:21;cc_1",
+    call$1: [function(e) {
+      this.cc_1.completeError$1(e);
+    }, "call$1", null, 2, 0, null, 2, "call"],
+    $isFunction: true
   },
   HetiSocketBuilder: {
     "^": "Object;"
@@ -17904,10 +17776,11 @@ var $$ = {};
       }
       buffer.write$1("#service;\r\n");
       for (t1 = this._serviceList, t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
-        t2 = C.JSString_methods.$add("__", t1._current.get$serviceId()) + ";\r\n";
+        t2 = C.JSString_methods.$add("__", t1.__internal$_current.get$serviceId()) + ";\r\n";
         buffer._contents += t2;
       }
-      return buffer._contents;
+      t1 = buffer._contents;
+      return t1.charCodeAt(0) == 0 ? t1 : t1;
     },
     getValue$2: function(key, defaultValue) {
       var t1, t2, t3, k;
@@ -17948,7 +17821,7 @@ var $$ = {};
       this.URLBase = this._extractFirstValue$3($document.get$root(), "URLBase", "");
       elements = $document.findAllElements$1("service");
       for (t2 = H.setRuntimeTypeInfo(new H.MappedIterator(null, J.get$iterator$ax(elements._iterable), elements._f), [H.getTypeArgumentByIndex(elements, 0), H.getTypeArgumentByIndex(elements, 1)]); t2.moveNext$0();) {
-        element = t2._current;
+        element = t2.__internal$_current;
         info = new V.UPnpDeviceServiceInfo("", "", "", "", "");
         info.controlURL = this._extractFirstValue$3(element, "controlURL", "");
         info.eventSubURL = this._extractFirstValue$3(element, "eventSubURL", "");
@@ -18014,10 +17887,7 @@ var $$ = {};
       t1 = this.this_0;
       t1._serviceXml = serviceXml;
       t1._updateServiceXml$0();
-      t1 = this.completer_1.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(0);
+      this.completer_1.complete$1(0, 0);
     }, "call$1", null, 2, 0, null, 154, "call"],
     $isFunction: true
   },
@@ -18049,7 +17919,7 @@ var $$ = {};
     call$1: [function(b) {
       var t1 = this.res_4;
       return J.get$body$x(t1).getLength$0().then$1(new V.UPnpDeviceInfo_requestServiceList___closure(this.completer_3, t1));
-    }, "call$1", null, 2, 0, null, 121, "call"],
+    }, "call$1", null, 2, 0, null, 153, "call"],
     $isFunction: true
   },
   UPnpDeviceInfo_requestServiceList___closure: {
@@ -18060,14 +17930,9 @@ var $$ = {};
     $isFunction: true
   },
   UPnpDeviceInfo_requestServiceList____closure: {
-    "^": "Closure:118;completer_7",
+    "^": "Closure:123;completer_7",
     call$1: [function(v) {
-      var t1, t2;
-      t1 = C.Utf8Codec_false.decode$1(v);
-      t2 = this.completer_7.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
+      this.completer_7.complete$1(0, C.Utf8Codec_false.decode$1(v));
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
@@ -18105,7 +17970,7 @@ var $$ = {};
     extractDeviceInfoFromUdpResponse$1: function(buffer) {
       var builder, parser;
       builder = new V.ArrayBuilder(1024, null, 0, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
-      builder._buffer8 = new Uint8Array(1024);
+      builder._buffer8 = new Uint8Array(H._checkLength(1024));
       parser = new V.EasyParser(0, [], null);
       parser.buffer = builder;
       builder.appendIntList$3(buffer, 0, J.get$length$asx(buffer));
@@ -18126,19 +17991,16 @@ var $$ = {};
       var t1;
       P.print("########");
       t1 = J.getInterceptor$x(info);
-      P.print(C.Utf8Codec_false.decode$1(t1.get$data(info)));
+      P.print(C.JSString_methods.$add("", C.Utf8Codec_false.decode$1(t1.get$data(info))));
       P.print("########");
       this.this_0.extractDeviceInfoFromUdpResponse$1(t1.get$data(info));
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   UpnpDeviceSearcher_createInstance_closure: {
     "^": "Closure:90;completer_0,ret_1",
     call$1: [function(v) {
-      var t1 = this.completer_0.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(this.ret_1);
+      this.completer_0.complete$1(0, this.ret_1);
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
@@ -18192,17 +18054,14 @@ var $$ = {};
     $isFunction: true
   },
   UpnpDeviceSearcher_searchWanPPPDevice_closure4: {
-    "^": "Closure:52;completer_3",
+    "^": "Closure:53;completer_3",
     call$0: function() {
-      var t1 = this.completer_3.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(0);
+      this.completer_3.complete$1(0, 0);
     },
     $isFunction: true
   },
   UpnpDeviceSearcher_extractDeviceInfoFromUdpResponse_closure: {
-    "^": "Closure:128;this_0",
+    "^": "Closure:125;this_0",
     call$1: [function(message) {
       var t1, info, t2;
       t1 = this.this_0;
@@ -18212,7 +18071,7 @@ var $$ = {};
         t2.push(info);
         info.extractService$0().then$1(new V.UpnpDeviceSearcher_extractDeviceInfoFromUdpResponse__closure(t1, info));
       }
-    }, "call$1", null, 2, 0, null, 127, "call"],
+    }, "call$1", null, 2, 0, null, 124, "call"],
     $isFunction: true
   },
   UpnpDeviceSearcher_extractDeviceInfoFromUdpResponse__closure: {
@@ -18236,7 +18095,7 @@ var $$ = {};
       }
       serviceInfo = C.JSArray_methods.get$first(this.getPPPService$0());
       requestBody = "<?xml version=\"1.0\"?>\r\n<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><SOAP-ENV:Body><m:GetGenericPortMappingEntry xmlns:m=\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "\"><NewPortMappingIndex>" + newPortMappingIndex + "</NewPortMappingIndex></m:GetGenericPortMappingEntry></SOAP-ENV:Body></SOAP-ENV:Envelope>\r\n";
-      this.request$4(serviceInfo, "\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "#GetGenericPortMappingEntry\"", requestBody, mode).then$1(new V.UPnpPPPDevice_requestGetGenericPortMapping_closure(completer)).catchError$1(new V.UPnpPPPDevice_requestGetGenericPortMapping_closure0(completer));
+      this.request$4(0, serviceInfo, "\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "#GetGenericPortMappingEntry\"", requestBody, mode).then$1(new V.UPnpPPPDevice_requestGetGenericPortMapping_closure(completer)).catchError$1(new V.UPnpPPPDevice_requestGetGenericPortMapping_closure0(completer));
       return completer.future;
     },
     requestGetGenericPortMapping$1: function(newPortMappingIndex) {
@@ -18249,7 +18108,7 @@ var $$ = {};
         return completer.future;
       }
       serviceInfo = C.JSArray_methods.get$first(this.getPPPService$0());
-      this.request$4(serviceInfo, "\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "#AddPortMapping\"", "<?xml version=\"1.0\"?>\r\n<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><SOAP-ENV:Body><m:AddPortMapping xmlns:m=\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "\">" + ("<NewRemoteHost></NewRemoteHost><NewExternalPort>" + newExternalPort + "</NewExternalPort><NewProtocol>" + newProtocol + "</NewProtocol><NewInternalPort>" + H.S(newInternalPort) + "</NewInternalPort><NewInternalClient>" + H.S(newInternalClient) + "</NewInternalClient><NewEnabled>" + newEnabled + "</NewEnabled><NewPortMappingDescription>" + newPortMappingDescription + "</NewPortMappingDescription><NewLeaseDuration>" + newLeaseDuration + "</NewLeaseDuration></m:AddPortMapping></SOAP-ENV:Body></SOAP-ENV:Envelope>\r\n"), mode).then$1(new V.UPnpPPPDevice_requestAddPortMapping_closure(completer)).catchError$1(new V.UPnpPPPDevice_requestAddPortMapping_closure0(completer));
+      this.request$4(0, serviceInfo, "\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "#AddPortMapping\"", "<?xml version=\"1.0\"?>\r\n<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><SOAP-ENV:Body><m:AddPortMapping xmlns:m=\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "\">" + ("<NewRemoteHost></NewRemoteHost><NewExternalPort>" + newExternalPort + "</NewExternalPort><NewProtocol>" + newProtocol + "</NewProtocol><NewInternalPort>" + H.S(newInternalPort) + "</NewInternalPort><NewInternalClient>" + H.S(newInternalClient) + "</NewInternalClient><NewEnabled>" + newEnabled + "</NewEnabled><NewPortMappingDescription>" + newPortMappingDescription + "</NewPortMappingDescription><NewLeaseDuration>" + newLeaseDuration + "</NewLeaseDuration></m:AddPortMapping></SOAP-ENV:Body></SOAP-ENV:Envelope>\r\n"), mode).then$1(new V.UPnpPPPDevice_requestAddPortMapping_closure(completer)).catchError$1(new V.UPnpPPPDevice_requestAddPortMapping_closure0(completer));
       return completer.future;
     },
     requestAddPortMapping$7: function(newExternalPort, newProtocol, newInternalPort, newInternalClient, newEnabled, newPortMappingDescription, newLeaseDuration) {
@@ -18264,7 +18123,7 @@ var $$ = {};
       }
       serviceInfo = C.JSArray_methods.get$first(this.getPPPService$0());
       requestBody = "<?xml version=\"1.0\"?>\r\n<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" SOAP-ENV:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><SOAP-ENV:Body><m:DeletePortMapping xmlns:m=\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "\">" + ("<NewRemoteHost></NewRemoteHost><NewExternalPort>" + H.S(newExternalPort) + "</NewExternalPort><NewProtocol>" + newProtocol + "</NewProtocol></m:DeletePortMapping></SOAP-ENV:Body></SOAP-ENV:Envelope>\r\n");
-      this.request$4(serviceInfo, "\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "#DeletePortMapping\"", requestBody, mode).then$1(new V.UPnpPPPDevice_requestDeletePortMapping_closure(completer)).catchError$1(new V.UPnpPPPDevice_requestDeletePortMapping_closure0(completer));
+      this.request$4(0, serviceInfo, "\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "#DeletePortMapping\"", requestBody, mode).then$1(new V.UPnpPPPDevice_requestDeletePortMapping_closure(completer)).catchError$1(new V.UPnpPPPDevice_requestDeletePortMapping_closure0(completer));
       return completer.future;
     },
     requestDeletePortMapping$2: function(newExternalPort, newProtocol) {
@@ -18277,7 +18136,7 @@ var $$ = {};
         return completer.future;
       }
       serviceInfo = C.JSArray_methods.get$first(this.getPPPService$0());
-      this.request$4(serviceInfo, "\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "#GetExternalIPAddress\"", "<?xml version=\"1.0\"?>\r\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><m:GetExternalIPAddress xmlns:m=\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "\"></m:GetExternalIPAddress></s:Body></s:Envelope>\r\n", mode).then$1(new V.UPnpPPPDevice_requestGetExternalIPAddress_closure(completer)).catchError$1(new V.UPnpPPPDevice_requestGetExternalIPAddress_closure0(completer));
+      this.request$4(0, serviceInfo, "\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "#GetExternalIPAddress\"", "<?xml version=\"1.0\"?>\r\n<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><s:Body><m:GetExternalIPAddress xmlns:m=\"urn:schemas-upnp-org:service:" + this._serviceName + ":" + H.S(this._version) + "\"></m:GetExternalIPAddress></s:Body></s:Envelope>\r\n", mode).then$1(new V.UPnpPPPDevice_requestGetExternalIPAddress_closure(completer)).catchError$1(new V.UPnpPPPDevice_requestGetExternalIPAddress_closure0(completer));
       return completer.future;
     },
     requestGetExternalIPAddress$0: function() {
@@ -18287,21 +18146,19 @@ var $$ = {};
       var deviceInfo, t1, info;
       deviceInfo = [];
       for (t1 = this._base._serviceList, t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
-        info = t1._current;
+        info = t1.__internal$_current;
         if (J.contains$1$asx(info.get$serviceType(), "WANIPConnection") === true || J.contains$1$asx(info.get$serviceType(), "WANPPPConnection") === true)
           deviceInfo.push(info);
       }
       return deviceInfo;
     },
-    request$4: function(info, soapAction, body, mode) {
-      var t1, completer, t2, t3, $location, client, url, host, port, urlBase;
+    request$4: function(_, info, soapAction, body, mode) {
+      var t1, completer, $location, client, t2, url, host, port, urlBase;
       t1 = {};
       completer = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
       this._base.socketBuilder.toString;
       P.StreamController_StreamController(null, null, null, null, false, null);
-      t2 = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      t3 = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      new V.ArrayBuilder(1024, null, 0, t2, [], t3, false)._buffer8 = new Uint8Array(1024);
+      new V.ArrayBuilder(1024, null, 0, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false)._buffer8 = new Uint8Array(H._checkLength(1024));
       $location = this._base.getValue$2("Location", "");
       if ("" === $location) {
         completer.completeError$1(P.LinkedHashMap_LinkedHashMap$_empty(null, null));
@@ -18338,7 +18195,7 @@ var $$ = {};
       t1 = J.getInterceptor$asx(st);
       if (t1.contains$1(st, "WANIPConnection") === true)
         this._serviceName = "WANIPConnection";
-      t1 = C.JSArray_methods.get$last(t1.replaceAll$2(st, " |\t|\r|\n", "").split(":"));
+      t1 = C.JSArray_methods.get$last(J.split$1$s(t1.replaceAll$2(st, " |\t|\r|\n", ""), ":"));
       this._version = t1;
       P.print(H.S(t1));
     },
@@ -18351,13 +18208,9 @@ var $$ = {};
   UPnpPPPDevice_requestGetGenericPortMapping_closure: {
     "^": "Closure:160;completer_0",
     call$1: [function(response) {
-      var t1, t2;
-      t1 = new V.UPnpGetGenericPortMappingResponse(null);
+      var t1 = new V.UPnpGetGenericPortMappingResponse(null);
       t1._response = response;
-      t2 = this.completer_0.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
+      this.completer_0.complete$1(0, t1);
     }, "call$1", null, 2, 0, null, 159, "call"],
     $isFunction: true
   },
@@ -18376,17 +18229,11 @@ var $$ = {};
       if (J.$eq(response.get$resultCode(), 200)) {
         t2 = new V.UPnpAddPortMappingResponse(200);
         t2.resultCode = response.get$resultCode();
-        t1 = t1.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(t2);
+        t1.complete$1(0, t2);
       } else {
         t2 = new V.UPnpAddPortMappingResponse(200);
         t2.resultCode = J.$mul$ns(response.get$resultCode(), -1);
-        t1 = t1.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(t2);
+        t1.complete$1(0, t2);
       }
     }, "call$1", null, 2, 0, null, 159, "call"],
     $isFunction: true
@@ -18406,17 +18253,11 @@ var $$ = {};
       if (J.$eq(response.get$resultCode(), 200)) {
         t2 = new V.UPnpDeletePortMappingResponse(200);
         t2.resultCode = response.get$resultCode();
-        t1 = t1.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(t2);
+        t1.complete$1(0, t2);
       } else {
         t2 = new V.UPnpDeletePortMappingResponse(200);
         t2.resultCode = J.$mul$ns(response.get$resultCode(), -1);
-        t1 = t1.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(t2);
+        t1.complete$1(0, t2);
       }
     }, "call$1", null, 2, 0, null, 159, "call"],
     $isFunction: true
@@ -18442,10 +18283,7 @@ var $$ = {};
         r = new V.UPnpGetExternalIPAddressResponse(200, "");
         r.resultCode = t4;
         r.externalIp = t1;
-        t1 = t3.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(r);
+        t3.complete$1(0, r);
       } else {
         t1 = response.get$resultCode();
         if (typeof t1 !== "number")
@@ -18453,10 +18291,7 @@ var $$ = {};
         r = new V.UPnpGetExternalIPAddressResponse(200, "");
         r.resultCode = -1 * t1;
         r.externalIp = "";
-        t1 = t3.future;
-        if (t1._state !== 0)
-          H.throwExpression(P.StateError$("Future already completed"));
-        t1._asyncComplete$1(r);
+        t3.complete$1(0, r);
       }
     }, "call$1", null, 2, 0, null, 159, "call"],
     $isFunction: true
@@ -18505,7 +18340,7 @@ var $$ = {};
     $isFunction: true
   },
   UPnpPPPDevice_request__closure1: {
-    "^": "Closure:118;completer_8,response_9",
+    "^": "Closure:123;completer_8,response_9",
     call$1: [function(body) {
       var t1, t2;
       P.print(C.Utf8Codec_false.decode$1(body));
@@ -18513,11 +18348,8 @@ var $$ = {};
       t2 = new V.UPnpPPPDeviceRequestResponse(null, null);
       t2.body = C.Utf8Codec_false.decode$1(body);
       t2.resultCode = t1;
-      t1 = this.completer_8.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(t2);
-    }, "call$1", null, 2, 0, null, 151, "call"],
+      this.completer_8.complete$1(0, t2);
+    }, "call$1", null, 2, 0, null, 148, "call"],
     $isFunction: true
   },
   UPnpPPPDevice_request_closure1: {
@@ -18625,9 +18457,9 @@ var $$ = {};
         t3 = this.index;
         if (t2 <= t3)
           return "";
-        if (!J.$eq(t1[t3], 47))
+        if (t1[t3] !== 47)
           return "";
-        ++this.index;
+        this.index = t3 + 1;
         for (; this.matchChar$1($.get$HttpUrlDecoder_PATH());)
           ;
         pathAsList = this.last$0(0);
@@ -18647,9 +18479,10 @@ var $$ = {};
       t3 = this.index;
       if (t2 <= t3)
         return "";
-      if (!J.$eq(t1[t3], 63))
+      if (t1[t3] !== 63)
         return "";
-      t1 = ++this.index;
+      t1 = t3 + 1;
+      this.index = t1;
       try {
         this.stack.push(t1);
         for (; this.matchChar$1($.get$HttpUrlDecoder_QUERY());)
@@ -18673,9 +18506,9 @@ var $$ = {};
         t3 = this.index;
         if (t2 <= t3)
           return 80;
-        if (!J.$eq(t1[t3], 58))
+        if (t1[t3] !== 58)
           return 80;
-        ++this.index;
+        this.index = t3 + 1;
         for (; this.matchChar$1($.get$RfcTable_DIGIT());)
           ;
         portAsList = this.last$0(0);
@@ -18707,35 +18540,32 @@ var $$ = {};
       return ret;
     }, "call$0", "get$last", 0, 0, null],
     matchGroup$1: function(v) {
-      var i, t1, t2, t3;
-      for (i = 0; i < v.length; ++i) {
-        t1 = this.url;
-        t2 = t1.length;
-        t3 = this.index;
-        if (t2 <= t3)
+      var t1, i, t2, t3, t4;
+      for (t1 = v.length, i = 0; i < t1; ++i) {
+        t2 = this.url;
+        t3 = t2.length;
+        t4 = this.index;
+        if (t3 <= t4)
           return false;
-        if (!J.$eq(v[i], t1[t3]))
+        if (v[i] !== t2[t4])
           return false;
         else
-          ++this.index;
+          this.index = t4 + 1;
       }
       return true;
     },
     matchChar$1: function(v) {
-      var i, t1, t2, t3;
-      if (this.url.length <= this.index)
+      var t1, t2, t3, i;
+      t1 = this.url;
+      t2 = t1.length;
+      t3 = this.index;
+      if (t2 <= t3)
         return false;
-      for (i = 0; i < v.length; ++i) {
-        t1 = v[i];
-        t2 = this.url;
-        t3 = this.index;
-        if (t3 >= t2.length)
-          return H.ioore(t2, t3);
-        if (J.$eq(t1, t2[t3])) {
-          ++this.index;
+      for (t2 = v.length, i = 0; i < t2; ++i)
+        if (v[i] === t1[t3]) {
+          this.index = t3 + 1;
           return true;
         }
-      }
       return false;
     },
     static: {"^": "HttpUrlDecoder_SCHEME_HTTP,HttpUrlDecoder_SCHEME_HTTPS,HttpUrlDecoder_PATH,HttpUrlDecoder_QUERY,HttpUrlDecoder__sDecoder"}
@@ -18743,62 +18573,33 @@ var $$ = {};
   PercentEncode: {
     "^": "Object;builder",
     encodeWork$1: function(target) {
-      var t1, count, i, t2, t3, t4;
+      var t1, count, i, t2, t3;
       t1 = this.builder;
       t1._hetima$_length = 0;
       count = target.length;
       for (i = 0; i < count; ++i) {
-        if (i >= target.length)
-          return H.ioore(target, i);
         t2 = target[i];
         if (45 !== t2)
-          if (46 !== t2) {
-            if (typeof t2 !== "number")
-              return H.iae(t2);
-            if (!(48 <= t2 && t2 <= 57)) {
-              if (i >= target.length)
-                return H.ioore(target, i);
-              t2 = target[i];
-              if (typeof t2 !== "number")
-                return H.iae(t2);
-              if (!(65 <= t2 && t2 <= 90)) {
-                if (i >= target.length)
-                  return H.ioore(target, i);
-                if (!J.$eq(target[i], 95)) {
-                  if (i >= target.length)
-                    return H.ioore(target, i);
-                  t2 = target[i];
-                  if (typeof t2 !== "number")
-                    return H.iae(t2);
-                  if (!(97 <= t2 && t2 <= 122)) {
-                    if (i >= target.length)
-                      return H.ioore(target, i);
-                    t2 = J.$eq(target[i], 126);
-                  } else
-                    t2 = true;
-                } else
-                  t2 = true;
-              } else
-                t2 = true;
-            } else
-              t2 = true;
-          } else
-            t2 = true;
+          if (46 !== t2)
+            if (!(48 <= t2 && t2 <= 57))
+              if (!(65 <= t2 && t2 <= 90))
+                if (t2 !== 95)
+                  t3 = 97 <= t2 && t2 <= 122 || t2 === 126;
+                else
+                  t3 = true;
+              else
+                t3 = true;
+            else
+              t3 = true;
+          else
+            t3 = true;
         else
-          t2 = true;
-        t3 = target[i];
-        t4 = target.length;
-        if (t2) {
-          if (i >= t4)
-            return H.ioore(target, i);
-          t1.appendByte$1(t3);
-        } else {
-          if (i >= t4)
-            return H.ioore(target, i);
-          if (typeof t3 !== "number")
-            return H.iae(t3);
-          t2 = $.get$PercentEncode_ENCODE_TABLE();
-          t1.appendString$1(C.JSString_methods.$add(C.JSString_methods.$add("%", t2.$index(0, (240 & t3) >>> 4)), t2.$index(0, 15 & t3)));
+          t3 = true;
+        if (t3)
+          t1.appendByte$1(t2);
+        else {
+          t3 = $.get$PercentEncode_ENCODE_TABLE();
+          t1.appendString$1(C.JSString_methods.$add(C.JSString_methods.$add("%", t3.$index(0, (240 & t2) >>> 4)), t3.$index(0, 15 & t2)));
         }
       }
       return C.Utf8Codec_false.decode$1(J.sublist$2$ax(t1._buffer8, 0, t1._hetima$_length));
@@ -18818,14 +18619,9 @@ var $$ = {};
   HetimaFileBlob: {
     "^": "HetimaFile;_mBlob",
     getLength$0: function() {
-      var ret, t1, t2;
-      ret = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
-      t1 = J.get$size$x(this._mBlob);
-      t2 = ret.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
-      return t2;
+      var ret = H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]);
+      ret.complete$1(0, J.get$size$x(this._mBlob));
+      return ret.future;
     },
     read$2: function(start, end) {
       var t1, ret, reader;
@@ -18850,38 +18646,27 @@ var $$ = {};
       t2 = new V.ReadResult(-1, null);
       t2.status = 1;
       t2.buffer = t1;
-      t1 = this.ret_0.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(t2);
+      this.ret_0.complete$1(0, t2);
     }, "call$1", null, 2, 0, null, 2, "call"],
     $isFunction: true
   },
   HetimaFileBlob_read_closure0: {
     "^": "Closure:79;ret_2",
     call$1: [function(e) {
-      var t1, t2;
-      t1 = new V.ReadResult(-1, null);
+      var t1 = new V.ReadResult(-1, null);
       t1.status = -1;
       t1.buffer = null;
-      t2 = this.ret_2.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
+      this.ret_2.complete$1(0, t1);
     }, "call$1", null, 2, 0, null, 2, "call"],
     $isFunction: true
   },
   HetimaFileBlob_read_closure1: {
     "^": "Closure:161;ret_3",
     call$1: [function(e) {
-      var t1, t2;
-      t1 = new V.ReadResult(-1, null);
+      var t1 = new V.ReadResult(-1, null);
       t1.status = -1;
       t1.buffer = null;
-      t2 = this.ret_3.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
+      this.ret_3.complete$1(0, t1);
     }, "call$1", null, 2, 0, null, 2, "call"],
     $isFunction: true
   },
@@ -18896,12 +18681,12 @@ var $$ = {};
       t2 = info.get$clientSocketId();
       t3 = P.StreamController_StreamController(null, null, null, null, false, null);
       t4 = new V.ArrayBuilder(1024, null, 0, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
-      t4._buffer8 = new Uint8Array(1024);
-      t3 = new N.HetiSocketChrome(null, t3, false, 0, t4, false);
-      t3.HetiSocketChrome$1(t2);
+      t4._buffer8 = new Uint8Array(H._checkLength(1024));
+      t4 = new N.HetiSocketChrome(null, t3, false, 0, t4, false);
+      t4.HetiSocketChrome$1(t2);
       if (t1._state >= 4)
         H.throwExpression(t1._badEventState$0());
-      t1._async$_add$1(t3);
+      t1._async$_add$1(t4);
     },
     close$0: function(_) {
       var t1, t2, t3, completer;
@@ -18923,7 +18708,7 @@ var $$ = {};
       }}
   },
   HetiServerSocketChrome_startServer_closure: {
-    "^": "Closure:52;address_0,port_1,completer_2",
+    "^": "Closure:53;address_0,port_1,completer_2",
     call$0: function() {
       var t1, t2, completer;
       t1 = $.get$sockets().tcpServer;
@@ -18949,7 +18734,7 @@ var $$ = {};
       completer = F.ChromeCompleter$oneArg(null);
       J.$index$asx(J.$index$asx(t3, "sockets"), "tcpServer").callMethod$2("listen", [t2, this.address_3, this.port_4, null, completer._callback]);
       return completer._completer.future.then$1(new N.HetiServerSocketChrome_startServer___closure(this.completer_5, info));
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiServerSocketChrome_startServer___closure: {
@@ -18960,20 +18745,14 @@ var $$ = {};
       server = new N.HetiServerSocketChrome(P.StreamController_StreamController(null, null, null, null, false, null), null);
       server._mInfo = t1;
       $.get$HetiChromeSocketManager__instance()._serverList.$indexSet(0, t1.get$socketId(), server);
-      t1 = this.completer_6.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(server);
+      this.completer_6.complete$1(0, server);
     }, "call$1", null, 2, 0, null, 163, "call"],
     $isFunction: true
   },
   HetiServerSocketChrome_startServer_closure0: {
     "^": "Closure:21;completer_8",
     call$1: [function(e) {
-      var t1 = this.completer_8.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(null);
+      this.completer_8.complete$1(0, null);
     }, "call$1", null, 2, 0, null, 2, "call"],
     $isFunction: true
   },
@@ -19036,7 +18815,7 @@ var $$ = {};
     }
   },
   HetiSocketChrome_send_closure: {
-    "^": "Closure:52;this_0,data_1,completer_2",
+    "^": "Closure:53;this_0,data_1,completer_2",
     call$0: function() {
       var buffer, t1, t2, t3, t4, completer;
       buffer = Z.ArrayBuffer_ArrayBuffer$fromBytes(this.data_1);
@@ -19055,34 +18834,26 @@ var $$ = {};
   HetiSocketChrome_send__closure: {
     "^": "Closure:164;this_3,completer_4",
     call$1: [function(info) {
-      var t1, t2;
-      t1 = Date.now();
+      var t1 = Date.now();
       new P.DateTime(t1, false).DateTime$_now$0();
       this.this_3.lastUpdateTime = t1;
       t1 = new V.HetiSendInfo(0);
       t1.resultCode = info.get$resultCode();
-      t2 = this.completer_4.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
-    }, "call$1", null, 2, 0, null, 124, "call"],
+      this.completer_4.complete$1(0, t1);
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiSocketChrome_send_closure0: {
     "^": "Closure:21;completer_5",
     call$1: [function(e) {
-      var t1, t2;
-      t1 = new V.HetiSendInfo(0);
+      var t1 = new V.HetiSendInfo(0);
       t1.resultCode = -1999;
-      t2 = this.completer_5.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
+      this.completer_5.complete$1(0, t1);
     }, "call$1", null, 2, 0, null, 2, "call"],
     $isFunction: true
   },
   HetiSocketChrome_connect_closure: {
-    "^": "Closure:52;this_0,peerAddress_1,peerPort_2,completer_3",
+    "^": "Closure:53;this_0,peerAddress_1,peerPort_2,completer_3",
     call$0: function() {
       var t1, t2, completer;
       t1 = $.get$sockets().tcp;
@@ -19107,7 +18878,7 @@ var $$ = {};
       completer = F.ChromeCompleter$oneArg(null);
       J.$index$asx(J.$index$asx(t3, "sockets"), "tcp").callMethod$2("connect", [t2, this.peerAddress_5, this.peerPort_6, completer._callback]);
       completer._completer.future.then$1(new N.HetiSocketChrome_connect___closure(this.this_4, this.completer_7, info));
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiSocketChrome_connect___closure: {
@@ -19121,22 +18892,15 @@ var $$ = {};
       t3 = $.get$HetiChromeSocketManager__instance();
       t1 = t1.get$socketId();
       t3._clientList.$indexSet(0, t1, t2);
-      t1 = this.completer_9.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(t2);
+      this.completer_9.complete$1(0, t2);
     }, "call$1", null, 2, 0, null, 2, "call"],
     $isFunction: true
   },
   HetiSocketChrome_connect_closure0: {
     "^": "Closure:21;completer_11",
     call$1: [function(e) {
-      var t1;
       P.print(J.toString$0(e));
-      t1 = this.completer_11.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(null);
+      this.completer_11.complete$1(0, null);
     }, "call$1", null, 2, 0, null, 2, "call"],
     $isFunction: true
   },
@@ -19167,10 +18931,7 @@ var $$ = {};
         inter.name = J.get$name$x(i);
         t2.push(inter);
       }
-      t1 = this.completer_0.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(t2);
+      this.completer_0.complete$1(0, t2);
     }, "call$1", null, 2, 0, null, 165, "call"],
     $isFunction: true
   },
@@ -19214,14 +18975,14 @@ var $$ = {};
       server = this.this_1._serverList.$index(0, info.get$socketId());
       if (server != null)
         server.onAcceptInternal$1(info);
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiChromeSocketManager_manageServerSocket_closure0: {
     "^": "Closure:168;",
     call$1: [function(info) {
       P.print("--accept error");
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiChromeSocketManager_manageServerSocket_closure1: {
@@ -19230,7 +18991,7 @@ var $$ = {};
       var socket = this.this_2._clientList.$index(0, info.get$socketId());
       if (socket != null)
         socket.onReceiveInternal$1(info);
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiChromeSocketManager_manageServerSocket_closure2: {
@@ -19243,7 +19004,7 @@ var $$ = {};
         this.box_0.closeChecking_0 = true;
         J.close$0$x(socket);
       }
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiChromeSocketManager_manageServerSocket_closure3: {
@@ -19252,14 +19013,14 @@ var $$ = {};
       var socket = this.this_4._udpList.$index(0, info.get$socketId());
       if (socket != null)
         socket.onReceiveInternal$1(info);
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiChromeSocketManager_manageServerSocket_closure4: {
     "^": "Closure:170;",
     call$1: [function(info) {
       P.print(C.JSString_methods.$add(C.JSString_methods.$add("--receive udp error ", J.toString$0(info.get$socketId())) + ",", J.toString$0(info.get$resultCode())));
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiUdpSocketChrome: {
@@ -19292,7 +19053,7 @@ var $$ = {};
       if (t1._state >= 4)
         H.throwExpression(t1._badEventState$0());
       t1._async$_add$1(t2);
-    }, "call$1", "get$onReceiveInternal", 2, 0, 171, 124],
+    }, "call$1", "get$onReceiveInternal", 2, 0, 171, 120],
     close$0: function(_) {
       var t1, t2, t3, completer;
       t1 = $.get$HetiChromeSocketManager__instance();
@@ -19339,7 +19100,7 @@ var $$ = {};
       completer = F.ChromeCompleter$oneArg(null);
       J.$index$asx(J.$index$asx(t2, "sockets"), "udp").callMethod$2("setMulticastLoopbackMode", [t1, true, completer._callback]);
       return completer._completer.future;
-    }, "call$1", null, 2, 0, null, 124, "call"],
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   },
   HetiUdpSocketChrome_bind_closure0: {
@@ -19360,10 +19121,7 @@ var $$ = {};
   HetiUdpSocketChrome_bind_closure1: {
     "^": "Closure:90;completer_4",
     call$1: [function(v) {
-      var t1 = this.completer_4.future;
-      if (t1._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t1._asyncComplete$1(v);
+      this.completer_4.complete$1(0, v);
     }, "call$1", null, 2, 0, null, 89, "call"],
     $isFunction: true
   },
@@ -19377,14 +19135,10 @@ var $$ = {};
   HetiUdpSocketChrome_send_closure: {
     "^": "Closure:164;completer_0",
     call$1: [function(info) {
-      var t1, t2;
-      t1 = new V.HetiUdpSendInfo(0);
+      var t1 = new V.HetiUdpSendInfo(0);
       t1.resultCode = info.get$resultCode();
-      t2 = this.completer_0.future;
-      if (t2._state !== 0)
-        H.throwExpression(P.StateError$("Future already completed"));
-      t2._asyncComplete$1(t1);
-    }, "call$1", null, 2, 0, null, 124, "call"],
+      this.completer_0.complete$1(0, t1);
+    }, "call$1", null, 2, 0, null, 120, "call"],
     $isFunction: true
   }
 }],
@@ -19502,7 +19256,7 @@ var $$ = {};
         copy = P.LinkedHashMap_LinkedHashMap$_empty(null, null);
         this.writeSlot_7.call$2(slot, copy);
         for (t1 = Object.keys(e), t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
-          key = t1._current;
+          key = t1.__internal$_current;
           copy.$indexSet(0, key, this.call$1(e[key]));
         }
         return copy;
@@ -19535,7 +19289,7 @@ var $$ = {};
       return P.List_List$from(t1.where$1(t1, new P.FilteredElementList__filtered_closure()), true, W.Element);
     },
     forEach$1: function(_, f) {
-      H.IterableMixinWorkaround_forEach(this.get$_filtered(), f);
+      C.JSArray_methods.forEach$1(this.get$_filtered(), f);
     },
     $indexSet: function(_, index, value) {
       var t1 = this.get$_filtered();
@@ -19570,7 +19324,7 @@ var $$ = {};
       throw H.wrapException(P.UnsupportedError$("Cannot setRange on filtered list"));
     },
     removeRange$2: function(_, start, end) {
-      H.IterableMixinWorkaround_forEach(C.JSArray_methods.sublist$2(this.get$_filtered(), start, end), new P.FilteredElementList_removeRange_closure());
+      C.JSArray_methods.forEach$1(C.JSArray_methods.sublist$2(this.get$_filtered(), start, end), new P.FilteredElementList_removeRange_closure());
     },
     removeAt$1: function(_, index) {
       var t1, result;
@@ -19706,8 +19460,6 @@ var $$ = {};
       position = context.position;
       t1 = J.getInterceptor$asx(buffer);
       t2 = t1.get$length(buffer);
-      if (typeof position !== "number")
-        return position.$lt();
       if (typeof t2 !== "number")
         return H.iae(t2);
       if (position < t2 && this._matcher.match$1(t1.codeUnitAt$1(buffer, position))) {
@@ -19717,7 +19469,7 @@ var $$ = {};
       return new E.Failure(this._petitparser$_message, buffer, position);
     },
     toString$0: function(_) {
-      return P.Object.prototype.toString$0.call(this, this) + "[" + H.S(this._petitparser$_message) + "]";
+      return P.Object.prototype.toString$0.call(this, this) + "[" + this._petitparser$_message + "]";
     }
   },
   _NotCharMatcher: {
@@ -19807,19 +19559,10 @@ var $$ = {};
     parseOn$1: function(context) {
       var result, t1, t2;
       result = this._delegate.parseOn$1(context);
-      if (!result.get$isFailure()) {
-        t1 = result.position;
-        t2 = J.get$length$asx(result.buffer);
-        t2 = t1 == null ? t2 == null : t1 === t2;
-        t1 = t2;
-      } else
-        t1 = true;
-      if (t1)
+      if (result.get$isFailure() || result.position === J.get$length$asx(result.buffer))
         return result;
       t1 = result.position;
       t2 = result.buffer;
-      if (t1 == null)
-        ;
       return new E.Failure(this._petitparser$_message, t2, t1);
     },
     toString$0: function(_) {
@@ -19960,7 +19703,7 @@ var $$ = {};
     }
   },
   CompositeParser__complete_closure: {
-    "^": "Closure:53;this_0",
+    "^": "Closure:54;this_0",
     call$2: function($name, parser) {
       var t1 = this.this_0._defined;
       if (!t1.containsKey$1($name))
@@ -19970,7 +19713,7 @@ var $$ = {};
     $isFunction: true
   },
   CompositeParser_ref_closure: {
-    "^": "Closure:52;name_0",
+    "^": "Closure:53;name_0",
     call$0: function() {
       return new E.SetableParser(new E.FailureParser("Uninitalized production: " + H.S(this.name_0)));
     },
@@ -20128,14 +19871,14 @@ var $$ = {};
     $isFunction: true
   },
   Parser_pick_closure: {
-    "^": "Closure:153;index_0",
+    "^": "Closure:150;index_0",
     call$1: [function(list) {
       return J.$index$asx(list, this.index_0);
     }, "call$1", null, 2, 0, null, 176, "call"],
     $isFunction: true
   },
   Parser_permute_closure: {
-    "^": "Closure:153;indexes_0",
+    "^": "Closure:150;indexes_0",
     call$1: [function(list) {
       return H.setRuntimeTypeInfo(new H.MappedListIterable(this.indexes_0, new E.Parser_permute__closure(list)), [null, null]).toList$0(0);
     }, "call$1", null, 2, 0, null, 176, "call"],
@@ -20150,7 +19893,7 @@ var $$ = {};
     $isFunction: true
   },
   Parser_separatedBy_closure: {
-    "^": "Closure:153;separator_0,includeSeparators_1,optionalSeparatorAtEnd_2",
+    "^": "Closure:150;separator_0,includeSeparators_1,optionalSeparatorAtEnd_2",
     call$1: [function(list) {
       var result, t1, t2, t3, tuple;
       result = [];
@@ -20207,8 +19950,6 @@ var $$ = {};
       buffer = context.buffer;
       t1 = J.getInterceptor$asx(buffer);
       t2 = t1.get$length(buffer);
-      if (typeof position !== "number")
-        return position.$lt();
       if (typeof t2 !== "number")
         return H.iae(t2);
       if (position < t2) {
@@ -20234,8 +19975,6 @@ var $$ = {};
     parseOn$1: function(context) {
       var start, $stop, t1, t2, t3, result;
       start = context.position;
-      if (typeof start !== "number")
-        return start.$add();
       $stop = start + this._petitparser$_length;
       t1 = context.buffer;
       t2 = J.getInterceptor$asx(t1);
@@ -20250,7 +19989,7 @@ var $$ = {};
       return new E.Failure(this._petitparser$_message, t1, start);
     },
     toString$0: function(_) {
-      return P.Object.prototype.toString$0.call(this, this) + "[" + H.S(this._petitparser$_message) + "]";
+      return P.Object.prototype.toString$0.call(this, this) + "[" + this._petitparser$_message + "]";
     }
   },
   RepeatingParser: {
@@ -20331,14 +20070,7 @@ var $$ = {};
   Token: {
     "^": "Object;value>,buffer>,start>,stop>",
     get$length: function(_) {
-      var t1, t2;
-      t1 = this.stop;
-      t2 = this.start;
-      if (typeof t1 !== "number")
-        return t1.$sub();
-      if (typeof t2 !== "number")
-        return H.iae(t2);
-      return t1 - t2;
+      return this.stop - this.start;
     },
     get$line: function() {
       return E.Token_lineAndColumnOf(this.buffer, this.start)[0];
@@ -20347,38 +20079,20 @@ var $$ = {};
       return "Token[" + E.Token_positionString(this.buffer, this.start) + "]: " + H.S(this.value);
     },
     $eq: function(_, other) {
-      var t1, t2;
       if (other == null)
         return false;
-      if (!!J.getInterceptor(other).$isToken)
-        if (J.$eq(this.value, other.value)) {
-          t1 = this.start;
-          t2 = other.start;
-          if (t1 == null ? t2 == null : t1 === t2) {
-            t1 = this.stop;
-            t2 = other.stop;
-            t2 = t1 == null ? t2 == null : t1 === t2;
-            t1 = t2;
-          } else
-            t1 = false;
-        } else
-          t1 = false;
-      else
-        t1 = false;
-      return t1;
+      return !!J.getInterceptor(other).$isToken && J.$eq(this.value, other.value) && this.start === other.start && this.stop === other.stop;
     },
     get$hashCode: function(_) {
-      return J.$add$ns(J.$add$ns(J.get$hashCode$(this.value), J.get$hashCode$(this.start)), J.get$hashCode$(this.stop));
+      return J.$add$ns(J.$add$ns(J.get$hashCode$(this.value), this.start & 0x1FFFFFFF), this.stop & 0x1FFFFFFF);
     },
     $isToken: true,
     static: {"^": "Token__NEWLINE_PARSER", Token_lineAndColumnOf: function(buffer, position) {
         var t1, line, offset, token, t2, t3;
         for (t1 = $.get$Token__NEWLINE_PARSER(), t1.toString, t1 = new E.TokenParser(t1).matchesSkipping$1(buffer), t1 = new H.ListIterator(t1, t1.length, 0, null), line = 1, offset = 0; t1.moveNext$0();) {
-          token = t1._current;
+          token = t1.__internal$_current;
           t2 = J.getInterceptor$x(token);
           t3 = t2.get$stop(token);
-          if (typeof position !== "number")
-            return position.$lt();
           if (typeof t3 !== "number")
             return H.iae(t3);
           if (position < t3) {
@@ -20389,8 +20103,6 @@ var $$ = {};
           ++line;
           offset = t2.get$stop(token);
         }
-        if (typeof position !== "number")
-          return position.$sub();
         if (typeof offset !== "number")
           return H.iae(offset);
         return [line, position - offset + 1];
@@ -20400,7 +20112,7 @@ var $$ = {};
           lineAndColumn = E.Token_lineAndColumnOf(buffer, position);
           return H.S(lineAndColumn[0]) + ":" + H.S(lineAndColumn[1]);
         } else
-          return H.S(position);
+          return "" + position;
       }}
   }
 }],
@@ -20535,7 +20247,7 @@ var $$ = {};
     "^": "IterableBase;start>",
     get$iterator: function(_) {
       var t1 = new L._XmlDescendantsIterator([], null);
-      t1.push$1(this.start);
+      t1.push$1(0, this.start);
       return t1;
     },
     $asIterableBase: function() {
@@ -20547,7 +20259,7 @@ var $$ = {};
   },
   _XmlDescendantsIterator: {
     "^": "Iterator;todo,current<",
-    push$1: function(node) {
+    push$1: function(_, node) {
       var t1, t2;
       t1 = this.todo;
       t2 = J.getInterceptor$x(node);
@@ -20566,7 +20278,7 @@ var $$ = {};
           return H.ioore(t1, 0);
         t1 = t1.pop();
         this.current = t1;
-        this.push$1(t1);
+        this.push$1(0, t1);
         return true;
       }
     }
@@ -20598,7 +20310,7 @@ var $$ = {};
     writeTo$1: function(buffer) {
       var t1;
       for (t1 = this.children, t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();)
-        t1._current.writeTo$1(buffer);
+        t1.__internal$_current.writeTo$1(buffer);
     },
     XmlBranch$1: function(children) {
       var t1;
@@ -20676,7 +20388,7 @@ var $$ = {};
       t1 = this.name;
       t1.writeTo$1(buffer);
       for (t2 = this.attributes, t2 = new H.ListIterator(t2, t2.length, 0, null); t2.moveNext$0();) {
-        attribute = t2._current;
+        attribute = t2.__internal$_current;
         buffer._contents += " ";
         attribute.writeTo$1(buffer);
       }
@@ -20912,7 +20624,7 @@ var $$ = {};
       var node, t1, attribute, t2;
       for (node = this.get$parent(this); node != null; node = node.get$parent(node))
         for (t1 = node.get$attributes(node), t1 = new H.ListIterator(t1, t1.length, 0, null); t1.moveNext$0();) {
-          attribute = t1._current;
+          attribute = t1.__internal$_current;
           t2 = J.getInterceptor$x(attribute);
           if (t2.get$name(attribute).get$prefix() == null && J.$eq(t2.get$name(attribute).get$local(), "xmlns"))
             return t2.get$value(attribute);
@@ -20926,7 +20638,7 @@ var $$ = {};
       var node, t1, t2, attribute, t3;
       for (node = this.get$parent(this), t1 = this.prefix; node != null; node = node.get$parent(node))
         for (t2 = node.get$attributes(node), t2 = new H.ListIterator(t2, t2.length, 0, null); t2.moveNext$0();) {
-          attribute = t2._current;
+          attribute = t2.__internal$_current;
           t3 = J.getInterceptor$x(attribute);
           if (t3.get$name(attribute).get$prefix() === "xmlns" && J.$eq(t3.get$name(attribute).get$local(), t1))
             return t3.get$value(attribute);
@@ -20993,9 +20705,11 @@ var $$ = {};
   XmlWritable: {
     "^": "Object;",
     toString$0: function(_) {
-      var buffer = P.StringBuffer$("");
+      var buffer, t1;
+      buffer = P.StringBuffer$("");
       this.writeTo$1(buffer);
-      return buffer._contents;
+      t1 = buffer._contents;
+      return t1.charCodeAt(0) == 0 ? t1 : t1;
     }
   }
 }],
@@ -21039,15 +20753,15 @@ $$ = null;
   _.$isComparable = TRUE;
   _.$asComparable = [P.Duration];
   _.$isObject = TRUE;
+  _ = P.List;
+  _.$isList = TRUE;
+  _.$isIterable = TRUE;
+  _.$isObject = TRUE;
   _ = W.Element;
   _.$isElement = TRUE;
   _.$isNode = TRUE;
   _.$isEventTarget = TRUE;
   _.$isEventTarget = TRUE;
-  _.$isObject = TRUE;
-  _ = P.List;
-  _.$isList = TRUE;
-  _.$isIterable = TRUE;
   _.$isObject = TRUE;
   _ = P.Match;
   _.$isMatch = TRUE;
@@ -21088,12 +20802,14 @@ $$ = null;
   _.$isNodeValidator = TRUE;
   _.$isObject = TRUE;
   _ = W.TableRowElement;
+  _.$isHtmlElement = TRUE;
   _.$isElement = TRUE;
   _.$isNode = TRUE;
   _.$isEventTarget = TRUE;
   _.$isEventTarget = TRUE;
   _.$isObject = TRUE;
   _ = W.TableCellElement;
+  _.$isHtmlElement = TRUE;
   _.$isElement = TRUE;
   _.$isNode = TRUE;
   _.$isEventTarget = TRUE;
@@ -21170,17 +20886,17 @@ $$ = null;
   _ = Q.SelectionEvent;
   _.$isSelectionEvent = TRUE;
   _.$isObject = TRUE;
-  _ = V.UpnpDeviceSearcher;
-  _.$isUpnpDeviceSearcher = TRUE;
-  _.$isObject = TRUE;
-  _ = V.HetiReceiveUdpInfo;
-  _.$isHetiReceiveUdpInfo = TRUE;
-  _.$isObject = TRUE;
   _ = P._BroadcastSubscription;
   _.$is_BroadcastSubscription = TRUE;
   _.$is_BufferingStreamSubscription = TRUE;
   _.$is_EventSink = TRUE;
   _.$isStreamSubscription = TRUE;
+  _.$isObject = TRUE;
+  _ = V.UpnpDeviceSearcher;
+  _.$isUpnpDeviceSearcher = TRUE;
+  _.$isObject = TRUE;
+  _ = V.HetiReceiveUdpInfo;
+  _.$isHetiReceiveUdpInfo = TRUE;
   _.$isObject = TRUE;
   _ = V.HetiHttpMessageWithoutBody;
   _.$isHetiHttpMessageWithoutBody = TRUE;
@@ -21270,6 +20986,13 @@ $$ = null;
   _ = P._DelayedEvent;
   _.$is_DelayedEvent = TRUE;
   _.$isObject = TRUE;
+  _ = W.HtmlElement;
+  _.$isHtmlElement = TRUE;
+  _.$isElement = TRUE;
+  _.$isNode = TRUE;
+  _.$isEventTarget = TRUE;
+  _.$isEventTarget = TRUE;
+  _.$isObject = TRUE;
   _ = P.DateTime;
   _.$isDateTime = TRUE;
   _.$isComparable = TRUE;
@@ -21293,11 +21016,11 @@ $$ = null;
   _ = V.HetiHttpServerRequest;
   _.$isHetiHttpServerRequest = TRUE;
   _.$isObject = TRUE;
-  _ = P.Function;
-  _.$isFunction = TRUE;
-  _.$isObject = TRUE;
   _ = P.Iterable;
   _.$isIterable = TRUE;
+  _.$isObject = TRUE;
+  _ = P.Function;
+  _.$isFunction = TRUE;
   _.$isObject = TRUE;
   _ = P.Iterator;
   _.$isIterator = TRUE;
@@ -21453,6 +21176,12 @@ J.$xor$n = function(receiver, a0) {
     return (receiver ^ a0) >>> 0;
   return J.getInterceptor$n(receiver).$xor(receiver, a0);
 };
+J._addEventListener$3$x = function(receiver, a0, a1, a2) {
+  return J.getInterceptor$x(receiver)._addEventListener$3(receiver, a0, a1, a2);
+};
+J._removeEventListener$3$x = function(receiver, a0, a1, a2) {
+  return J.getInterceptor$x(receiver)._removeEventListener$3(receiver, a0, a1, a2);
+};
 J._replaceChild$2$x = function(receiver, a0, a1) {
   return J.getInterceptor$x(receiver)._replaceChild$2(receiver, a0, a1);
 };
@@ -21461,9 +21190,6 @@ J.add$1$ax = function(receiver, a0) {
 };
 J.addAll$1$ax = function(receiver, a0) {
   return J.getInterceptor$ax(receiver).addAll$1(receiver, a0);
-};
-J.addEventListener$3$x = function(receiver, a0, a1, a2) {
-  return J.getInterceptor$x(receiver).addEventListener$3(receiver, a0, a1, a2);
 };
 J.append$1$x = function(receiver, a0) {
   return J.getInterceptor$x(receiver).append$1(receiver, a0);
@@ -21534,9 +21260,6 @@ J.get$hashCode$ = function(receiver) {
 J.get$index$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$index(receiver);
 };
-J.get$innerHtml$x = function(receiver) {
-  return J.getInterceptor$x(receiver).get$innerHtml(receiver);
-};
 J.get$isEmpty$asx = function(receiver) {
   return J.getInterceptor$asx(receiver).get$isEmpty(receiver);
 };
@@ -21594,6 +21317,9 @@ J.get$start$x = function(receiver) {
 J.get$statusCode$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$statusCode(receiver);
 };
+J.get$tabIndex$x = function(receiver) {
+  return J.getInterceptor$x(receiver).get$tabIndex(receiver);
+};
 J.get$tagName$x = function(receiver) {
   return J.getInterceptor$x(receiver).get$tagName(receiver);
 };
@@ -21638,9 +21364,6 @@ J.remove$1$ax = function(receiver, a0) {
 };
 J.removeAt$1$ax = function(receiver, a0) {
   return J.getInterceptor$ax(receiver).removeAt$1(receiver, a0);
-};
-J.removeEventListener$3$x = function(receiver, a0, a1, a2) {
-  return J.getInterceptor$x(receiver).removeEventListener$3(receiver, a0, a1, a2);
 };
 J.replaceAll$2$s = function(receiver, a0, a1) {
   return J.getInterceptor$s(receiver).replaceAll$2(receiver, a0, a1);
@@ -21714,6 +21437,9 @@ J.setRange$4$ax = function(receiver, a0, a1, a2, a3) {
 J.slice$2$x = function(receiver, a0, a1) {
   return J.getInterceptor$x(receiver).slice$2(receiver, a0, a1);
 };
+J.split$1$s = function(receiver, a0) {
+  return J.getInterceptor$s(receiver).split$1(receiver, a0);
+};
 J.startsWith$1$s = function(receiver, a0) {
   return J.getInterceptor$s(receiver).startsWith$1(receiver, a0);
 };
@@ -21754,6 +21480,7 @@ C.JSInt_methods = J.JSInt.prototype;
 C.JSNull_methods = J.JSNull.prototype;
 C.JSNumber_methods = J.JSNumber.prototype;
 C.JSString_methods = J.JSString.prototype;
+C.NativeUint8List_methods = H.NativeUint8List.prototype;
 C.NodeList_methods = W.NodeList.prototype;
 C.PlainJavaScriptObject_methods = J.PlainJavaScriptObject.prototype;
 C.UnknownJavaScriptObject_methods = J.UnknownJavaScriptObject.prototype;
@@ -21768,7 +21495,6 @@ C.Direction_RTL = new A.Direction("RTL");
 C.Duration_0 = new P.Duration(0);
 C.EventStreamProvider_abort = new W.EventStreamProvider("abort");
 C.EventStreamProvider_blur = new W.EventStreamProvider("blur");
-C.EventStreamProvider_canplaythrough = new W.EventStreamProvider("canplaythrough");
 C.EventStreamProvider_change = new W.EventStreamProvider("change");
 C.EventStreamProvider_click = new W.EventStreamProvider("click");
 C.EventStreamProvider_contextmenu = new W.EventStreamProvider("contextmenu");
@@ -21780,7 +21506,6 @@ C.EventStreamProvider_dragleave = new W.EventStreamProvider("dragleave");
 C.EventStreamProvider_dragover = new W.EventStreamProvider("dragover");
 C.EventStreamProvider_dragstart = new W.EventStreamProvider("dragstart");
 C.EventStreamProvider_drop = new W.EventStreamProvider("drop");
-C.EventStreamProvider_ended = new W.EventStreamProvider("ended");
 C.EventStreamProvider_error = new W.EventStreamProvider("error");
 C.EventStreamProvider_focus = new W.EventStreamProvider("focus");
 C.EventStreamProvider_keydown = new W.EventStreamProvider("keydown");
@@ -21794,7 +21519,6 @@ C.EventStreamProvider_mouseout = new W.EventStreamProvider("mouseout");
 C.EventStreamProvider_mouseover = new W.EventStreamProvider("mouseover");
 C.EventStreamProvider_mouseup = new W.EventStreamProvider("mouseup");
 C.EventStreamProvider_paste = new W.EventStreamProvider("paste");
-C.EventStreamProvider_progress = new W.EventStreamProvider("progress");
 C.EventStreamProvider_scroll = new W.EventStreamProvider("scroll");
 C.EventStreamProvider_touchcancel = new W.EventStreamProvider("touchcancel");
 C.EventStreamProvider_touchend = new W.EventStreamProvider("touchend");
@@ -21956,16 +21680,9 @@ C.List_yrN = H.setRuntimeTypeInfo(Isolate.makeConstantList(["A::href", "AREA::hr
 C.List_Wnk = Isolate.makeConstantList(["lt", "gt", "amp", "apos", "quot", "Aacute", "aacute", "Acirc", "acirc", "acute", "AElig", "aelig", "Agrave", "agrave", "alefsym", "Alpha", "alpha", "and", "ang", "Aring", "aring", "asymp", "Atilde", "atilde", "Auml", "auml", "bdquo", "Beta", "beta", "brvbar", "bull", "cap", "Ccedil", "ccedil", "cedil", "cent", "Chi", "chi", "circ", "clubs", "cong", "copy", "crarr", "cup", "curren", "dagger", "Dagger", "darr", "dArr", "deg", "Delta", "delta", "diams", "divide", "Eacute", "eacute", "Ecirc", "ecirc", "Egrave", "egrave", "empty", "emsp", "ensp", "Epsilon", "epsilon", "equiv", "Eta", "eta", "ETH", "eth", "Euml", "euml", "euro", "exist", "fnof", "forall", "frac12", "frac14", "frac34", "frasl", "Gamma", "gamma", "ge", "harr", "hArr", "hearts", "hellip", "Iacute", "iacute", "Icirc", "icirc", "iexcl", "Igrave", "igrave", "image", "infin", "int", "Iota", "iota", "iquest", "isin", "Iuml", "iuml", "Kappa", "kappa", "Lambda", "lambda", "lang", "laquo", "larr", "lArr", "lceil", "ldquo", "le", "lfloor", "lowast", "loz", "lrm", "lsaquo", "lsquo", "macr", "mdash", "micro", "middot", "minus", "Mu", "mu", "nabla", "nbsp", "ndash", "ne", "ni", "not", "notin", "nsub", "Ntilde", "ntilde", "Nu", "nu", "Oacute", "oacute", "Ocirc", "ocirc", "OElig", "oelig", "Ograve", "ograve", "oline", "Omega", "omega", "Omicron", "omicron", "oplus", "or", "ordf", "ordm", "Oslash", "oslash", "Otilde", "otilde", "otimes", "Ouml", "ouml", "para", "part", "permil", "perp", "Phi", "phi", "Pi", "pi", "piv", "plusmn", "pound", "prime", "Prime", "prod", "prop", "Psi", "psi", "radic", "rang", "raquo", "rarr", "rArr", "rceil", "rdquo", "real", "reg", "rfloor", "Rho", "rho", "rlm", "rsaquo", "rsquo", "sbquo", "Scaron", "scaron", "sdot", "sect", "shy", "Sigma", "sigma", "sigmaf", "sim", "spades", "sub", "sube", "sum", "sup", "sup1", "sup2", "sup3", "supe", "szlig", "Tau", "tau", "there4", "Theta", "theta", "thetasym", "thinsp", "THORN", "thorn", "tilde", "times", "trade", "Uacute", "uacute", "uarr", "uArr", "Ucirc", "ucirc", "Ugrave", "ugrave", "uml", "upsih", "Upsilon", "upsilon", "Uuml", "uuml", "weierp", "Xi", "xi", "Yacute", "yacute", "yen", "yuml", "Yuml", "Zeta", "zeta", "zwj", "zwnj"]);
 C.Map_WngUw = new H.ConstantStringMap(253, {lt: "<", gt: ">", amp: "&", apos: "'", quot: "\"", Aacute: "\u00c1", aacute: "\u00e1", Acirc: "\u00c2", acirc: "\u00e2", acute: "\u00b4", AElig: "\u00c6", aelig: "\u00e6", Agrave: "\u00c0", agrave: "\u00e0", alefsym: "\u2135", Alpha: "\u0391", alpha: "\u03b1", and: "\u2227", ang: "\u2220", Aring: "\u00c5", aring: "\u00e5", asymp: "\u2248", Atilde: "\u00c3", atilde: "\u00e3", Auml: "\u00c4", auml: "\u00e4", bdquo: "\u201e", Beta: "\u0392", beta: "\u03b2", brvbar: "\u00a6", bull: "\u2022", cap: "\u2229", Ccedil: "\u00c7", ccedil: "\u00e7", cedil: "\u00b8", cent: "\u00a2", Chi: "\u03a7", chi: "\u03c7", circ: "\u02c6", clubs: "\u2663", cong: "\u2245", copy: "\u00a9", crarr: "\u21b5", cup: "\u222a", curren: "\u00a4", dagger: "\u2020", Dagger: "\u2021", darr: "\u2193", dArr: "\u21d3", deg: "\u00b0", Delta: "\u0394", delta: "\u03b4", diams: "\u2666", divide: "\u00f7", Eacute: "\u00c9", eacute: "\u00e9", Ecirc: "\u00ca", ecirc: "\u00ea", Egrave: "\u00c8", egrave: "\u00e8", empty: "\u2205", emsp: "\u2003", ensp: "\u2002", Epsilon: "\u0395", epsilon: "\u03b5", equiv: "\u2261", Eta: "\u0397", eta: "\u03b7", ETH: "\u00d0", eth: "\u00f0", Euml: "\u00cb", euml: "\u00eb", euro: "\u20ac", exist: "\u2203", fnof: "\u0192", forall: "\u2200", frac12: "\u00bd", frac14: "\u00bc", frac34: "\u00be", frasl: "\u2044", Gamma: "\u0393", gamma: "\u03b3", ge: "\u2265", harr: "\u2194", hArr: "\u21d4", hearts: "\u2665", hellip: "\u2026", Iacute: "\u00cd", iacute: "\u00ed", Icirc: "\u00ce", icirc: "\u00ee", iexcl: "\u00a1", Igrave: "\u00cc", igrave: "\u00ec", image: "\u2111", infin: "\u221e", int: "\u222b", Iota: "\u0399", iota: "\u03b9", iquest: "\u00bf", isin: "\u2208", Iuml: "\u00cf", iuml: "\u00ef", Kappa: "\u039a", kappa: "\u03ba", Lambda: "\u039b", lambda: "\u03bb", lang: "\u2329", laquo: "\u00ab", larr: "\u2190", lArr: "\u21d0", lceil: "\u2308", ldquo: "\u201c", le: "\u2264", lfloor: "\u230a", lowast: "\u2217", loz: "\u25ca", lrm: "\u200e", lsaquo: "\u2039", lsquo: "\u2018", macr: "\u00af", mdash: "\u2014", micro: "\u00b5", middot: "\u00b7", minus: "\u2212", Mu: "\u039c", mu: "\u03bc", nabla: "\u2207", nbsp: "\u00a0", ndash: "\u2013", ne: "\u2260", ni: "\u220b", not: "\u00ac", notin: "\u2209", nsub: "\u2284", Ntilde: "\u00d1", ntilde: "\u00f1", Nu: "\u039d", nu: "\u03bd", Oacute: "\u00d3", oacute: "\u00f3", Ocirc: "\u00d4", ocirc: "\u00f4", OElig: "\u0152", oelig: "\u0153", Ograve: "\u00d2", ograve: "\u00f2", oline: "\u203e", Omega: "\u03a9", omega: "\u03c9", Omicron: "\u039f", omicron: "\u03bf", oplus: "\u2295", or: "\u2228", ordf: "\u00aa", ordm: "\u00ba", Oslash: "\u00d8", oslash: "\u00f8", Otilde: "\u00d5", otilde: "\u00f5", otimes: "\u2297", Ouml: "\u00d6", ouml: "\u00f6", para: "\u00b6", part: "\u2202", permil: "\u2030", perp: "\u22a5", Phi: "\u03a6", phi: "\u03c6", Pi: "\u03a0", pi: "\u03c0", piv: "\u03d6", plusmn: "\u00b1", pound: "\u00a3", prime: "\u2032", Prime: "\u2033", prod: "\u220f", prop: "\u221d", Psi: "\u03a8", psi: "\u03c8", radic: "\u221a", rang: "\u232a", raquo: "\u00bb", rarr: "\u2192", rArr: "\u21d2", rceil: "\u2309", rdquo: "\u201d", real: "\u211c", reg: "\u00ae", rfloor: "\u230b", Rho: "\u03a1", rho: "\u03c1", rlm: "\u200f", rsaquo: "\u203a", rsquo: "\u2019", sbquo: "\u201a", Scaron: "\u0160", scaron: "\u0161", sdot: "\u22c5", sect: "\u00a7", shy: "\u00ad", Sigma: "\u03a3", sigma: "\u03c3", sigmaf: "\u03c2", sim: "\u223c", spades: "\u2660", sub: "\u2282", sube: "\u2286", sum: "\u2211", sup: "\u2283", sup1: "\u00b9", sup2: "\u00b2", sup3: "\u00b3", supe: "\u2287", szlig: "\u00df", Tau: "\u03a4", tau: "\u03c4", there4: "\u2234", Theta: "\u0398", theta: "\u03b8", thetasym: "\u03d1", thinsp: "\u2009", THORN: "\u00de", thorn: "\u00fe", tilde: "\u02dc", times: "\u00d7", trade: "\u2122", Uacute: "\u00da", uacute: "\u00fa", uarr: "\u2191", uArr: "\u21d1", Ucirc: "\u00db", ucirc: "\u00fb", Ugrave: "\u00d9", ugrave: "\u00f9", uml: "\u00a8", upsih: "\u03d2", Upsilon: "\u03a5", upsilon: "\u03c5", Uuml: "\u00dc", uuml: "\u00fc", weierp: "\u2118", Xi: "\u039e", xi: "\u03be", Yacute: "\u00dd", yacute: "\u00fd", yen: "\u00a5", yuml: "\u00ff", Yuml: "\u0178", Zeta: "\u0396", zeta: "\u03b6", zwj: "\u200d", zwnj: "\u200c"}, C.List_Wnk);
 C.Symbol_call = new H.Symbol0("call");
-C.Type_AHF = H.createRuntimeType('NativeTypedArray');
-C.Type_EQs = H.createRuntimeType('GlobalEventHandlers');
-C.Type_NlB = H.createRuntimeType('NativeTypedArrayOfDouble');
-C.Type_QyU = H.createRuntimeType('WindowEventHandlers');
-C.Type_wOW = H.createRuntimeType('NativeTypedArrayOfInt');
 C.Utf8Codec_false = new P.Utf8Codec(false);
 C.VerticalAlignmentConstant_bottom = new A.VerticalAlignmentConstant("bottom");
 C.VerticalAlignmentConstant_top = new A.VerticalAlignmentConstant("top");
-C.WhiteSpace_normal = new K.WhiteSpace("normal");
-C.WhiteSpace_nowrap = new K.WhiteSpace("nowrap");
 C.XmlNodeType_ATTRIBUTE = new L.XmlNodeType("ATTRIBUTE");
 C.XmlNodeType_CDATA = new L.XmlNodeType("CDATA");
 C.XmlNodeType_COMMENT = new L.XmlNodeType("COMMENT");
@@ -21975,7 +21692,6 @@ C.XmlNodeType_ELEMENT = new L.XmlNodeType("ELEMENT");
 C.XmlNodeType_PROCESSING = new L.XmlNodeType("PROCESSING");
 C.XmlNodeType_TEXT = new L.XmlNodeType("TEXT");
 C._CustomEventStreamProvider__determineMouseWheelEventType = new W._CustomEventStreamProvider(W.Element__determineMouseWheelEventType$closure());
-$.libraries_to_load = {};
 $.IsolateNatives_enableSpawnWorker = null;
 $.RawReceivePortImpl__nextFreeId = 1;
 $.Primitives_mirrorFunctionCacheName = "$cachedFunction";
@@ -22145,10 +21861,10 @@ Isolate.$lazy($, "context", "context", "get$context", function() {
   return P._wrapToDart(self);
 });
 Isolate.$lazy($, "_DART_OBJECT_PROPERTY_NAME", "_DART_OBJECT_PROPERTY_NAME", "get$_DART_OBJECT_PROPERTY_NAME", function() {
-  return init.getIsolateTag("_$dart_dartObject");
+  return H.getIsolateAffinityTag("_$dart_dartObject");
 });
 Isolate.$lazy($, "_DART_CLOSURE_PROPERTY_NAME", "_DART_CLOSURE_PROPERTY_NAME", "get$_DART_CLOSURE_PROPERTY_NAME", function() {
-  return init.getIsolateTag("_$dart_dartClosure");
+  return H.getIsolateAffinityTag("_$dart_dartClosure");
 });
 Isolate.$lazy($, "_dartProxyCtor", "_dartProxyCtor", "get$_dartProxyCtor", function() {
   return function DartObject(o) {
@@ -22248,7 +21964,7 @@ Isolate.$lazy($, "SCHEME_HTTPS", "HttpUrlDecoder_SCHEME_HTTPS", "get$HttpUrlDeco
 });
 Isolate.$lazy($, "PATH", "HttpUrlDecoder_PATH", "get$HttpUrlDecoder_PATH", function() {
   var t1 = $.get$RfcTable_RFC3986_PCHAR_AS_STRING();
-  if (typeof t1 !== "string")
+  if (t1 == null)
     return t1.$add();
   t1 += "/";
   return C.Utf8Codec_false.get$encoder().convert$1(t1);
@@ -22257,7 +21973,7 @@ Isolate.$lazy($, "QUERY", "HttpUrlDecoder_QUERY", "get$HttpUrlDecoder_QUERY", fu
   var t1, t2;
   t1 = $.get$RfcTable_RFC3986_RESERVED_AS_STRING();
   t2 = $.get$RfcTable_RFC3986_UNRESERVED_AS_STRING();
-  if (typeof t1 !== "string")
+  if (t1 == null)
     return t1.$add();
   t2 = J.$add$ns(t1, t2);
   return C.Utf8Codec_false.get$encoder().convert$1(t2);
@@ -22270,7 +21986,7 @@ Isolate.$lazy($, "ENCODE_TABLE", "PercentEncode_ENCODE_TABLE", "get$PercentEncod
 });
 Isolate.$lazy($, "_sencoder", "PercentEncode__sencoder", "get$PercentEncode__sencoder", function() {
   var t1 = new V.ArrayBuilder(1024, null, 0, H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), [], H.setRuntimeTypeInfo(new P._AsyncCompleter(P._Future$(null)), [null]), false);
-  t1._buffer8 = new Uint8Array(1024);
+  t1._buffer8 = new Uint8Array(H._checkLength(1024));
   return new V.PercentEncode(t1);
 });
 Isolate.$lazy($, "VCHAR_STRING", "RfcTable_VCHAR_STRING", "get$RfcTable_VCHAR_STRING", function() {
@@ -22292,7 +22008,7 @@ Isolate.$lazy($, "RFC3986_UNRESERVED_AS_STRING", "RfcTable_RFC3986_UNRESERVED_AS
   var t1, t2;
   t1 = $.get$RfcTable_ALPHA_AS_STRING();
   t2 = $.RfcTable_DIGIT_AS_STRING;
-  if (typeof t1 !== "string")
+  if (t1 == null)
     return t1.$add();
   return t1 + t2 + "-._~";
 });
@@ -22301,7 +22017,7 @@ Isolate.$lazy($, "RFC3986_RESERVED_AS_STRING", "RfcTable_RFC3986_RESERVED_AS_STR
 });
 Isolate.$lazy($, "RFC3986_PCHAR_AS_STRING", "RfcTable_RFC3986_PCHAR_AS_STRING", "get$RfcTable_RFC3986_PCHAR_AS_STRING", function() {
   var t1 = $.get$RfcTable_RFC3986_UNRESERVED_AS_STRING();
-  if (typeof t1 !== "string")
+  if (t1 == null)
     return t1.$add();
   return t1 + ":@" + $.RfcTable_RFC3986_SUB_DELIMS_AS_STRING + "%";
 });
@@ -22410,6 +22126,7 @@ init.metadata = ["object",
 {func: "Object__dynamic", ret: P.Object, args: [null]},
 "input",
 "invocation",
+{func: "int_", ret: P.$int},
 {func: "args0"},
 {func: "args2", args: [null, null]},
 "key",
@@ -22419,10 +22136,9 @@ init.metadata = ["object",
 {func: "dynamic__ChromeEnum", args: [Z.ChromeEnum]},
 "_",
 {func: "dynamic__void_", args: [{func: "void_", void: true}]},
-"ignored",
-{func: "void___dynamic", void: true, opt: [null]},
 {func: "dynamic__dynamic__dynamic", args: [null], opt: [null]},
 {func: "bool_", ret: P.bool},
+"ignored",
 {func: "dynamic__bool", args: [P.bool]},
 {func: "dynamic__dynamic_StackTrace", args: [null, P.StackTrace]},
 "data",
@@ -22476,15 +22192,12 @@ init.metadata = ["object",
 {func: "dynamic__UPnpGetGenericPortMappingResponse", args: [V.UPnpGetGenericPortMappingResponse]},
 "l",
 {func: "dynamic__List", args: [[P.List, V.HetiNetworkInterface]]},
-{func: "dynamic__List0", args: [[P.List, P.$int]]},
-"va",
-{func: "Future_", ret: [P.Future, P.Object]},
-"b",
 "socket",
 {func: "dynamic__HetiSocket", args: [V.HetiSocket]},
 "info",
 {func: "dynamic__HetiReceiveInfo", args: [V.HetiReceiveInfo]},
 "len",
+{func: "dynamic__List0", args: [[P.List, P.$int]]},
 "message",
 {func: "dynamic__HetiHttpMessageWithoutBody", args: [V.HetiHttpMessageWithoutBody]},
 "buffer",
@@ -22492,7 +22205,7 @@ init.metadata = ["object",
 {func: "dynamic__HetiHttpResponseStatusLine", args: [V.HetiHttpResponseStatusLine]},
 "httpfields",
 {func: "dynamic__List1", args: [[P.List, V.HetiHttpResponseHeaderField]]},
-{func: "Future_0", ret: P.Future},
+{func: "Future_", ret: P.Future},
 {func: "dynamic__HetiHttpResponseHeaderField", args: [V.HetiHttpResponseHeaderField]},
 "vv",
 "onValue",
@@ -22512,6 +22225,9 @@ init.metadata = ["object",
 "body",
 {func: "dynamic__HetiHttpRequestMessageWithoutBody", args: [V.HetiHttpRequestMessageWithoutBody]},
 {func: "dynamic__List2", args: [P.List]},
+"va",
+{func: "Future_0", ret: [P.Future, P.Object]},
+"b",
 "serviceXml",
 {func: "dynamic__HetiHttpClientResponse", args: [V.HetiHttpClientResponse]},
 {func: "dynamic__HetiReceiveUdpInfo", args: [V.HetiReceiveUdpInfo]},
@@ -22577,7 +22293,7 @@ X = convertToFastObject(X);
 Y = convertToFastObject(Y);
 Z = convertToFastObject(Z);
 function init() {
-  Isolate.$isolateProperties = {};
+  Isolate.$isolateProperties = Object.create(null);
   function generateAccessor(fieldDescriptor, accessors, cls) {
     var fieldInformation = fieldDescriptor.split("-");
     var field = fieldInformation[0];
@@ -22664,9 +22380,9 @@ function init() {
     };
   }();
   Isolate.$finishClasses = function(collectedClasses, isolateProperties, existingIsolateProperties) {
-    var pendingClasses = {};
+    var pendingClasses = Object.create(null);
     if (!init.allClasses)
-      init.allClasses = {};
+      init.allClasses = Object.create(null);
     var allClasses = init.allClasses;
     var hasOwnProperty = Object.prototype.hasOwnProperty;
     if (typeof dart_precompiled == "function") {
@@ -22676,50 +22392,48 @@ function init() {
       var constructorsList = [];
     }
     for (var cls in collectedClasses) {
-      if (hasOwnProperty.call(collectedClasses, cls)) {
-        var desc = collectedClasses[cls];
-        if (desc instanceof Array)
-          desc = desc[1];
-        var classData = desc["^"], supr, name = cls, fields = classData;
-        if (typeof classData == "string") {
-          var split = classData.split("/");
-          if (split.length == 2) {
-            name = split[0];
-            fields = split[1];
-          }
-        }
-        var s = fields.split(";");
-        fields = s[1] == "" ? [] : s[1].split(",");
-        supr = s[0];
-        split = supr.split(":");
+      var desc = collectedClasses[cls];
+      if (desc instanceof Array)
+        desc = desc[1];
+      var classData = desc["^"], supr, name = cls, fields = classData;
+      if (typeof classData == "string") {
+        var split = classData.split("/");
         if (split.length == 2) {
-          supr = split[0];
-          var functionSignature = split[1];
-          if (functionSignature)
-            desc.$signature = function(s) {
-              return function() {
-                return init.metadata[s];
-              };
-            }(functionSignature);
+          name = split[0];
+          fields = split[1];
         }
-        if (supr && supr.indexOf("+") > 0) {
-          s = supr.split("+");
-          supr = s[0];
-          var mixin = collectedClasses[s[1]];
-          if (mixin instanceof Array)
-            mixin = mixin[1];
-          for (var d in mixin) {
-            if (hasOwnProperty.call(mixin, d) && !hasOwnProperty.call(desc, d))
-              desc[d] = mixin[d];
-          }
-        }
-        if (typeof dart_precompiled != "function") {
-          combinedConstructorFunction += defineClass(name, cls, fields);
-          constructorsList.push(cls);
-        }
-        if (supr)
-          pendingClasses[cls] = supr;
       }
+      var s = fields.split(";");
+      fields = s[1] == "" ? [] : s[1].split(",");
+      supr = s[0];
+      split = supr.split(":");
+      if (split.length == 2) {
+        supr = split[0];
+        var functionSignature = split[1];
+        if (functionSignature)
+          desc.$signature = function(s) {
+            return function() {
+              return init.metadata[s];
+            };
+          }(functionSignature);
+      }
+      if (supr && supr.indexOf("+") > 0) {
+        s = supr.split("+");
+        supr = s[0];
+        var mixin = collectedClasses[s[1]];
+        if (mixin instanceof Array)
+          mixin = mixin[1];
+        for (var d in mixin) {
+          if (hasOwnProperty.call(mixin, d) && !hasOwnProperty.call(desc, d))
+            desc[d] = mixin[d];
+        }
+      }
+      if (typeof dart_precompiled != "function") {
+        combinedConstructorFunction += defineClass(name, cls, fields);
+        constructorsList.push(cls);
+      }
+      if (supr)
+        pendingClasses[cls] = supr;
     }
     if (typeof dart_precompiled != "function") {
       combinedConstructorFunction += "return [\n  " + constructorsList.join(",\n  ") + "\n]";
@@ -22739,12 +22453,11 @@ function init() {
       globalObject[cls] = constructor;
     }
     constructors = null;
-    var finishedClasses = {};
+    var finishedClasses = Object.create(null);
     init.interceptorsByTag = Object.create(null);
-    init.leafTags = {};
+    init.leafTags = Object.create(null);
     function finishClass(cls) {
-      var hasOwnProperty = Object.prototype.hasOwnProperty;
-      if (hasOwnProperty.call(finishedClasses, cls))
+      if (finishedClasses[cls])
         return;
       finishedClasses[cls] = true;
       var superclass = pendingClasses[cls];
@@ -22756,7 +22469,7 @@ function init() {
       if (!superConstructor)
         superConstructor = existingIsolateProperties[superclass];
       var prototype = inheritFrom(constructor, superConstructor);
-      if (hasOwnProperty.call(prototype, "%")) {
+      if (Object.prototype.hasOwnProperty.call(prototype, "%")) {
         var nativeSpec = prototype["%"].split(";");
         if (nativeSpec[0]) {
           var tags = nativeSpec[0].split("|");
@@ -22785,6 +22498,9 @@ function init() {
       finishClass(cls);
   };
   Isolate.$lazy = function(prototype, staticName, fieldName, getterName, lazyValue) {
+    if (!init.lazies)
+      init.lazies = Object.create(null);
+    init.lazies[fieldName] = getterName;
     var sentinelUndefined = {};
     var sentinelInProgress = {};
     prototype[fieldName] = sentinelUndefined;
@@ -22797,8 +22513,7 @@ function init() {
             result = $[fieldName] = lazyValue();
           } finally {
             if (result === sentinelUndefined)
-              if ($[fieldName] === sentinelInProgress)
-                $[fieldName] = null;
+              $[fieldName] = null;
           }
         } else {
           if (result === sentinelInProgress)
@@ -22819,10 +22534,18 @@ function init() {
       for (var staticName in isolateProperties)
         if (hasOwnProperty.call(isolateProperties, staticName))
           this[staticName] = isolateProperties[staticName];
+      var lazies = init.lazies;
+      for (var lazyInit in lazies) {
+        this[lazies[lazyInit]] = null;
+      }
       function ForceEfficientMap() {
       }
       ForceEfficientMap.prototype = this;
       new ForceEfficientMap();
+      for (var lazyInit in lazies) {
+        var lazyInitName = lazies[lazyInit];
+        this[lazyInitName] = isolateProperties[lazyInitName];
+      }
     }
     Isolate.prototype = oldIsolate.prototype;
     Isolate.prototype.constructor = Isolate;
@@ -22889,21 +22612,6 @@ init.dispatchPropertyName = init.getIsolateTag("dispatch_record");
 ;
 // END invoke [main].
 })()
-
-//# sourceMappingURL=delphinium.dart.js.map
-{
-  var message =
-      'Deprecation: Automatic generation of output for Content Security\n' +
-      'Policy is deprecated and will be removed with the next development\n' +
-      'release. Use the --csp option to generate CSP restricted output.';
-  if (typeof dartPrint == "function") {
-    dartPrint(message);
-  } else if (typeof console == "object" && typeof console.log == "function") {
-    console.log(message);
-  } else if (typeof print == "function") {
-    print(message);
-  }
-}
 function dart_precompiled($collectedClasses) {
   var $desc;
   function HtmlElement() {
@@ -22957,6 +22665,27 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   AnimationEvent.prototype = $desc;
+  function AnimationPlayerEvent() {
+  }
+  AnimationPlayerEvent.builtin$cls = "AnimationPlayerEvent";
+  if (!"name" in AnimationPlayerEvent)
+    AnimationPlayerEvent.name = "AnimationPlayerEvent";
+  $desc = $collectedClasses.AnimationPlayerEvent;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  AnimationPlayerEvent.prototype = $desc;
+  function ApplicationCacheErrorEvent() {
+  }
+  ApplicationCacheErrorEvent.builtin$cls = "ApplicationCacheErrorEvent";
+  if (!"name" in ApplicationCacheErrorEvent)
+    ApplicationCacheErrorEvent.name = "ApplicationCacheErrorEvent";
+  $desc = $collectedClasses.ApplicationCacheErrorEvent;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  ApplicationCacheErrorEvent.prototype = $desc;
+  ApplicationCacheErrorEvent.prototype.get$message = function(receiver) {
+    return receiver.message;
+  };
   function AreaElement() {
   }
   AreaElement.builtin$cls = "AreaElement";
@@ -23023,15 +22752,6 @@ function dart_precompiled($collectedClasses) {
   BaseElement.prototype.set$href = function(receiver, v) {
     return receiver.href = v;
   };
-  function BeforeLoadEvent() {
-  }
-  BeforeLoadEvent.builtin$cls = "BeforeLoadEvent";
-  if (!"name" in BeforeLoadEvent)
-    BeforeLoadEvent.name = "BeforeLoadEvent";
-  $desc = $collectedClasses.BeforeLoadEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  BeforeLoadEvent.prototype = $desc;
   function BeforeUnloadEvent() {
   }
   BeforeUnloadEvent.builtin$cls = "BeforeUnloadEvent";
@@ -23215,6 +22935,18 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   DetailsElement.prototype = $desc;
+  function DeviceLightEvent() {
+  }
+  DeviceLightEvent.builtin$cls = "DeviceLightEvent";
+  if (!"name" in DeviceLightEvent)
+    DeviceLightEvent.name = "DeviceLightEvent";
+  $desc = $collectedClasses.DeviceLightEvent;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  DeviceLightEvent.prototype = $desc;
+  DeviceLightEvent.prototype.get$value = function(receiver) {
+    return receiver.value;
+  };
   function DeviceMotionEvent() {
   }
   DeviceMotionEvent.builtin$cls = "DeviceMotionEvent";
@@ -23314,6 +23046,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Element.prototype = $desc;
+  Element.prototype.get$tabIndex = function(receiver) {
+    return receiver.tabIndex;
+  };
   Element.prototype.get$title = function(receiver) {
     return receiver.title;
   };
@@ -23374,6 +23109,15 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   EventTarget.prototype = $desc;
+  function FetchEvent() {
+  }
+  FetchEvent.builtin$cls = "FetchEvent";
+  if (!"name" in FetchEvent)
+    FetchEvent.name = "FetchEvent";
+  $desc = $collectedClasses.FetchEvent;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  FetchEvent.prototype = $desc;
   function FieldSetElement() {
   }
   FieldSetElement.builtin$cls = "FieldSetElement";
@@ -23455,6 +23199,15 @@ function dart_precompiled($collectedClasses) {
   FormElement.prototype.get$name = function(receiver) {
     return receiver.name;
   };
+  function GamepadEvent() {
+  }
+  GamepadEvent.builtin$cls = "GamepadEvent";
+  if (!"name" in GamepadEvent)
+    GamepadEvent.name = "GamepadEvent";
+  $desc = $collectedClasses.GamepadEvent;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  GamepadEvent.prototype = $desc;
   function HRElement() {
   }
   HRElement.builtin$cls = "HRElement";
@@ -23926,6 +23679,15 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Navigator.prototype = $desc;
+  function NavigatorCpu() {
+  }
+  NavigatorCpu.builtin$cls = "NavigatorCpu";
+  if (!"name" in NavigatorCpu)
+    NavigatorCpu.name = "NavigatorCpu";
+  $desc = $collectedClasses.NavigatorCpu;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  NavigatorCpu.prototype = $desc;
   function NavigatorUserMediaError() {
   }
   NavigatorUserMediaError.builtin$cls = "NavigatorUserMediaError";
@@ -24097,6 +23859,15 @@ function dart_precompiled($collectedClasses) {
   ParamElement.prototype.get$value = function(receiver) {
     return receiver.value;
   };
+  function PictureElement() {
+  }
+  PictureElement.builtin$cls = "PictureElement";
+  if (!"name" in PictureElement)
+    PictureElement.name = "PictureElement";
+  $desc = $collectedClasses.PictureElement;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  PictureElement.prototype = $desc;
   function PopStateEvent() {
   }
   PopStateEvent.builtin$cls = "PopStateEvent";
@@ -24157,6 +23928,27 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   ProgressEvent.prototype = $desc;
+  function PushEvent() {
+  }
+  PushEvent.builtin$cls = "PushEvent";
+  if (!"name" in PushEvent)
+    PushEvent.name = "PushEvent";
+  $desc = $collectedClasses.PushEvent;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  PushEvent.prototype = $desc;
+  PushEvent.prototype.get$data = function(receiver) {
+    return receiver.data;
+  };
+  function PushManager() {
+  }
+  PushManager.builtin$cls = "PushManager";
+  if (!"name" in PushManager)
+    PushManager.name = "PushManager";
+  $desc = $collectedClasses.PushManager;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  PushManager.prototype = $desc;
   function QuoteElement() {
   }
   QuoteElement.builtin$cls = "QuoteElement";
@@ -24175,6 +23967,15 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Range.prototype = $desc;
+  function Request() {
+  }
+  Request.builtin$cls = "Request";
+  if (!"name" in Request)
+    Request.name = "Request";
+  $desc = $collectedClasses.Request;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  Request.prototype = $desc;
   function ResourceProgressEvent() {
   }
   ResourceProgressEvent.builtin$cls = "ResourceProgressEvent";
@@ -24310,15 +24111,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   SpanElement.prototype = $desc;
-  function SpeechInputEvent() {
-  }
-  SpeechInputEvent.builtin$cls = "SpeechInputEvent";
-  if (!"name" in SpeechInputEvent)
-    SpeechInputEvent.name = "SpeechInputEvent";
-  $desc = $collectedClasses.SpeechInputEvent;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  SpeechInputEvent.prototype = $desc;
   function SpeechRecognitionError() {
   }
   SpeechRecognitionError.builtin$cls = "SpeechRecognitionError";
@@ -25838,6 +25630,16 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   JSArray.prototype = $desc;
+  function JSArray_forEach_getLength(this_0) {
+    this.this_0 = this_0;
+  }
+  JSArray_forEach_getLength.builtin$cls = "JSArray_forEach_getLength";
+  if (!"name" in JSArray_forEach_getLength)
+    JSArray_forEach_getLength.name = "JSArray_forEach_getLength";
+  $desc = $collectedClasses.JSArray_forEach_getLength;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  JSArray_forEach_getLength.prototype = $desc;
   function JSNumber() {
   }
   JSNumber.builtin$cls = "JSNumber";
@@ -26579,17 +26381,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   DynamicRuntimeType.prototype = $desc;
-  function TypeImpl(_typeName, _unmangledName) {
-    this._typeName = _typeName;
-    this._unmangledName = _unmangledName;
-  }
-  TypeImpl.builtin$cls = "TypeImpl";
-  if (!"name" in TypeImpl)
-    TypeImpl.name = "TypeImpl";
-  $desc = $collectedClasses.TypeImpl;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  TypeImpl.prototype = $desc;
   function initHooks_closure(getTag_0) {
     this.getTag_0 = getTag_0;
   }
@@ -27199,11 +26990,11 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   SubListIterable.prototype = $desc;
-  function ListIterator(_iterable, _length, _index, _current) {
+  function ListIterator(_iterable, __internal$_length, _index, __internal$_current) {
     this._iterable = _iterable;
-    this._length = _length;
+    this.__internal$_length = __internal$_length;
     this._index = _index;
-    this._current = _current;
+    this.__internal$_current = __internal$_current;
   }
   ListIterator.builtin$cls = "ListIterator";
   if (!"name" in ListIterator)
@@ -27234,8 +27025,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   EfficientLengthMappedIterable.prototype = $desc;
-  function MappedIterator(_current, _iterator, _f) {
-    this._current = _current;
+  function MappedIterator(__internal$_current, _iterator, _f) {
+    this.__internal$_current = __internal$_current;
     this._iterator = _iterator;
     this._f = _f;
   }
@@ -27352,23 +27143,16 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _AsyncRun__scheduleImmediateJsOverride_internalCallback.prototype = $desc;
-  function _AsyncError(error, stackTrace) {
-    this.error = error;
-    this.stackTrace = stackTrace;
+  function _AsyncRun__scheduleImmediateWithSetImmediate_internalCallback(callback_0) {
+    this.callback_0 = callback_0;
   }
-  _AsyncError.builtin$cls = "_AsyncError";
-  if (!"name" in _AsyncError)
-    _AsyncError.name = "_AsyncError";
-  $desc = $collectedClasses._AsyncError;
+  _AsyncRun__scheduleImmediateWithSetImmediate_internalCallback.builtin$cls = "_AsyncRun__scheduleImmediateWithSetImmediate_internalCallback";
+  if (!"name" in _AsyncRun__scheduleImmediateWithSetImmediate_internalCallback)
+    _AsyncRun__scheduleImmediateWithSetImmediate_internalCallback.name = "_AsyncRun__scheduleImmediateWithSetImmediate_internalCallback";
+  $desc = $collectedClasses._AsyncRun__scheduleImmediateWithSetImmediate_internalCallback;
   if ($desc instanceof Array)
     $desc = $desc[1];
-  _AsyncError.prototype = $desc;
-  _AsyncError.prototype.get$error = function(receiver) {
-    return this.error;
-  };
-  _AsyncError.prototype.get$stackTrace = function() {
-    return this.stackTrace;
-  };
+  _AsyncRun__scheduleImmediateWithSetImmediate_internalCallback.prototype = $desc;
   function _UncaughtAsyncError(error, stackTrace) {
     this.error = error;
     this.stackTrace = stackTrace;
@@ -27478,18 +27262,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _SyncBroadcastStreamController__sendData_closure.prototype = $desc;
-  function _SyncBroadcastStreamController__sendError_closure(this_0, error_1, stackTrace_2) {
-    this.this_0 = this_0;
-    this.error_1 = error_1;
-    this.stackTrace_2 = stackTrace_2;
-  }
-  _SyncBroadcastStreamController__sendError_closure.builtin$cls = "_SyncBroadcastStreamController__sendError_closure";
-  if (!"name" in _SyncBroadcastStreamController__sendError_closure)
-    _SyncBroadcastStreamController__sendError_closure.name = "_SyncBroadcastStreamController__sendError_closure";
-  $desc = $collectedClasses._SyncBroadcastStreamController__sendError_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SyncBroadcastStreamController__sendError_closure.prototype = $desc;
   function _SyncBroadcastStreamController__sendDone_closure(this_0) {
     this.this_0 = this_0;
   }
@@ -27525,8 +27297,9 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Future.prototype = $desc;
-  function Future_Future$delayed_closure(computation_0) {
+  function Future_Future$delayed_closure(computation_0, result_1) {
     this.computation_0 = computation_0;
+    this.result_1 = result_1;
   }
   Future_Future$delayed_closure.builtin$cls = "Future_Future$delayed_closure";
   if (!"name" in Future_Future$delayed_closure)
@@ -27558,16 +27331,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _AsyncCompleter.prototype = $desc;
-  function _SyncCompleter(future) {
-    this.future = future;
-  }
-  _SyncCompleter.builtin$cls = "_SyncCompleter";
-  if (!"name" in _SyncCompleter)
-    _SyncCompleter.name = "_SyncCompleter";
-  $desc = $collectedClasses._SyncCompleter;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  _SyncCompleter.prototype = $desc;
   function _Future(_state, _zone, _resultOrListeners, _nextListener, _onValueCallback, _errorTestCallback, _onErrorCallback, _whenCompleteActionCallback) {
     this._state = _state;
     this._zone = _zone;
@@ -28371,6 +28134,23 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _MapStream.prototype = $desc;
+  function AsyncError(error, stackTrace) {
+    this.error = error;
+    this.stackTrace = stackTrace;
+  }
+  AsyncError.builtin$cls = "AsyncError";
+  if (!"name" in AsyncError)
+    AsyncError.name = "AsyncError";
+  $desc = $collectedClasses.AsyncError;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  AsyncError.prototype = $desc;
+  AsyncError.prototype.get$error = function(receiver) {
+    return this.error;
+  };
+  AsyncError.prototype.get$stackTrace = function() {
+    return this.stackTrace;
+  };
   function _Zone() {
   }
   _Zone.builtin$cls = "_Zone";
@@ -29623,11 +29403,11 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   _WrappedIterator.prototype = $desc;
-  function FixedSizeListIterator(_array, _html$_length, _position, _html$_current) {
-    this._array = _array;
-    this._html$_length = _html$_length;
+  function FixedSizeListIterator(_html$_array, _length, _position, _current) {
+    this._html$_array = _html$_array;
+    this._length = _length;
     this._position = _position;
-    this._html$_current = _html$_current;
+    this._current = _current;
   }
   FixedSizeListIterator.builtin$cls = "FixedSizeListIterator";
   if (!"name" in FixedSizeListIterator)
@@ -31011,8 +30791,8 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Widget.prototype = $desc;
-  function WidgetCollection(_dart_web_toolkit_ui$_array, _parent, _size) {
-    this._dart_web_toolkit_ui$_array = _dart_web_toolkit_ui$_array;
+  function WidgetCollection(_array, _parent, _size) {
+    this._array = _array;
     this._parent = _parent;
     this._size = _size;
   }
@@ -31046,16 +30826,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   Enum.prototype = $desc;
-  function WhiteSpace(_dart_web_toolkit_util$_value) {
-    this._dart_web_toolkit_util$_value = _dart_web_toolkit_util$_value;
-  }
-  WhiteSpace.builtin$cls = "WhiteSpace";
-  if (!"name" in WhiteSpace)
-    WhiteSpace.name = "WhiteSpace";
-  $desc = $collectedClasses.WhiteSpace;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  WhiteSpace.prototype = $desc;
   function TextAlign(_dart_web_toolkit_util$_value) {
     this._dart_web_toolkit_util$_value = _dart_web_toolkit_util$_value;
   }
@@ -31806,284 +31576,6 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   PortMap_startGetLocalIp_closure0.prototype = $desc;
-  function ArrayBuilder(_max, _buffer8, _hetima$_length, completer, mGetByteFutreList, completerFin, _immutable) {
-    this._max = _max;
-    this._buffer8 = _buffer8;
-    this._hetima$_length = _hetima$_length;
-    this.completer = completer;
-    this.mGetByteFutreList = mGetByteFutreList;
-    this.completerFin = completerFin;
-    this._immutable = _immutable;
-  }
-  ArrayBuilder.builtin$cls = "ArrayBuilder";
-  if (!"name" in ArrayBuilder)
-    ArrayBuilder.name = "ArrayBuilder";
-  $desc = $collectedClasses.ArrayBuilder;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ArrayBuilder.prototype = $desc;
-  function GetByteFutureInfo(completerResult, completerResultLength) {
-    this.completerResult = completerResult;
-    this.completerResultLength = completerResultLength;
-  }
-  GetByteFutureInfo.builtin$cls = "GetByteFutureInfo";
-  if (!"name" in GetByteFutureInfo)
-    GetByteFutureInfo.name = "GetByteFutureInfo";
-  $desc = $collectedClasses.GetByteFutureInfo;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  GetByteFutureInfo.prototype = $desc;
-  GetByteFutureInfo.prototype.get$completerResult = function() {
-    return this.completerResult;
-  };
-  GetByteFutureInfo.prototype.set$completerResult = function(v) {
-    return this.completerResult = v;
-  };
-  GetByteFutureInfo.prototype.get$completerResultLength = function() {
-    return this.completerResultLength;
-  };
-  GetByteFutureInfo.prototype.set$completerResultLength = function(v) {
-    return this.completerResultLength = v;
-  };
-  function EasyParser(index, stack, buffer) {
-    this.index = index;
-    this.stack = stack;
-    this.buffer = buffer;
-  }
-  EasyParser.builtin$cls = "EasyParser";
-  if (!"name" in EasyParser)
-    EasyParser.name = "EasyParser";
-  $desc = $collectedClasses.EasyParser;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EasyParser.prototype = $desc;
-  EasyParser.prototype.get$index = function(receiver) {
-    return this.index;
-  };
-  EasyParser.prototype.set$index = function(receiver, v) {
-    return this.index = v;
-  };
-  EasyParser.prototype.get$buffer = function(receiver) {
-    return this.buffer;
-  };
-  function EasyParser_nextString_closure(this_0, value_1, completer_2, encoded_3) {
-    this.this_0 = this_0;
-    this.value_1 = value_1;
-    this.completer_2 = completer_2;
-    this.encoded_3 = encoded_3;
-  }
-  EasyParser_nextString_closure.builtin$cls = "EasyParser_nextString_closure";
-  if (!"name" in EasyParser_nextString_closure)
-    EasyParser_nextString_closure.name = "EasyParser_nextString_closure";
-  $desc = $collectedClasses.EasyParser_nextString_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EasyParser_nextString_closure.prototype = $desc;
-  function EasyParser_nextBytePattern_closure(this_0, matcher_1, completer_2) {
-    this.this_0 = this_0;
-    this.matcher_1 = matcher_1;
-    this.completer_2 = completer_2;
-  }
-  EasyParser_nextBytePattern_closure.builtin$cls = "EasyParser_nextBytePattern_closure";
-  if (!"name" in EasyParser_nextBytePattern_closure)
-    EasyParser_nextBytePattern_closure.name = "EasyParser_nextBytePattern_closure";
-  $desc = $collectedClasses.EasyParser_nextBytePattern_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EasyParser_nextBytePattern_closure.prototype = $desc;
-  function EasyParser_nextBytePatternWithLength_closure(this_0, matcher_1, length_2, completer_3) {
-    this.this_0 = this_0;
-    this.matcher_1 = matcher_1;
-    this.length_2 = length_2;
-    this.completer_3 = completer_3;
-  }
-  EasyParser_nextBytePatternWithLength_closure.builtin$cls = "EasyParser_nextBytePatternWithLength_closure";
-  if (!"name" in EasyParser_nextBytePatternWithLength_closure)
-    EasyParser_nextBytePatternWithLength_closure.name = "EasyParser_nextBytePatternWithLength_closure";
-  $desc = $collectedClasses.EasyParser_nextBytePatternWithLength_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EasyParser_nextBytePatternWithLength_closure.prototype = $desc;
-  function EasyParser_nextBytePatternByUnmatch_p(this_0, matcher_1, completer_2, ret_3) {
-    this.this_0 = this_0;
-    this.matcher_1 = matcher_1;
-    this.completer_2 = completer_2;
-    this.ret_3 = ret_3;
-  }
-  EasyParser_nextBytePatternByUnmatch_p.builtin$cls = "EasyParser_nextBytePatternByUnmatch_p";
-  if (!"name" in EasyParser_nextBytePatternByUnmatch_p)
-    EasyParser_nextBytePatternByUnmatch_p.name = "EasyParser_nextBytePatternByUnmatch_p";
-  $desc = $collectedClasses.EasyParser_nextBytePatternByUnmatch_p;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EasyParser_nextBytePatternByUnmatch_p.prototype = $desc;
-  function EasyParser_nextBytePatternByUnmatch_p_closure(this_4, matcher_5, completer_6, ret_7, p_8) {
-    this.this_4 = this_4;
-    this.matcher_5 = matcher_5;
-    this.completer_6 = completer_6;
-    this.ret_7 = ret_7;
-    this.p_8 = p_8;
-  }
-  EasyParser_nextBytePatternByUnmatch_p_closure.builtin$cls = "EasyParser_nextBytePatternByUnmatch_p_closure";
-  if (!"name" in EasyParser_nextBytePatternByUnmatch_p_closure)
-    EasyParser_nextBytePatternByUnmatch_p_closure.name = "EasyParser_nextBytePatternByUnmatch_p_closure";
-  $desc = $collectedClasses.EasyParser_nextBytePatternByUnmatch_p_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EasyParser_nextBytePatternByUnmatch_p_closure.prototype = $desc;
-  function EasyParserMatcher() {
-  }
-  EasyParserMatcher.builtin$cls = "EasyParserMatcher";
-  if (!"name" in EasyParserMatcher)
-    EasyParserMatcher.name = "EasyParserMatcher";
-  $desc = $collectedClasses.EasyParserMatcher;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EasyParserMatcher.prototype = $desc;
-  function EasyParserIncludeMatcher(include) {
-    this.include = include;
-  }
-  EasyParserIncludeMatcher.builtin$cls = "EasyParserIncludeMatcher";
-  if (!"name" in EasyParserIncludeMatcher)
-    EasyParserIncludeMatcher.name = "EasyParserIncludeMatcher";
-  $desc = $collectedClasses.EasyParserIncludeMatcher;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EasyParserIncludeMatcher.prototype = $desc;
-  function EasyParseError() {
-  }
-  EasyParseError.builtin$cls = "EasyParseError";
-  if (!"name" in EasyParseError)
-    EasyParseError.name = "EasyParseError";
-  $desc = $collectedClasses.EasyParseError;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  EasyParseError.prototype = $desc;
-  function HetimaBuilder() {
-  }
-  HetimaBuilder.builtin$cls = "HetimaBuilder";
-  if (!"name" in HetimaBuilder)
-    HetimaBuilder.name = "HetimaBuilder";
-  $desc = $collectedClasses.HetimaBuilder;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HetimaBuilder.prototype = $desc;
-  function HetimaBuilderAdapter(_base, _startIndex, completerFin, _immutable) {
-    this._base = _base;
-    this._startIndex = _startIndex;
-    this.completerFin = completerFin;
-    this._immutable = _immutable;
-  }
-  HetimaBuilderAdapter.builtin$cls = "HetimaBuilderAdapter";
-  if (!"name" in HetimaBuilderAdapter)
-    HetimaBuilderAdapter.name = "HetimaBuilderAdapter";
-  $desc = $collectedClasses.HetimaBuilderAdapter;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HetimaBuilderAdapter.prototype = $desc;
-  function HetimaBuilderAdapter_getLength_closure(this_0, completer_1) {
-    this.this_0 = this_0;
-    this.completer_1 = completer_1;
-  }
-  HetimaBuilderAdapter_getLength_closure.builtin$cls = "HetimaBuilderAdapter_getLength_closure";
-  if (!"name" in HetimaBuilderAdapter_getLength_closure)
-    HetimaBuilderAdapter_getLength_closure.name = "HetimaBuilderAdapter_getLength_closure";
-  $desc = $collectedClasses.HetimaBuilderAdapter_getLength_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HetimaBuilderAdapter_getLength_closure.prototype = $desc;
-  function HetimaBuilderAdapter_getLength_closure0(completer_2) {
-    this.completer_2 = completer_2;
-  }
-  HetimaBuilderAdapter_getLength_closure0.builtin$cls = "HetimaBuilderAdapter_getLength_closure0";
-  if (!"name" in HetimaBuilderAdapter_getLength_closure0)
-    HetimaBuilderAdapter_getLength_closure0.name = "HetimaBuilderAdapter_getLength_closure0";
-  $desc = $collectedClasses.HetimaBuilderAdapter_getLength_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HetimaBuilderAdapter_getLength_closure0.prototype = $desc;
-  function HetimaBuilderAdapter_getByteFuture_closure(completer_0) {
-    this.completer_0 = completer_0;
-  }
-  HetimaBuilderAdapter_getByteFuture_closure.builtin$cls = "HetimaBuilderAdapter_getByteFuture_closure";
-  if (!"name" in HetimaBuilderAdapter_getByteFuture_closure)
-    HetimaBuilderAdapter_getByteFuture_closure.name = "HetimaBuilderAdapter_getByteFuture_closure";
-  $desc = $collectedClasses.HetimaBuilderAdapter_getByteFuture_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HetimaBuilderAdapter_getByteFuture_closure.prototype = $desc;
-  function HetimaBuilderAdapter_getByteFuture_closure0(completer_1) {
-    this.completer_1 = completer_1;
-  }
-  HetimaBuilderAdapter_getByteFuture_closure0.builtin$cls = "HetimaBuilderAdapter_getByteFuture_closure0";
-  if (!"name" in HetimaBuilderAdapter_getByteFuture_closure0)
-    HetimaBuilderAdapter_getByteFuture_closure0.name = "HetimaBuilderAdapter_getByteFuture_closure0";
-  $desc = $collectedClasses.HetimaBuilderAdapter_getByteFuture_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HetimaBuilderAdapter_getByteFuture_closure0.prototype = $desc;
-  function HetimaFile() {
-  }
-  HetimaFile.builtin$cls = "HetimaFile";
-  if (!"name" in HetimaFile)
-    HetimaFile.name = "HetimaFile";
-  $desc = $collectedClasses.HetimaFile;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HetimaFile.prototype = $desc;
-  function HetimaReadBuffer() {
-  }
-  HetimaReadBuffer.builtin$cls = "HetimaReadBuffer";
-  if (!"name" in HetimaReadBuffer)
-    HetimaReadBuffer.name = "HetimaReadBuffer";
-  $desc = $collectedClasses.HetimaReadBuffer;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HetimaReadBuffer.prototype = $desc;
-  function ReadResult(status, buffer) {
-    this.status = status;
-    this.buffer = buffer;
-  }
-  ReadResult.builtin$cls = "ReadResult";
-  if (!"name" in ReadResult)
-    ReadResult.name = "ReadResult";
-  $desc = $collectedClasses.ReadResult;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  ReadResult.prototype = $desc;
-  ReadResult.prototype.get$buffer = function(receiver) {
-    return this.buffer;
-  };
-  function HetimaBuilderToFile(mBuilder) {
-    this.mBuilder = mBuilder;
-  }
-  HetimaBuilderToFile.builtin$cls = "HetimaBuilderToFile";
-  if (!"name" in HetimaBuilderToFile)
-    HetimaBuilderToFile.name = "HetimaBuilderToFile";
-  $desc = $collectedClasses.HetimaBuilderToFile;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HetimaBuilderToFile.prototype = $desc;
-  function HetimaBuilderToFile_read_closure(cc_0) {
-    this.cc_0 = cc_0;
-  }
-  HetimaBuilderToFile_read_closure.builtin$cls = "HetimaBuilderToFile_read_closure";
-  if (!"name" in HetimaBuilderToFile_read_closure)
-    HetimaBuilderToFile_read_closure.name = "HetimaBuilderToFile_read_closure";
-  $desc = $collectedClasses.HetimaBuilderToFile_read_closure;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HetimaBuilderToFile_read_closure.prototype = $desc;
-  function HetimaBuilderToFile_read_closure0(cc_1) {
-    this.cc_1 = cc_1;
-  }
-  HetimaBuilderToFile_read_closure0.builtin$cls = "HetimaBuilderToFile_read_closure0";
-  if (!"name" in HetimaBuilderToFile_read_closure0)
-    HetimaBuilderToFile_read_closure0.name = "HetimaBuilderToFile_read_closure0";
-  $desc = $collectedClasses.HetimaBuilderToFile_read_closure0;
-  if ($desc instanceof Array)
-    $desc = $desc[1];
-  HetimaBuilderToFile_read_closure0.prototype = $desc;
   function HetiHttpClientResponse(message, body) {
     this.message = message;
     this.body = body;
@@ -33173,6 +32665,284 @@ function dart_precompiled($collectedClasses) {
   HetiHttpServerRequest.prototype.get$info = function() {
     return this.info;
   };
+  function ArrayBuilder(_max, _buffer8, _hetima$_length, completer, mGetByteFutreList, completerFin, _immutable) {
+    this._max = _max;
+    this._buffer8 = _buffer8;
+    this._hetima$_length = _hetima$_length;
+    this.completer = completer;
+    this.mGetByteFutreList = mGetByteFutreList;
+    this.completerFin = completerFin;
+    this._immutable = _immutable;
+  }
+  ArrayBuilder.builtin$cls = "ArrayBuilder";
+  if (!"name" in ArrayBuilder)
+    ArrayBuilder.name = "ArrayBuilder";
+  $desc = $collectedClasses.ArrayBuilder;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  ArrayBuilder.prototype = $desc;
+  function GetByteFutureInfo(completerResult, completerResultLength) {
+    this.completerResult = completerResult;
+    this.completerResultLength = completerResultLength;
+  }
+  GetByteFutureInfo.builtin$cls = "GetByteFutureInfo";
+  if (!"name" in GetByteFutureInfo)
+    GetByteFutureInfo.name = "GetByteFutureInfo";
+  $desc = $collectedClasses.GetByteFutureInfo;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  GetByteFutureInfo.prototype = $desc;
+  GetByteFutureInfo.prototype.get$completerResult = function() {
+    return this.completerResult;
+  };
+  GetByteFutureInfo.prototype.set$completerResult = function(v) {
+    return this.completerResult = v;
+  };
+  GetByteFutureInfo.prototype.get$completerResultLength = function() {
+    return this.completerResultLength;
+  };
+  GetByteFutureInfo.prototype.set$completerResultLength = function(v) {
+    return this.completerResultLength = v;
+  };
+  function EasyParser(index, stack, buffer) {
+    this.index = index;
+    this.stack = stack;
+    this.buffer = buffer;
+  }
+  EasyParser.builtin$cls = "EasyParser";
+  if (!"name" in EasyParser)
+    EasyParser.name = "EasyParser";
+  $desc = $collectedClasses.EasyParser;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  EasyParser.prototype = $desc;
+  EasyParser.prototype.get$index = function(receiver) {
+    return this.index;
+  };
+  EasyParser.prototype.set$index = function(receiver, v) {
+    return this.index = v;
+  };
+  EasyParser.prototype.get$buffer = function(receiver) {
+    return this.buffer;
+  };
+  function EasyParser_nextString_closure(this_0, value_1, completer_2, encoded_3) {
+    this.this_0 = this_0;
+    this.value_1 = value_1;
+    this.completer_2 = completer_2;
+    this.encoded_3 = encoded_3;
+  }
+  EasyParser_nextString_closure.builtin$cls = "EasyParser_nextString_closure";
+  if (!"name" in EasyParser_nextString_closure)
+    EasyParser_nextString_closure.name = "EasyParser_nextString_closure";
+  $desc = $collectedClasses.EasyParser_nextString_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  EasyParser_nextString_closure.prototype = $desc;
+  function EasyParser_nextBytePattern_closure(this_0, matcher_1, completer_2) {
+    this.this_0 = this_0;
+    this.matcher_1 = matcher_1;
+    this.completer_2 = completer_2;
+  }
+  EasyParser_nextBytePattern_closure.builtin$cls = "EasyParser_nextBytePattern_closure";
+  if (!"name" in EasyParser_nextBytePattern_closure)
+    EasyParser_nextBytePattern_closure.name = "EasyParser_nextBytePattern_closure";
+  $desc = $collectedClasses.EasyParser_nextBytePattern_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  EasyParser_nextBytePattern_closure.prototype = $desc;
+  function EasyParser_nextBytePatternWithLength_closure(this_0, matcher_1, length_2, completer_3) {
+    this.this_0 = this_0;
+    this.matcher_1 = matcher_1;
+    this.length_2 = length_2;
+    this.completer_3 = completer_3;
+  }
+  EasyParser_nextBytePatternWithLength_closure.builtin$cls = "EasyParser_nextBytePatternWithLength_closure";
+  if (!"name" in EasyParser_nextBytePatternWithLength_closure)
+    EasyParser_nextBytePatternWithLength_closure.name = "EasyParser_nextBytePatternWithLength_closure";
+  $desc = $collectedClasses.EasyParser_nextBytePatternWithLength_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  EasyParser_nextBytePatternWithLength_closure.prototype = $desc;
+  function EasyParser_nextBytePatternByUnmatch_p(this_0, matcher_1, completer_2, ret_3) {
+    this.this_0 = this_0;
+    this.matcher_1 = matcher_1;
+    this.completer_2 = completer_2;
+    this.ret_3 = ret_3;
+  }
+  EasyParser_nextBytePatternByUnmatch_p.builtin$cls = "EasyParser_nextBytePatternByUnmatch_p";
+  if (!"name" in EasyParser_nextBytePatternByUnmatch_p)
+    EasyParser_nextBytePatternByUnmatch_p.name = "EasyParser_nextBytePatternByUnmatch_p";
+  $desc = $collectedClasses.EasyParser_nextBytePatternByUnmatch_p;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  EasyParser_nextBytePatternByUnmatch_p.prototype = $desc;
+  function EasyParser_nextBytePatternByUnmatch_p_closure(this_4, matcher_5, completer_6, ret_7, p_8) {
+    this.this_4 = this_4;
+    this.matcher_5 = matcher_5;
+    this.completer_6 = completer_6;
+    this.ret_7 = ret_7;
+    this.p_8 = p_8;
+  }
+  EasyParser_nextBytePatternByUnmatch_p_closure.builtin$cls = "EasyParser_nextBytePatternByUnmatch_p_closure";
+  if (!"name" in EasyParser_nextBytePatternByUnmatch_p_closure)
+    EasyParser_nextBytePatternByUnmatch_p_closure.name = "EasyParser_nextBytePatternByUnmatch_p_closure";
+  $desc = $collectedClasses.EasyParser_nextBytePatternByUnmatch_p_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  EasyParser_nextBytePatternByUnmatch_p_closure.prototype = $desc;
+  function EasyParserMatcher() {
+  }
+  EasyParserMatcher.builtin$cls = "EasyParserMatcher";
+  if (!"name" in EasyParserMatcher)
+    EasyParserMatcher.name = "EasyParserMatcher";
+  $desc = $collectedClasses.EasyParserMatcher;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  EasyParserMatcher.prototype = $desc;
+  function EasyParserIncludeMatcher(include) {
+    this.include = include;
+  }
+  EasyParserIncludeMatcher.builtin$cls = "EasyParserIncludeMatcher";
+  if (!"name" in EasyParserIncludeMatcher)
+    EasyParserIncludeMatcher.name = "EasyParserIncludeMatcher";
+  $desc = $collectedClasses.EasyParserIncludeMatcher;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  EasyParserIncludeMatcher.prototype = $desc;
+  function EasyParseError() {
+  }
+  EasyParseError.builtin$cls = "EasyParseError";
+  if (!"name" in EasyParseError)
+    EasyParseError.name = "EasyParseError";
+  $desc = $collectedClasses.EasyParseError;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  EasyParseError.prototype = $desc;
+  function HetimaBuilder() {
+  }
+  HetimaBuilder.builtin$cls = "HetimaBuilder";
+  if (!"name" in HetimaBuilder)
+    HetimaBuilder.name = "HetimaBuilder";
+  $desc = $collectedClasses.HetimaBuilder;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HetimaBuilder.prototype = $desc;
+  function HetimaBuilderAdapter(_base, _startIndex, completerFin, _immutable) {
+    this._base = _base;
+    this._startIndex = _startIndex;
+    this.completerFin = completerFin;
+    this._immutable = _immutable;
+  }
+  HetimaBuilderAdapter.builtin$cls = "HetimaBuilderAdapter";
+  if (!"name" in HetimaBuilderAdapter)
+    HetimaBuilderAdapter.name = "HetimaBuilderAdapter";
+  $desc = $collectedClasses.HetimaBuilderAdapter;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HetimaBuilderAdapter.prototype = $desc;
+  function HetimaBuilderAdapter_getLength_closure(this_0, completer_1) {
+    this.this_0 = this_0;
+    this.completer_1 = completer_1;
+  }
+  HetimaBuilderAdapter_getLength_closure.builtin$cls = "HetimaBuilderAdapter_getLength_closure";
+  if (!"name" in HetimaBuilderAdapter_getLength_closure)
+    HetimaBuilderAdapter_getLength_closure.name = "HetimaBuilderAdapter_getLength_closure";
+  $desc = $collectedClasses.HetimaBuilderAdapter_getLength_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HetimaBuilderAdapter_getLength_closure.prototype = $desc;
+  function HetimaBuilderAdapter_getLength_closure0(completer_2) {
+    this.completer_2 = completer_2;
+  }
+  HetimaBuilderAdapter_getLength_closure0.builtin$cls = "HetimaBuilderAdapter_getLength_closure0";
+  if (!"name" in HetimaBuilderAdapter_getLength_closure0)
+    HetimaBuilderAdapter_getLength_closure0.name = "HetimaBuilderAdapter_getLength_closure0";
+  $desc = $collectedClasses.HetimaBuilderAdapter_getLength_closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HetimaBuilderAdapter_getLength_closure0.prototype = $desc;
+  function HetimaBuilderAdapter_getByteFuture_closure(completer_0) {
+    this.completer_0 = completer_0;
+  }
+  HetimaBuilderAdapter_getByteFuture_closure.builtin$cls = "HetimaBuilderAdapter_getByteFuture_closure";
+  if (!"name" in HetimaBuilderAdapter_getByteFuture_closure)
+    HetimaBuilderAdapter_getByteFuture_closure.name = "HetimaBuilderAdapter_getByteFuture_closure";
+  $desc = $collectedClasses.HetimaBuilderAdapter_getByteFuture_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HetimaBuilderAdapter_getByteFuture_closure.prototype = $desc;
+  function HetimaBuilderAdapter_getByteFuture_closure0(completer_1) {
+    this.completer_1 = completer_1;
+  }
+  HetimaBuilderAdapter_getByteFuture_closure0.builtin$cls = "HetimaBuilderAdapter_getByteFuture_closure0";
+  if (!"name" in HetimaBuilderAdapter_getByteFuture_closure0)
+    HetimaBuilderAdapter_getByteFuture_closure0.name = "HetimaBuilderAdapter_getByteFuture_closure0";
+  $desc = $collectedClasses.HetimaBuilderAdapter_getByteFuture_closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HetimaBuilderAdapter_getByteFuture_closure0.prototype = $desc;
+  function HetimaFile() {
+  }
+  HetimaFile.builtin$cls = "HetimaFile";
+  if (!"name" in HetimaFile)
+    HetimaFile.name = "HetimaFile";
+  $desc = $collectedClasses.HetimaFile;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HetimaFile.prototype = $desc;
+  function HetimaReadBuffer() {
+  }
+  HetimaReadBuffer.builtin$cls = "HetimaReadBuffer";
+  if (!"name" in HetimaReadBuffer)
+    HetimaReadBuffer.name = "HetimaReadBuffer";
+  $desc = $collectedClasses.HetimaReadBuffer;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HetimaReadBuffer.prototype = $desc;
+  function ReadResult(status, buffer) {
+    this.status = status;
+    this.buffer = buffer;
+  }
+  ReadResult.builtin$cls = "ReadResult";
+  if (!"name" in ReadResult)
+    ReadResult.name = "ReadResult";
+  $desc = $collectedClasses.ReadResult;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  ReadResult.prototype = $desc;
+  ReadResult.prototype.get$buffer = function(receiver) {
+    return this.buffer;
+  };
+  function HetimaBuilderToFile(mBuilder) {
+    this.mBuilder = mBuilder;
+  }
+  HetimaBuilderToFile.builtin$cls = "HetimaBuilderToFile";
+  if (!"name" in HetimaBuilderToFile)
+    HetimaBuilderToFile.name = "HetimaBuilderToFile";
+  $desc = $collectedClasses.HetimaBuilderToFile;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HetimaBuilderToFile.prototype = $desc;
+  function HetimaBuilderToFile_read_closure(cc_0) {
+    this.cc_0 = cc_0;
+  }
+  HetimaBuilderToFile_read_closure.builtin$cls = "HetimaBuilderToFile_read_closure";
+  if (!"name" in HetimaBuilderToFile_read_closure)
+    HetimaBuilderToFile_read_closure.name = "HetimaBuilderToFile_read_closure";
+  $desc = $collectedClasses.HetimaBuilderToFile_read_closure;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HetimaBuilderToFile_read_closure.prototype = $desc;
+  function HetimaBuilderToFile_read_closure0(cc_1) {
+    this.cc_1 = cc_1;
+  }
+  HetimaBuilderToFile_read_closure0.builtin$cls = "HetimaBuilderToFile_read_closure0";
+  if (!"name" in HetimaBuilderToFile_read_closure0)
+    HetimaBuilderToFile_read_closure0.name = "HetimaBuilderToFile_read_closure0";
+  $desc = $collectedClasses.HetimaBuilderToFile_read_closure0;
+  if ($desc instanceof Array)
+    $desc = $desc[1];
+  HetimaBuilderToFile_read_closure0.prototype = $desc;
   function HetiSocketBuilder() {
   }
   HetiSocketBuilder.builtin$cls = "HetiSocketBuilder";
@@ -35315,5 +35085,7 @@ function dart_precompiled($collectedClasses) {
   if ($desc instanceof Array)
     $desc = $desc[1];
   XmlWritable.prototype = $desc;
-  return [HtmlElement, AnchorElement, AnimationEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeLoadEvent, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, DomImplementation, Element, EmbedElement, ErrorEvent, Event, EventTarget, FieldSetElement, File, FileError, FileList, FileReader, FocusEvent, FormElement, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlCollection, HtmlDocument, HtmlFormControlsCollection, HtmlHtmlElement, HtmlOptionsCollection, IFrameElement, ImageData, ImageElement, InputElement, InstallEvent, InstallPhaseEvent, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, Location, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiInput, MidiMessageEvent, MidiOutput, MidiPort, ModElement, MouseEvent, Navigator, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, QuoteElement, Range, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement0, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechInputEvent, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument0, _Attr, _ClientRect, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, KeyRange, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedEnumeration, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimatedString, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_respond, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, ConstantMap, ConstantStringMap, ConstantStringMap_values_closure, _ConstantMapKeyIterable, JSInvocationMirror, ReflectionInfo, ReflectionInfo_sortedIndex_closure, Primitives_functionNoSuchMethod_closure, Primitives_applyFunction_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, CastErrorImplementation, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, TypeImpl, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, _MatchImplementation, _AllMatchesIterable, _AllMatchesIterator, StringMatch, ChromeApp, ChromeAppRuntime, ChromeAppRuntime$__closure, LaunchData, EmbedRequest, _ChromeAppWindow, _ChromeAppWindow$__closure, _AppWindow, ChromeAppWindow, AppWindow, AppWindow_onClosed_closure, ChromeSockets, ChromeSocketsTcp, ChromeSocketsTcp$__closure, CreateInfo, SendInfo, ReceiveInfo, ReceiveErrorInfo, ChromeSocketsTcpServer, ChromeSocketsTcpServer$__closure, AcceptInfo, AcceptErrorInfo, ChromeSocketsUdp, ChromeSocketsUdp$__closure, ChromeCompleter, ChromeCompleter$noArgs_closure, ChromeCompleter$oneArg_closure, ChromeStreamController, ChromeStreamController$noArgs_closure, ChromeStreamController$oneArg_closure, ChromeObject, ChromeApi, ChromeEnum, ArrayBuffer, ChromeSystem, ChromeSystemCpu, ChromeSystemDisplay, ChromeSystemDisplay$__closure, ChromeSystemMemory, ChromeSystemNetwork, ChromeSystemNetwork_getNetworkInterfaces_closure, NetworkInterface, ChromeSystemStorage, ChromeSystemStorage$__closure, StorageUnitType, StorageUnitInfo, _createStorageUnitType_closure, ListIterable, SubListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, WhereIterable, WhereIterator, IterableMixinWorkaround, FixedLengthListMixin, ReversedListIterable, Symbol0, _AsyncRun__initializeScheduleImmediate_internalCallback, _AsyncRun__initializeScheduleImmediate_closure, _AsyncRun__scheduleImmediateJsOverride_internalCallback, _AsyncError, _UncaughtAsyncError, _BroadcastStream, _BroadcastSubscription, _BroadcastStreamController, _SyncBroadcastStreamController, _SyncBroadcastStreamController__sendData_closure, _SyncBroadcastStreamController__sendError_closure, _SyncBroadcastStreamController__sendDone_closure, _AsyncBroadcastStreamController, Future, Future_Future$delayed_closure, _Completer, _AsyncCompleter, _SyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_contains_closure, Stream_contains__closure, Stream_contains__closure0, Stream_contains_closure0, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_isEmpty_closure, Stream_isEmpty_closure0, Stream_first_closure, Stream_first_closure0, StreamSubscription, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _AsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _SyncStreamController, _StreamController__SyncStreamControllerDispatch, _NoCallbacks, _NoCallbackAsyncStreamController, _StreamController__AsyncStreamControllerDispatch0, _NoCallbackSyncStreamController, _StreamController__SyncStreamControllerDispatch0, _ControllerStream, _ControllerSubscription, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendError_sendError, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedError, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _DoneStreamSubscription, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _ForwardingStream, _ForwardingStreamSubscription, _WhereStream, _MapStream, _Zone, _rootHandleUncaughtError_closure, _RootZone, _RootZone_bindCallback_closure, _RootZone_bindCallback_closure0, _RootZone_bindUnaryCallback_closure, _RootZone_bindUnaryCallback_closure0, _HashMap, _HashMap_values_closure, _IdentityHashMap, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListBase, Object_ListMixin, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, SetMixin, SetBase, Codec, Converter, Encoding, Utf8Codec, Utf8Encoder, _Utf8Encoder, Utf8Decoder, _Utf8Decoder, _Utf8Decoder_convert_scanOneByteCharacters, _Utf8Decoder_convert_addSingleBytes, Function__toMangledNames_closure, NoSuchMethodError_toString_closure, bool, Comparable, DateTime, $double, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, NoSuchMethodError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, OutOfMemoryError, StackOverflowError, CyclicInitializationError, Exception, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, $int, Iterable, Iterator, List, Map, Null, num, Object, Match, StackTrace, String, StringBuffer, Symbol, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, _ChildrenElementList, Element_Element$html_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _ChildNodeListLazy, Interceptor_ListMixin1, Interceptor_ListMixin_ImmutableListMixin1, Interceptor_ListMixin2, Interceptor_ListMixin_ImmutableListMixin2, _AttributeMap, _ElementAttributeMap, _DataAttributeMap, _DataAttributeMap_forEach_closure, _DataAttributeMap_keys_closure, _DataAttributeMap_values_closure, EventStreamProvider, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, _CustomEventStreamProvider, _Html5NodeValidator, ImmutableListMixin, NodeValidatorBuilder, NodeValidatorBuilder_allowsElement_closure, NodeValidatorBuilder_allowsAttribute_closure, _SimpleNodeValidator, _TemplatingNodeValidator, _TemplatingNodeValidator_closure, _SvgNodeValidator, _WrappedList, _WrappedIterator, FixedSizeListIterator, _DOMWindowCrossFrame, NodeValidator, _SameOriginUriPolicy, _ValidatingTreeSanitizer, _ValidatingTreeSanitizer_sanitizeTree_walk, Capability, JsObject, JsObject__convertDataTree__convert, JsFunction, JsArray, JsObject_ListMixin, _convertToJS_closure, _convertToJS_closure0, _wrapToDart_closure, _wrapToDart_closure0, _wrapToDart_closure1, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0, LeafValueEditor, ChangeHandlerAdapter, ClickHandlerAdapter, SelectionHandlerAdapter, AttachEvent, AttachEventHandler, BeforeSelectionEvent, BeforeSelectionHandler, ChangeEvent, ChangeHandler, ClickEvent, ClickHandler, Command, DomEvent, DomEventType, DwtEvent, IEvent, EventType, EventBus, EventHandler, EventHandlerAdapter, EventListener, HandlerRegistration, DomImpl, DomImplStandard, DomImplStandard_initEventSystem_closure, DomImplStandard_initEventSystem_closure0, DomImplStandard_initEventSystem_closure1, DomImplStandard_initEventSystem_closure2, DomImplStandard_initEventSystem_closure3, KeyCodeEvent, KeyEvent, KeyUpEvent, KeyUpHandler, MouseEvent0, NativePreviewHandler, SelectionEvent, SelectionHandler, SimpleEventBus, _HandlerRegistration, _EmptySource, _AddCommand, _RemoveCommand, UmbrellaException, AutoDirectionHandler, BidiPolicyImpl, BidiUtils, Direction, DirectionalTextHelper, AutoHorizontalAlignmentConstant, HorizontalAlignmentConstant, VerticalAlignmentConstant, LocaleInfoImpl, LocaleInfo, AbstractRenderer, PassthroughParser, PassthroughRenderer, Html, AbsolutePanel, TakesValueEditor, ValueBoxEditor, AttachDetachException, AttachExceptionCommand, DetachExceptionCommand, Button, ButtonBase, CellPanel, ComplexPanel, Composite, FileUpload, FileUploadImpl, FlexTable, FlexCellFormatter, FocusWidget, HorizontalPanel, HtmlPanel, HtmlTable, CellFormatter, ColumnFormatter, RowFormatter, _WidgetIterator, ElementMapperImpl, FreeNode, FocusImplDefault, Label, LabelBase, Panel, RootPanel, RootPanel__hookWindowClosing_closure, DefaultRootPanel, MaybeDetachExceptionCommand, SimplePanel, SimplePanelIterator, TabBar, _ClickDelegatePanel, TextBox, TextBoxBase, UiObject, ValueBoxBase, VerticalPanel, Widget, WidgetCollection, WidgetIterator, Enum, WhiteSpace, TextAlign, main_closure, main_closure0, main_closure1, main_closure2, main_closure3, main_closure4, main_closure5, main__closure, main__closure0, main_closure6, main_closure7, main_closure8, FileListPanel, FileListPanel_initFileListPanel_closure, HttpServer, HttpServer_startServer_closure, HttpServer_startServer_closure0, HttpServer__hundleRequest_closure, HttpServer__startResponseHomePage_closure, HttpServer__startResponseHomePage_closure0, HttpServer__startResponseHomePage_closure1, HttpServer__startResponsePreviewPage_closure, HttpServer__startResponsePreviewPage_closure0, HttpServer__startResponsePreviewPage_closure1, HttpServer__startResponseRangeFile_closure, HttpServer__startResponseRangeFile__closure, HttpServer__startResponseRangeFile__closure0, HttpServer__startResponseFile_closure, HttpServer__startResponseFile__closure, HttpServer__startResponseFile__closure0, HttpServer__startResponseBuffer_responseTask, HttpServer__startResponseBuffer_responseTask_closure, HttpServer__startResponseBuffer_responseTask_closure0, HttpServer__startResponseBuffer_responseTask_closure1, HttpServer__startResponseBuffer_responseTask_closure2, HttpServer__retryBind_bindFunc, HttpServer__retryBind_bindFunc_closure, HttpServer__retryBind_bindFunc_closure0, InfoPanel, MainPanel, MainPanel_initMainPanel_closure, MainPanel_initMainPanel__closure, MainPanel_initMainPanel_closure0, MainView, MainView_initTab_closure, FileSelectResult, PortMap, PortMap_startPortMap_closure, PortMap_startPortMap__closure, PortMap_startPortMap___closure, PortMap_startPortMap___tryAddPortMap, PortMap_startPortMap___tryAddPortMap_closure, PortMap_startPortMap___tryAddPortMap_closure0, PortMap_startPortMap__closure0, PortMap_deleteAllPortMap_closure, PortMap_deleteAllPortMap__closure, PortMap_deleteAllPortMap___deletePortMap, PortMap_deleteAllPortMap___deletePortMap_closure, PortMap_deleteAllPortMap___tryGetPortMapInfo, PortMap_deleteAllPortMap___tryGetPortMapInfo_closure, PortMap_deleteAllPortMap___tryGetPortMapInfo_closure0, PortMap_startGetLocalIp_closure, PortMap_startGetLocalIp_closure0, ArrayBuilder, GetByteFutureInfo, EasyParser, EasyParser_nextString_closure, EasyParser_nextBytePattern_closure, EasyParser_nextBytePatternWithLength_closure, EasyParser_nextBytePatternByUnmatch_p, EasyParser_nextBytePatternByUnmatch_p_closure, EasyParserMatcher, EasyParserIncludeMatcher, EasyParseError, HetimaBuilder, HetimaBuilderAdapter, HetimaBuilderAdapter_getLength_closure, HetimaBuilderAdapter_getLength_closure0, HetimaBuilderAdapter_getByteFuture_closure, HetimaBuilderAdapter_getByteFuture_closure0, HetimaFile, HetimaReadBuffer, ReadResult, HetimaBuilderToFile, HetimaBuilderToFile_read_closure, HetimaBuilderToFile_read_closure0, HetiHttpClientResponse, HetiHttpClient, HetiHttpClient_connect_closure, HetiHttpClient_get_closure, HetiHttpClient_get_closure0, HetiHttpClient_post_closure, HetiHttpClient_post__closure, HetiHttpClient_post_closure0, HetiHttpClient_post_closure1, HetiHttpClient_mpost_closure, HetiHttpClient_mpost__closure, HetiHttpClient_mpost_closure0, HetiHttpClient_mpost_closure1, HetiHttpClient_handleResponse_closure, HetiHttpClient_handleResponse__closure, HetiHttpClient_handleResponse__closure0, HetiHttpClient_handleResponse_closure0, HetiHttpResponse_decodeHttpMessage_closure, HetiHttpResponse_decodeHttpMessage_closure0, HetiHttpResponse_decodeHttpMessage_closure1, HetiHttpResponse_decodeHeaderFields_p, HetiHttpResponse_decodeHeaderFields_p_closure, HetiHttpResponse_decodeHeaderFields_closure, HetiHttpResponse_decodeHeaderFields_closure0, HetiHttpResponse_decodeHeaderFields_closure1, HetiHttpResponse_decodeHeaderField_closure, HetiHttpResponse_decodeHeaderField_closure0, HetiHttpResponse_decodeHeaderField_closure1, HetiHttpResponse_decodeHeaderField_closure2, HetiHttpResponse_decodeHeaderField_closure3, HetiHttpResponse_decodeHeaderField_closure4, HetiHttpResponse_decodeFieldName_closure, HetiHttpResponse_decodeFieldValue_closure, HetiHttpResponse_decodeHttpVersion_closure, HetiHttpResponse_decodeHttpVersion_closure0, HetiHttpResponse_decodeHttpVersion_closure1, HetiHttpResponse_decodeHttpVersion_closure2, HetiHttpResponse_decodeHttpVersion_closure3, HetiHttpResponse_decodeStatusCode_closure, HetiHttpResponse_decodeReasonPhrase_closure, HetiHttpResponse_decodeStatusline_closure, HetiHttpResponse_decodeStatusline_closure0, HetiHttpResponse_decodeStatusline_closure1, HetiHttpResponse_decodeStatusline_closure2, HetiHttpResponse_decodeStatusline_closure3, HetiHttpResponse_decodeStatusline_closure4, HetiHttpResponse_decodeOWS_closure, HetiHttpResponse_decodeOWS_closure0, HetiHttpResponse_decodeSP_closure, HetiHttpResponse_decodeSP_closure0, HetiHttpResponse_decodeCrlf_closure, HetiHttpResponse_decodeCrlf_closure0, HetiHttpResponse_decodeCrlf_closure1, HetiHttpResponse_decodeCrlf_closure2, HetiHttpResponse_decodeChunkedSize_closure, HetiHttpResponse_decodeChunkedSize_closure0, HetiHttpResponse_decodeChunkedSize_closure1, HetiHttpResponse_decodeRequestLine_closure, HetiHttpResponse_decodeRequestLine_closure0, HetiHttpResponse_decodeRequestLine_closure1, HetiHttpResponse_decodeRequestLine_closure2, HetiHttpResponse_decodeRequestLine_closure3, HetiHttpResponse_decodeRequestLine_closure4, HetiHttpResponse_decodeRequestLine_closure5, HetiHttpResponse_decodeRequestMessage_closure, HetiHttpResponse_decodeRequestMessage_closure0, HetiHttpResponse_decodeRequestMessage_closure1, HetiHttpResponse_decodeMethod_closure, HetiHttpResponse_decodeRequestTarget_closure, HetiHttpResponse_decodeRequestRangeValue_closure, HetiHttpResponse_decodeRequestRangeValue_closure0, HetiHttpResponse_decodeRequestRangeValue_closure1, HetiHttpResponse_decodeRequestRangeValue_closure2, HetiHttpResponse_decodeRequestRangeValue_closure3, HetiHttpRequestRange, TextMatcher, FieldValueMatcher, HetiHttpResponseStatusLine, HetiHttpResponseHeaderField, HetiRequestLine, HetiHttpRequestMessageWithoutBody, HetiHttpMessageWithoutBody, ChunkedBuilderAdapter, ChunkedBuilderAdapter_start_closure, ChunkedBuilderAdapter_start_closure0, ChunkedBuilderAdapter__decodeChunked_closure, ChunkedBuilderAdapter__decodeChunked__closure, ChunkedBuilderAdapter__decodeChunked___closure, ChunkedBuilderAdapter__decodeChunked___closure0, ChunkedBuilderAdapter__decodeChunked_closure0, HetiHttpServer, HetiHttpServer_bind_closure, HetiHttpServer_bind__closure, HetiHttpServer_bind___closure, HetiHttpServer_bind____closure, HetiHttpServer_bind____closure0, HetiHttpServer_bind_closure0, HetiHttpServerRequest, HetiSocketBuilder, HetiServerSocket, HetiSocket, HetiUdpSocket, HetiNetworkInterface, HetiSendInfo, HetiReceiveInfo, HetiReceiveUdpInfo, HetiUdpSendInfo, UPnpDeviceInfo, UPnpDeviceInfo_extractService_closure, UPnpDeviceInfo_extractService_closure0, UPnpDeviceInfo_requestServiceList_closure, UPnpDeviceInfo_requestServiceList_closure0, UPnpDeviceInfo_requestServiceList__closure, UPnpDeviceInfo_requestServiceList___closure, UPnpDeviceInfo_requestServiceList____closure, UPnpDeviceInfo_requestServiceList_closure1, UPnpDeviceServiceInfo, UpnpDeviceSearcher, UpnpDeviceSearcher__init_closure, UpnpDeviceSearcher_createInstance_closure, UpnpDeviceSearcher_createInstance_closure0, UpnpDeviceSearcher_searchWanPPPDevice_closure, UpnpDeviceSearcher_searchWanPPPDevice_closure0, UpnpDeviceSearcher_searchWanPPPDevice_closure1, UpnpDeviceSearcher_searchWanPPPDevice_closure2, UpnpDeviceSearcher_searchWanPPPDevice_closure3, UpnpDeviceSearcher_searchWanPPPDevice_closure4, UpnpDeviceSearcher_extractDeviceInfoFromUdpResponse_closure, UpnpDeviceSearcher_extractDeviceInfoFromUdpResponse__closure, UPnpPPPDevice, UPnpPPPDevice_requestGetGenericPortMapping_closure, UPnpPPPDevice_requestGetGenericPortMapping_closure0, UPnpPPPDevice_requestAddPortMapping_closure, UPnpPPPDevice_requestAddPortMapping_closure0, UPnpPPPDevice_requestDeletePortMapping_closure, UPnpPPPDevice_requestDeletePortMapping_closure0, UPnpPPPDevice_requestGetExternalIPAddress_closure, UPnpPPPDevice_requestGetExternalIPAddress_closure0, UPnpPPPDevice_request_closure, UPnpPPPDevice_request_closure0, UPnpPPPDevice_request__closure, UPnpPPPDevice_request__closure0, UPnpPPPDevice_request__closure1, UPnpPPPDevice_request_closure1, UPnpPPPDeviceRequestResponse, UPnpGetExternalIPAddressResponse, UPnpAddPortMappingResponse, UPnpDeletePortMappingResponse, UPnpGetGenericPortMappingResponse, HttpUrl, HttpUrlDecoder, PercentEncode, ParseError, HetimaFileBlob, HetimaFileBlob_read_closure, HetimaFileBlob_read_closure0, HetimaFileBlob_read_closure1, HetiServerSocketChrome, HetiServerSocketChrome_startServer_closure, HetiServerSocketChrome_startServer__closure, HetiServerSocketChrome_startServer___closure, HetiServerSocketChrome_startServer_closure0, HetiSocketChrome, HetiSocketChrome_send_closure, HetiSocketChrome_send__closure, HetiSocketChrome_send_closure0, HetiSocketChrome_connect_closure, HetiSocketChrome_connect__closure, HetiSocketChrome_connect___closure, HetiSocketChrome_connect_closure0, HetiSocketChrome_close_closure, HetiSocketBuilderChrome, HetiSocketBuilderChrome_getNetworkInterfaces_closure, HetiSocketBuilderChrome_getNetworkInterfaces_closure0, HetiChromeSocketManager, HetiChromeSocketManager_manageServerSocket_closure, HetiChromeSocketManager_manageServerSocket_closure0, HetiChromeSocketManager_manageServerSocket_closure1, HetiChromeSocketManager_manageServerSocket_closure2, HetiChromeSocketManager_manageServerSocket_closure3, HetiChromeSocketManager_manageServerSocket_closure4, HetiUdpSocketChrome, HetiUdpSocketChrome_bind_closure, HetiUdpSocketChrome_bind_closure0, HetiUdpSocketChrome_bind_closure1, HetiUdpSocketChrome_bind_closure2, HetiUdpSocketChrome_send_closure, convertNativeToDart_AcceptStructuredClone_findSlot, convertNativeToDart_AcceptStructuredClone_readSlot, convertNativeToDart_AcceptStructuredClone_writeSlot, convertNativeToDart_AcceptStructuredClone_walk, FilteredElementList, FilteredElementList__filtered_closure, FilteredElementList_removeRange_closure, ActionParser, FlattenParser, TokenParser, CharacterParser, _NotCharMatcher, _AltCharMatcher, _SingleCharMatcher, _createPatternParser_closure0, _createPatternParser_closure, _createPatternParser_closure2, _createPatternParser_closure1, _RangeCharMatcher, _WhitespaceCharMatcher, DelegateParser, EndOfInputParser, NotParser, OptionalParser, ListParser, ChoiceParser, SequenceParser, CompositeParser, CompositeParser__complete_closure, CompositeParser_ref_closure, CompositeParser_action_closure, CompletedParserError, UndefinedProductionError, RedefinedProductionError, Context, Result, Success, Failure, ParserError, Parser, Parser_matchesSkipping_closure, Parser_pick_closure, Parser_permute_closure, Parser_permute__closure, Parser_separatedBy_closure, FailureParser, SetableParser, AnyParser, string_closure, PredicateParser, RepeatingParser, PossessiveRepeatingParser, LimitedRepeatingParser, LazyRepeatingParser, Token, XmlGrammar, XmlGrammar_initialize_closure, XmlGrammar_initialize__closure, XmlGrammar_initialize_closure0, _XmlDescendantsIterable, _XmlDescendantsIterator, XmlAttribute, XmlBranch, XmlBranch__filterElements_closure, XmlBranch__filterElements_closure0, XmlCDATA, XmlComment, XmlData, XmlDoctype, XmlDocument, XmlElement, XmlNode, Object_XmlWritable, Object_XmlWritable_XmlParent, XmlNode_text_closure, XmlNode_text_closure0, XmlProcessing, XmlText, XmlParser, XmlParser_initialize_closure, XmlParser_initialize_closure0, XmlParser_initialize_closure1, XmlParser_initialize_closure2, XmlParser_initialize_closure3, XmlParser_initialize_closure4, XmlParser_initialize_closure5, XmlParser_initialize_closure6, XmlParser_initialize_closure7, _decodeXml_closure, _encodeXmlText_closure, XmlName, Object_XmlWritable0, Object_XmlWritable_XmlParent0, _XmlSimpleName, _XmlPrefixName, XmlNamed, _createMatcher_closure, _createMatcher_closure1, _createMatcher_closure0, _createMatcher_closure2, _createMatcher_closure3, XmlParent, XmlNodeType, XmlWritable];
+  return [HtmlElement, AnchorElement, AnimationEvent, AnimationPlayerEvent, ApplicationCacheErrorEvent, AreaElement, AudioElement, AutocompleteErrorEvent, BRElement, BaseElement, BeforeUnloadEvent, Blob, BodyElement, ButtonElement, CDataSection, CanvasElement, CharacterData, CloseEvent, Comment, CompositionEvent, ContentElement, CssFontFaceLoadEvent, CssStyleDeclaration, CustomEvent, DListElement, DataListElement, DetailsElement, DeviceLightEvent, DeviceMotionEvent, DeviceOrientationEvent, DialogElement, DivElement, Document, DocumentFragment, DomError, DomException, DomImplementation, Element, EmbedElement, ErrorEvent, Event, EventTarget, FetchEvent, FieldSetElement, File, FileError, FileList, FileReader, FocusEvent, FormElement, GamepadEvent, HRElement, HashChangeEvent, HeadElement, HeadingElement, HtmlCollection, HtmlDocument, HtmlFormControlsCollection, HtmlHtmlElement, HtmlOptionsCollection, IFrameElement, ImageData, ImageElement, InputElement, InstallEvent, InstallPhaseEvent, KeyboardEvent, KeygenElement, LIElement, LabelElement, LegendElement, LinkElement, Location, MapElement, MediaElement, MediaError, MediaKeyError, MediaKeyEvent, MediaKeyMessageEvent, MediaKeyNeededEvent, MediaStream, MediaStreamEvent, MediaStreamTrackEvent, MenuElement, MessageEvent, MetaElement, MeterElement, MidiConnectionEvent, MidiInput, MidiMessageEvent, MidiOutput, MidiPort, ModElement, MouseEvent, Navigator, NavigatorCpu, NavigatorUserMediaError, Node, NodeList, OListElement, ObjectElement, OptGroupElement, OptionElement, OutputElement, OverflowEvent, PageTransitionEvent, ParagraphElement, ParamElement, PictureElement, PopStateEvent, PositionError, PreElement, ProcessingInstruction, ProgressElement, ProgressEvent, PushEvent, PushManager, QuoteElement, Range, Request, ResourceProgressEvent, RtcDataChannelEvent, RtcDtmfToneChangeEvent, RtcIceCandidateEvent, ScriptElement0, SecurityPolicyViolationEvent, SelectElement, ShadowElement, ShadowRoot, SourceElement, SpanElement, SpeechRecognitionError, SpeechRecognitionEvent, SpeechSynthesisEvent, StorageEvent, StyleElement, TableCaptionElement, TableCellElement, TableColElement, TableElement, TableRowElement, TableSectionElement, TemplateElement, Text, TextAreaElement, TextEvent, TitleElement, TouchEvent, TrackElement, TrackEvent, TransitionEvent, UIEvent, UListElement, UnknownElement, VideoElement, WheelEvent, Window, XmlDocument0, _Attr, _ClientRect, _DocumentType, _HTMLAppletElement, _HTMLDirectoryElement, _HTMLFontElement, _HTMLFrameElement, _HTMLFrameSetElement, _HTMLMarqueeElement, _MutationEvent, _NamedNodeMap, _Notation, _XMLHttpRequestProgressEvent, KeyRange, VersionChangeEvent, AElement, AltGlyphElement, AnimateElement, AnimateMotionElement, AnimateTransformElement, AnimatedEnumeration, AnimatedLength, AnimatedLengthList, AnimatedNumber, AnimatedNumberList, AnimatedString, AnimationElement, CircleElement, ClipPathElement, DefsElement, DescElement, DiscardElement, EllipseElement, FEBlendElement, FEColorMatrixElement, FEComponentTransferElement, FECompositeElement, FEConvolveMatrixElement, FEDiffuseLightingElement, FEDisplacementMapElement, FEDistantLightElement, FEFloodElement, FEFuncAElement, FEFuncBElement, FEFuncGElement, FEFuncRElement, FEGaussianBlurElement, FEImageElement, FEMergeElement, FEMergeNodeElement, FEMorphologyElement, FEOffsetElement, FEPointLightElement, FESpecularLightingElement, FESpotLightElement, FETileElement, FETurbulenceElement, FilterElement, ForeignObjectElement, GElement, GeometryElement, GraphicsElement, ImageElement0, LineElement, LinearGradientElement, MarkerElement, MaskElement, MetadataElement, PathElement, PatternElement, PolygonElement, PolylineElement, RadialGradientElement, RectElement, ScriptElement, SetElement, StopElement, StyleElement0, SvgElement, SvgSvgElement, SwitchElement, SymbolElement, TSpanElement, TextContentElement, TextElement, TextPathElement, TextPositioningElement, TitleElement0, UseElement, ViewElement, ZoomEvent, _GradientElement, _SVGAltGlyphDefElement, _SVGAltGlyphItemElement, _SVGComponentTransferFunctionElement, _SVGCursorElement, _SVGFEDropShadowElement, _SVGFontElement, _SVGFontFaceElement, _SVGFontFaceFormatElement, _SVGFontFaceNameElement, _SVGFontFaceSrcElement, _SVGFontFaceUriElement, _SVGGlyphElement, _SVGGlyphRefElement, _SVGHKernElement, _SVGMPathElement, _SVGMissingGlyphElement, _SVGVKernElement, AudioProcessingEvent, OfflineAudioCompletionEvent, ContextEvent, SqlError, NativeByteBuffer, NativeTypedData, NativeByteData, NativeFloat32List, NativeFloat64List, NativeInt16List, NativeInt32List, NativeInt8List, NativeUint16List, NativeUint32List, NativeUint8ClampedList, NativeUint8List, JS_CONST, Interceptor, JSBool, JSNull, JavaScriptObject, PlainJavaScriptObject, UnknownJavaScriptObject, JSArray, JSArray_forEach_getLength, JSNumber, JSInt, JSDouble, JSString, startRootIsolate_closure, startRootIsolate_closure0, _Manager, _IsolateContext, _IsolateContext_handlePing_respond, _EventLoop, _EventLoop__runHelper_next, _IsolateEvent, _MainManagerStub, IsolateNatives__processWorkerMessage_closure, IsolateNatives__startIsolate_runStartFunction, _BaseSendPort, _NativeJsSendPort, _NativeJsSendPort_send_closure, _WorkerSendPort, RawReceivePortImpl, _JsSerializer, _JsCopier, _JsDeserializer, _JsVisitedMap, _MessageTraverserVisitedMap, _MessageTraverser, _Copier, _Copier_visitMap_closure, _Serializer, _Deserializer, TimerImpl, TimerImpl_internalCallback, TimerImpl_internalCallback0, CapabilityImpl, ConstantMap, ConstantStringMap, ConstantStringMap_values_closure, _ConstantMapKeyIterable, JSInvocationMirror, ReflectionInfo, ReflectionInfo_sortedIndex_closure, Primitives_functionNoSuchMethod_closure, Primitives_applyFunction_closure, TypeErrorDecoder, NullError, JsNoSuchMethodError, UnknownJsTypeError, unwrapException_saveStackTrace, _StackTrace, invokeClosure_closure, invokeClosure_closure0, invokeClosure_closure1, invokeClosure_closure2, invokeClosure_closure3, Closure, TearOffClosure, BoundClosure, CastErrorImplementation, RuntimeError, RuntimeType, RuntimeFunctionType, DynamicRuntimeType, initHooks_closure, initHooks_closure0, initHooks_closure1, JSSyntaxRegExp, _MatchImplementation, _AllMatchesIterable, _AllMatchesIterator, StringMatch, ChromeApp, ChromeAppRuntime, ChromeAppRuntime$__closure, LaunchData, EmbedRequest, _ChromeAppWindow, _ChromeAppWindow$__closure, _AppWindow, ChromeAppWindow, AppWindow, AppWindow_onClosed_closure, ChromeSockets, ChromeSocketsTcp, ChromeSocketsTcp$__closure, CreateInfo, SendInfo, ReceiveInfo, ReceiveErrorInfo, ChromeSocketsTcpServer, ChromeSocketsTcpServer$__closure, AcceptInfo, AcceptErrorInfo, ChromeSocketsUdp, ChromeSocketsUdp$__closure, ChromeCompleter, ChromeCompleter$noArgs_closure, ChromeCompleter$oneArg_closure, ChromeStreamController, ChromeStreamController$noArgs_closure, ChromeStreamController$oneArg_closure, ChromeObject, ChromeApi, ChromeEnum, ArrayBuffer, ChromeSystem, ChromeSystemCpu, ChromeSystemDisplay, ChromeSystemDisplay$__closure, ChromeSystemMemory, ChromeSystemNetwork, ChromeSystemNetwork_getNetworkInterfaces_closure, NetworkInterface, ChromeSystemStorage, ChromeSystemStorage$__closure, StorageUnitType, StorageUnitInfo, _createStorageUnitType_closure, ListIterable, SubListIterable, ListIterator, MappedIterable, EfficientLengthMappedIterable, MappedIterator, MappedListIterable, WhereIterable, WhereIterator, IterableMixinWorkaround, FixedLengthListMixin, ReversedListIterable, Symbol0, _AsyncRun__initializeScheduleImmediate_internalCallback, _AsyncRun__initializeScheduleImmediate_closure, _AsyncRun__scheduleImmediateJsOverride_internalCallback, _AsyncRun__scheduleImmediateWithSetImmediate_internalCallback, _UncaughtAsyncError, _BroadcastStream, _BroadcastSubscription, _BroadcastStreamController, _SyncBroadcastStreamController, _SyncBroadcastStreamController__sendData_closure, _SyncBroadcastStreamController__sendDone_closure, _AsyncBroadcastStreamController, Future, Future_Future$delayed_closure, _Completer, _AsyncCompleter, _Future, _Future__addListener_closure, _Future__chainForeignFuture_closure, _Future__chainForeignFuture_closure0, _Future__asyncComplete_closure, _Future__asyncComplete_closure0, _Future__asyncCompleteError_closure, _Future__propagateToListeners_handleValueCallback, _Future__propagateToListeners_handleError, _Future__propagateToListeners_handleWhenCompleteCallback, _Future__propagateToListeners_handleWhenCompleteCallback_closure, _Future__propagateToListeners_handleWhenCompleteCallback_closure0, _AsyncCallbackEntry, Stream, Stream_contains_closure, Stream_contains__closure, Stream_contains__closure0, Stream_contains_closure0, Stream_forEach_closure, Stream_forEach__closure, Stream_forEach__closure0, Stream_forEach_closure0, Stream_length_closure, Stream_length_closure0, Stream_isEmpty_closure, Stream_isEmpty_closure0, Stream_first_closure, Stream_first_closure0, StreamSubscription, _StreamController, _StreamController__subscribe_closure, _StreamController__recordCancel_complete, _SyncStreamControllerDispatch, _AsyncStreamControllerDispatch, _AsyncStreamController, _StreamController__AsyncStreamControllerDispatch, _SyncStreamController, _StreamController__SyncStreamControllerDispatch, _NoCallbacks, _NoCallbackAsyncStreamController, _StreamController__AsyncStreamControllerDispatch0, _NoCallbackSyncStreamController, _StreamController__SyncStreamControllerDispatch0, _ControllerStream, _ControllerSubscription, _EventSink, _BufferingStreamSubscription, _BufferingStreamSubscription__sendError_sendError, _BufferingStreamSubscription__sendDone_sendDone, _StreamImpl, _DelayedEvent, _DelayedData, _DelayedError, _DelayedDone, _PendingEvents, _PendingEvents_schedule_closure, _StreamImplEvents, _DoneStreamSubscription, _cancelAndError_closure, _cancelAndErrorClosure_closure, _cancelAndValue_closure, _ForwardingStream, _ForwardingStreamSubscription, _WhereStream, _MapStream, AsyncError, _Zone, _rootHandleUncaughtError_closure, _RootZone, _RootZone_bindCallback_closure, _RootZone_bindCallback_closure0, _RootZone_bindUnaryCallback_closure, _RootZone_bindUnaryCallback_closure0, _HashMap, _HashMap_values_closure, _IdentityHashMap, HashMapKeyIterable, HashMapKeyIterator, _LinkedHashMap, _LinkedHashMap_values_closure, LinkedHashMapCell, LinkedHashMapKeyIterable, LinkedHashMapKeyIterator, _LinkedHashSet, LinkedHashSetCell, LinkedHashSetIterator, _HashSetBase, IterableBase, ListBase, Object_ListMixin, ListMixin, Maps_mapToString_closure, ListQueue, _ListQueueIterator, SetMixin, SetBase, Codec, Converter, Encoding, Utf8Codec, Utf8Encoder, _Utf8Encoder, Utf8Decoder, _Utf8Decoder, _Utf8Decoder_convert_scanOneByteCharacters, _Utf8Decoder_convert_addSingleBytes, Function__toMangledNames_closure, NoSuchMethodError_toString_closure, bool, Comparable, DateTime, $double, Duration, Duration_toString_sixDigits, Duration_toString_twoDigits, Error, NullThrownError, ArgumentError, RangeError, NoSuchMethodError, UnsupportedError, UnimplementedError, StateError, ConcurrentModificationError, OutOfMemoryError, StackOverflowError, CyclicInitializationError, Exception, _ExceptionImplementation, FormatException, IntegerDivisionByZeroException, Expando, Function, $int, Iterable, Iterator, List, Map, Null, num, Object, Match, StackTrace, String, StringBuffer, Symbol, Interceptor_CssStyleDeclarationBase, CssStyleDeclarationBase, _ChildrenElementList, Element_Element$html_closure, Interceptor_ListMixin, Interceptor_ListMixin_ImmutableListMixin, Interceptor_ListMixin0, Interceptor_ListMixin_ImmutableListMixin0, _ChildNodeListLazy, Interceptor_ListMixin1, Interceptor_ListMixin_ImmutableListMixin1, Interceptor_ListMixin2, Interceptor_ListMixin_ImmutableListMixin2, _AttributeMap, _ElementAttributeMap, _DataAttributeMap, _DataAttributeMap_forEach_closure, _DataAttributeMap_keys_closure, _DataAttributeMap_values_closure, EventStreamProvider, _EventStream, _ElementEventStreamImpl, _EventStreamSubscription, _CustomEventStreamProvider, _Html5NodeValidator, ImmutableListMixin, NodeValidatorBuilder, NodeValidatorBuilder_allowsElement_closure, NodeValidatorBuilder_allowsAttribute_closure, _SimpleNodeValidator, _TemplatingNodeValidator, _TemplatingNodeValidator_closure, _SvgNodeValidator, _WrappedList, _WrappedIterator, FixedSizeListIterator, _DOMWindowCrossFrame, NodeValidator, _SameOriginUriPolicy, _ValidatingTreeSanitizer, _ValidatingTreeSanitizer_sanitizeTree_walk, Capability, JsObject, JsObject__convertDataTree__convert, JsFunction, JsArray, JsObject_ListMixin, _convertToJS_closure, _convertToJS_closure0, _wrapToDart_closure, _wrapToDart_closure0, _wrapToDart_closure1, NativeTypedArray, NativeTypedArrayOfDouble, NativeTypedArray_ListMixin, NativeTypedArray_ListMixin_FixedLengthListMixin, NativeTypedArrayOfInt, NativeTypedArray_ListMixin0, NativeTypedArray_ListMixin_FixedLengthListMixin0, LeafValueEditor, ChangeHandlerAdapter, ClickHandlerAdapter, SelectionHandlerAdapter, AttachEvent, AttachEventHandler, BeforeSelectionEvent, BeforeSelectionHandler, ChangeEvent, ChangeHandler, ClickEvent, ClickHandler, Command, DomEvent, DomEventType, DwtEvent, IEvent, EventType, EventBus, EventHandler, EventHandlerAdapter, EventListener, HandlerRegistration, DomImpl, DomImplStandard, DomImplStandard_initEventSystem_closure, DomImplStandard_initEventSystem_closure0, DomImplStandard_initEventSystem_closure1, DomImplStandard_initEventSystem_closure2, DomImplStandard_initEventSystem_closure3, KeyCodeEvent, KeyEvent, KeyUpEvent, KeyUpHandler, MouseEvent0, NativePreviewHandler, SelectionEvent, SelectionHandler, SimpleEventBus, _HandlerRegistration, _EmptySource, _AddCommand, _RemoveCommand, UmbrellaException, AutoDirectionHandler, BidiPolicyImpl, BidiUtils, Direction, DirectionalTextHelper, AutoHorizontalAlignmentConstant, HorizontalAlignmentConstant, VerticalAlignmentConstant, LocaleInfoImpl, LocaleInfo, AbstractRenderer, PassthroughParser, PassthroughRenderer, Html, AbsolutePanel, TakesValueEditor, ValueBoxEditor, AttachDetachException, AttachExceptionCommand, DetachExceptionCommand, Button, ButtonBase, CellPanel, ComplexPanel, Composite, FileUpload, FileUploadImpl, FlexTable, FlexCellFormatter, FocusWidget, HorizontalPanel, HtmlPanel, HtmlTable, CellFormatter, ColumnFormatter, RowFormatter, _WidgetIterator, ElementMapperImpl, FreeNode, FocusImplDefault, Label, LabelBase, Panel, RootPanel, RootPanel__hookWindowClosing_closure, DefaultRootPanel, MaybeDetachExceptionCommand, SimplePanel, SimplePanelIterator, TabBar, _ClickDelegatePanel, TextBox, TextBoxBase, UiObject, ValueBoxBase, VerticalPanel, Widget, WidgetCollection, WidgetIterator, Enum, TextAlign, main_closure, main_closure0, main_closure1, main_closure2, main_closure3, main_closure4, main_closure5, main__closure, main__closure0, main_closure6, main_closure7, main_closure8, FileListPanel, FileListPanel_initFileListPanel_closure, HttpServer, HttpServer_startServer_closure, HttpServer_startServer_closure0, HttpServer__hundleRequest_closure, HttpServer__startResponseHomePage_closure, HttpServer__startResponseHomePage_closure0, HttpServer__startResponseHomePage_closure1, HttpServer__startResponsePreviewPage_closure, HttpServer__startResponsePreviewPage_closure0, HttpServer__startResponsePreviewPage_closure1, HttpServer__startResponseRangeFile_closure, HttpServer__startResponseRangeFile__closure, HttpServer__startResponseRangeFile__closure0, HttpServer__startResponseFile_closure, HttpServer__startResponseFile__closure, HttpServer__startResponseFile__closure0, HttpServer__startResponseBuffer_responseTask, HttpServer__startResponseBuffer_responseTask_closure, HttpServer__startResponseBuffer_responseTask_closure0, HttpServer__startResponseBuffer_responseTask_closure1, HttpServer__startResponseBuffer_responseTask_closure2, HttpServer__retryBind_bindFunc, HttpServer__retryBind_bindFunc_closure, HttpServer__retryBind_bindFunc_closure0, InfoPanel, MainPanel, MainPanel_initMainPanel_closure, MainPanel_initMainPanel__closure, MainPanel_initMainPanel_closure0, MainView, MainView_initTab_closure, FileSelectResult, PortMap, PortMap_startPortMap_closure, PortMap_startPortMap__closure, PortMap_startPortMap___closure, PortMap_startPortMap___tryAddPortMap, PortMap_startPortMap___tryAddPortMap_closure, PortMap_startPortMap___tryAddPortMap_closure0, PortMap_startPortMap__closure0, PortMap_deleteAllPortMap_closure, PortMap_deleteAllPortMap__closure, PortMap_deleteAllPortMap___deletePortMap, PortMap_deleteAllPortMap___deletePortMap_closure, PortMap_deleteAllPortMap___tryGetPortMapInfo, PortMap_deleteAllPortMap___tryGetPortMapInfo_closure, PortMap_deleteAllPortMap___tryGetPortMapInfo_closure0, PortMap_startGetLocalIp_closure, PortMap_startGetLocalIp_closure0, HetiHttpClientResponse, HetiHttpClient, HetiHttpClient_connect_closure, HetiHttpClient_get_closure, HetiHttpClient_get_closure0, HetiHttpClient_post_closure, HetiHttpClient_post__closure, HetiHttpClient_post_closure0, HetiHttpClient_post_closure1, HetiHttpClient_mpost_closure, HetiHttpClient_mpost__closure, HetiHttpClient_mpost_closure0, HetiHttpClient_mpost_closure1, HetiHttpClient_handleResponse_closure, HetiHttpClient_handleResponse__closure, HetiHttpClient_handleResponse__closure0, HetiHttpClient_handleResponse_closure0, HetiHttpResponse_decodeHttpMessage_closure, HetiHttpResponse_decodeHttpMessage_closure0, HetiHttpResponse_decodeHttpMessage_closure1, HetiHttpResponse_decodeHeaderFields_p, HetiHttpResponse_decodeHeaderFields_p_closure, HetiHttpResponse_decodeHeaderFields_closure, HetiHttpResponse_decodeHeaderFields_closure0, HetiHttpResponse_decodeHeaderFields_closure1, HetiHttpResponse_decodeHeaderField_closure, HetiHttpResponse_decodeHeaderField_closure0, HetiHttpResponse_decodeHeaderField_closure1, HetiHttpResponse_decodeHeaderField_closure2, HetiHttpResponse_decodeHeaderField_closure3, HetiHttpResponse_decodeHeaderField_closure4, HetiHttpResponse_decodeFieldName_closure, HetiHttpResponse_decodeFieldValue_closure, HetiHttpResponse_decodeHttpVersion_closure, HetiHttpResponse_decodeHttpVersion_closure0, HetiHttpResponse_decodeHttpVersion_closure1, HetiHttpResponse_decodeHttpVersion_closure2, HetiHttpResponse_decodeHttpVersion_closure3, HetiHttpResponse_decodeStatusCode_closure, HetiHttpResponse_decodeReasonPhrase_closure, HetiHttpResponse_decodeStatusline_closure, HetiHttpResponse_decodeStatusline_closure0, HetiHttpResponse_decodeStatusline_closure1, HetiHttpResponse_decodeStatusline_closure2, HetiHttpResponse_decodeStatusline_closure3, HetiHttpResponse_decodeStatusline_closure4, HetiHttpResponse_decodeOWS_closure, HetiHttpResponse_decodeOWS_closure0, HetiHttpResponse_decodeSP_closure, HetiHttpResponse_decodeSP_closure0, HetiHttpResponse_decodeCrlf_closure, HetiHttpResponse_decodeCrlf_closure0, HetiHttpResponse_decodeCrlf_closure1, HetiHttpResponse_decodeCrlf_closure2, HetiHttpResponse_decodeChunkedSize_closure, HetiHttpResponse_decodeChunkedSize_closure0, HetiHttpResponse_decodeChunkedSize_closure1, HetiHttpResponse_decodeRequestLine_closure, HetiHttpResponse_decodeRequestLine_closure0, HetiHttpResponse_decodeRequestLine_closure1, HetiHttpResponse_decodeRequestLine_closure2, HetiHttpResponse_decodeRequestLine_closure3, HetiHttpResponse_decodeRequestLine_closure4, HetiHttpResponse_decodeRequestLine_closure5, HetiHttpResponse_decodeRequestMessage_closure, HetiHttpResponse_decodeRequestMessage_closure0, HetiHttpResponse_decodeRequestMessage_closure1, HetiHttpResponse_decodeMethod_closure, HetiHttpResponse_decodeRequestTarget_closure, HetiHttpResponse_decodeRequestRangeValue_closure, HetiHttpResponse_decodeRequestRangeValue_closure0, HetiHttpResponse_decodeRequestRangeValue_closure1, HetiHttpResponse_decodeRequestRangeValue_closure2, HetiHttpResponse_decodeRequestRangeValue_closure3, HetiHttpRequestRange, TextMatcher, FieldValueMatcher, HetiHttpResponseStatusLine, HetiHttpResponseHeaderField, HetiRequestLine, HetiHttpRequestMessageWithoutBody, HetiHttpMessageWithoutBody, ChunkedBuilderAdapter, ChunkedBuilderAdapter_start_closure, ChunkedBuilderAdapter_start_closure0, ChunkedBuilderAdapter__decodeChunked_closure, ChunkedBuilderAdapter__decodeChunked__closure, ChunkedBuilderAdapter__decodeChunked___closure, ChunkedBuilderAdapter__decodeChunked___closure0, ChunkedBuilderAdapter__decodeChunked_closure0, HetiHttpServer, HetiHttpServer_bind_closure, HetiHttpServer_bind__closure, HetiHttpServer_bind___closure, HetiHttpServer_bind____closure, HetiHttpServer_bind____closure0, HetiHttpServer_bind_closure0, HetiHttpServerRequest, ArrayBuilder, GetByteFutureInfo, EasyParser, EasyParser_nextString_closure, EasyParser_nextBytePattern_closure, EasyParser_nextBytePatternWithLength_closure, EasyParser_nextBytePatternByUnmatch_p, EasyParser_nextBytePatternByUnmatch_p_closure, EasyParserMatcher, EasyParserIncludeMatcher, EasyParseError, HetimaBuilder, HetimaBuilderAdapter, HetimaBuilderAdapter_getLength_closure, HetimaBuilderAdapter_getLength_closure0, HetimaBuilderAdapter_getByteFuture_closure, HetimaBuilderAdapter_getByteFuture_closure0, HetimaFile, HetimaReadBuffer, ReadResult, HetimaBuilderToFile, HetimaBuilderToFile_read_closure, HetimaBuilderToFile_read_closure0, HetiSocketBuilder, HetiServerSocket, HetiSocket, HetiUdpSocket, HetiNetworkInterface, HetiSendInfo, HetiReceiveInfo, HetiReceiveUdpInfo, HetiUdpSendInfo, UPnpDeviceInfo, UPnpDeviceInfo_extractService_closure, UPnpDeviceInfo_extractService_closure0, UPnpDeviceInfo_requestServiceList_closure, UPnpDeviceInfo_requestServiceList_closure0, UPnpDeviceInfo_requestServiceList__closure, UPnpDeviceInfo_requestServiceList___closure, UPnpDeviceInfo_requestServiceList____closure, UPnpDeviceInfo_requestServiceList_closure1, UPnpDeviceServiceInfo, UpnpDeviceSearcher, UpnpDeviceSearcher__init_closure, UpnpDeviceSearcher_createInstance_closure, UpnpDeviceSearcher_createInstance_closure0, UpnpDeviceSearcher_searchWanPPPDevice_closure, UpnpDeviceSearcher_searchWanPPPDevice_closure0, UpnpDeviceSearcher_searchWanPPPDevice_closure1, UpnpDeviceSearcher_searchWanPPPDevice_closure2, UpnpDeviceSearcher_searchWanPPPDevice_closure3, UpnpDeviceSearcher_searchWanPPPDevice_closure4, UpnpDeviceSearcher_extractDeviceInfoFromUdpResponse_closure, UpnpDeviceSearcher_extractDeviceInfoFromUdpResponse__closure, UPnpPPPDevice, UPnpPPPDevice_requestGetGenericPortMapping_closure, UPnpPPPDevice_requestGetGenericPortMapping_closure0, UPnpPPPDevice_requestAddPortMapping_closure, UPnpPPPDevice_requestAddPortMapping_closure0, UPnpPPPDevice_requestDeletePortMapping_closure, UPnpPPPDevice_requestDeletePortMapping_closure0, UPnpPPPDevice_requestGetExternalIPAddress_closure, UPnpPPPDevice_requestGetExternalIPAddress_closure0, UPnpPPPDevice_request_closure, UPnpPPPDevice_request_closure0, UPnpPPPDevice_request__closure, UPnpPPPDevice_request__closure0, UPnpPPPDevice_request__closure1, UPnpPPPDevice_request_closure1, UPnpPPPDeviceRequestResponse, UPnpGetExternalIPAddressResponse, UPnpAddPortMappingResponse, UPnpDeletePortMappingResponse, UPnpGetGenericPortMappingResponse, HttpUrl, HttpUrlDecoder, PercentEncode, ParseError, HetimaFileBlob, HetimaFileBlob_read_closure, HetimaFileBlob_read_closure0, HetimaFileBlob_read_closure1, HetiServerSocketChrome, HetiServerSocketChrome_startServer_closure, HetiServerSocketChrome_startServer__closure, HetiServerSocketChrome_startServer___closure, HetiServerSocketChrome_startServer_closure0, HetiSocketChrome, HetiSocketChrome_send_closure, HetiSocketChrome_send__closure, HetiSocketChrome_send_closure0, HetiSocketChrome_connect_closure, HetiSocketChrome_connect__closure, HetiSocketChrome_connect___closure, HetiSocketChrome_connect_closure0, HetiSocketChrome_close_closure, HetiSocketBuilderChrome, HetiSocketBuilderChrome_getNetworkInterfaces_closure, HetiSocketBuilderChrome_getNetworkInterfaces_closure0, HetiChromeSocketManager, HetiChromeSocketManager_manageServerSocket_closure, HetiChromeSocketManager_manageServerSocket_closure0, HetiChromeSocketManager_manageServerSocket_closure1, HetiChromeSocketManager_manageServerSocket_closure2, HetiChromeSocketManager_manageServerSocket_closure3, HetiChromeSocketManager_manageServerSocket_closure4, HetiUdpSocketChrome, HetiUdpSocketChrome_bind_closure, HetiUdpSocketChrome_bind_closure0, HetiUdpSocketChrome_bind_closure1, HetiUdpSocketChrome_bind_closure2, HetiUdpSocketChrome_send_closure, convertNativeToDart_AcceptStructuredClone_findSlot, convertNativeToDart_AcceptStructuredClone_readSlot, convertNativeToDart_AcceptStructuredClone_writeSlot, convertNativeToDart_AcceptStructuredClone_walk, FilteredElementList, FilteredElementList__filtered_closure, FilteredElementList_removeRange_closure, ActionParser, FlattenParser, TokenParser, CharacterParser, _NotCharMatcher, _AltCharMatcher, _SingleCharMatcher, _createPatternParser_closure0, _createPatternParser_closure, _createPatternParser_closure2, _createPatternParser_closure1, _RangeCharMatcher, _WhitespaceCharMatcher, DelegateParser, EndOfInputParser, NotParser, OptionalParser, ListParser, ChoiceParser, SequenceParser, CompositeParser, CompositeParser__complete_closure, CompositeParser_ref_closure, CompositeParser_action_closure, CompletedParserError, UndefinedProductionError, RedefinedProductionError, Context, Result, Success, Failure, ParserError, Parser, Parser_matchesSkipping_closure, Parser_pick_closure, Parser_permute_closure, Parser_permute__closure, Parser_separatedBy_closure, FailureParser, SetableParser, AnyParser, string_closure, PredicateParser, RepeatingParser, PossessiveRepeatingParser, LimitedRepeatingParser, LazyRepeatingParser, Token, XmlGrammar, XmlGrammar_initialize_closure, XmlGrammar_initialize__closure, XmlGrammar_initialize_closure0, _XmlDescendantsIterable, _XmlDescendantsIterator, XmlAttribute, XmlBranch, XmlBranch__filterElements_closure, XmlBranch__filterElements_closure0, XmlCDATA, XmlComment, XmlData, XmlDoctype, XmlDocument, XmlElement, XmlNode, Object_XmlWritable, Object_XmlWritable_XmlParent, XmlNode_text_closure, XmlNode_text_closure0, XmlProcessing, XmlText, XmlParser, XmlParser_initialize_closure, XmlParser_initialize_closure0, XmlParser_initialize_closure1, XmlParser_initialize_closure2, XmlParser_initialize_closure3, XmlParser_initialize_closure4, XmlParser_initialize_closure5, XmlParser_initialize_closure6, XmlParser_initialize_closure7, _decodeXml_closure, _encodeXmlText_closure, XmlName, Object_XmlWritable0, Object_XmlWritable_XmlParent0, _XmlSimpleName, _XmlPrefixName, XmlNamed, _createMatcher_closure, _createMatcher_closure1, _createMatcher_closure0, _createMatcher_closure2, _createMatcher_closure3, XmlParent, XmlNodeType, XmlWritable];
 }
+
+//# sourceMappingURL=delphinium.dart.js.map

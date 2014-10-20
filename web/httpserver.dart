@@ -76,7 +76,7 @@ class HttpServer {
       req.socket.close();
       return;
     }
-    if ("/${dataPath}/index.html" == req.info.line.requestTarget || "/${dataPath}/" == req.info.line.requestTarget || "/${dataPath}" == req.info.line.requestTarget) {
+    if ("/${dataPath}/index.html" == req.info.line.requestTarget || "/${dataPath}/" == req.info.line.requestTarget) {
       _startResponseHomePage(req.socket);
       return;
     }

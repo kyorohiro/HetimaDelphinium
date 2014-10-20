@@ -26,13 +26,13 @@ class MainPanel {
 
   void setDownloadPath(String path) {
     _downloadPath = path;
-    _globalAccessPoint.text = "http://${_globalIP.text}:${_globalPort.text}/${_downloadPath}";
-    _localAccessPoint.text = "http://${_localIP.text}:${_localPort.text}/${_downloadPath}";
+    _globalAccessPoint.text = "http://${_globalIP.text}:${_globalPort.text}/${_downloadPath}/";
+    _localAccessPoint.text = "http://${_localIP.text}:${_localPort.text}/${_downloadPath}/";
   }
 
   void updateAccessPointer() {
-    _globalAccessPoint.text = "http://${_globalIP.text}:${_globalPort.text}/${_downloadPath}";
-    _localAccessPoint.text = "http://${_localIP.text}:${_localPort.text}/${_downloadPath}";
+    _globalAccessPoint.text = "http://${_globalIP.text}:${_globalPort.text}/${_downloadPath}/";
+    _localAccessPoint.text = "http://${_localIP.text}:${_localPort.text}/${_downloadPath}/";
   }
   void setLocalPort(String port) {
     _localPort.text = port;

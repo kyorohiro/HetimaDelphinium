@@ -8,3 +8,5 @@ dependencies:
     path: /Users/kiyohiro/dart/git/dart_hetimalib
 transformers:
 - chrome
+- $dart2js:
+    csp: true
