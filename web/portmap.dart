@@ -23,7 +23,7 @@ class PortMap {
 
   void startPortMap() {
     _externalPort = basePort;
-    hetima.UpnpDeviceSearcher.createInstance(new hetimacl.HetiSocketBuilderChrome()).then((hetima.UpnpDeviceSearcher searcher) {
+    hetima.UpnpDeviceSearcher.createInstance(new hetima.HetiSocketBuilderChrome()).then((hetima.UpnpDeviceSearcher searcher) {
       searcher.searchWanPPPDevice().then((int e) {
         if (searcher.deviceInfoList.length <= 0) {
           return;
@@ -59,7 +59,7 @@ class PortMap {
   }
 
   void deleteAllPortMap() {
-    hetima.UpnpDeviceSearcher.createInstance(new hetimacl.HetiSocketBuilderChrome()).then((hetima.UpnpDeviceSearcher searcher) {
+    hetima.UpnpDeviceSearcher.createInstance(new hetima.HetiSocketBuilderChrome()).then((hetima.UpnpDeviceSearcher searcher) {
       searcher.searchWanPPPDevice().then((int e) {
         if (searcher.deviceInfoList.length <= 0) {
           return;
@@ -105,7 +105,7 @@ class PortMap {
 
   async.Future<int> startGetLocalIp() {
     async.Completer<int> completer = new async.Completer();
-    (new hetimacl.HetiSocketBuilderChrome()).getNetworkInterfaces().then((List<hetima.HetiNetworkInterface> l) {
+    (new hetima.HetiSocketBuilderChrome()).getNetworkInterfaces().then((List<hetima.HetiNetworkInterface> l) {
       // search 24
       for (hetima.HetiNetworkInterface i in l) {
         if (i.prefixLength == 24 && !i.address.startsWith("127")) {

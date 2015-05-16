@@ -4,9 +4,10 @@ import 'dart:convert' as convert;
 import 'dart:async' as async;
 import 'dart:typed_data' as typed_data;
 import 'package:chrome/chrome_app.dart' as chrome;
-import 'package:hetima/hetima.dart' as hetima;
-import 'package:hetima/hetima_cl.dart' as hetimacl;
-
+import 'package:hetimacore/hetimacore.dart' as hetima;
+import 'package:hetimacore/hetimacore_cl.dart' as hetima;
+import 'package:hetimanet/hetimanet.dart' as hetima;
+import 'package:hetimanet/hetimanet_chrome.dart' as hetima;
 import 'package:dart_web_toolkit/event.dart' as event;
 import 'package:dart_web_toolkit/ui.dart' as ui;
 import 'package:dart_web_toolkit/util.dart' as util;

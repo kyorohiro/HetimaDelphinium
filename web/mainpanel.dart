@@ -71,7 +71,7 @@ class MainPanel {
         print("##${_fileUpload.title}");
         String path = _fileUpload.getFilename();
         for (html.File f in (_fileUpload.getElement() as html.InputElement).files) {
-          hetimacl.HetimaFileBlob file = new hetimacl.HetimaFileBlob(f);
+          hetima.HetimaFileBlob file = new hetima.HetimaFileBlob(f);
           file.getLength().then((int length) {
             print("###${length}");
             FileSelectResult ff = new FileSelectResult();

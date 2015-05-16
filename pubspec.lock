@@ -4,7 +4,7 @@ packages:
   barback:
     description: barback
     source: hosted
-    version: "0.15.2+2"
+    version: "0.15.2+4"
   browser:
     description: browser
     source: hosted
@@ -12,11 +12,11 @@ packages:
   chrome:
     description: chrome
     source: hosted
-    version: "0.6.3"
+    version: "0.6.5"
   collection:
     description: collection
     source: hosted
-    version: "1.0.0"
+    version: "1.1.1"
   crypto:
     description: crypto
     source: hosted
@@ -24,25 +24,36 @@ packages:
   dart_web_toolkit:
     description: dart_web_toolkit
     source: hosted
-    version: "0.4.4"
-  hetima:
+    version: "0.4.5"
+  hetimacore:
     description:
-      path: "/Users/kiyohiro/dart/git/dart_hetimalib"
-      relative: false
-    source: path
-    version: "0.0.103"
-  matcher:
-    description: matcher
-    source: hosted
-    version: "0.11.1"
+      ref: null
+      resolved-ref: "19cdf7af53960387cda960f07fcd90e72e1b182c"
+      url: "https://github.com/kyorohiro/dart_hetimacore"
+    source: git
+    version: "0.0.2"
+  hetimanet:
+    description:
+      ref: null
+      resolved-ref: "0e88c4c666beef31b84f967fc1efef56f5d09c82"
+      url: "https://github.com/kyorohiro/dart_hetimanet"
+    source: git
+    version: "0.0.1"
+  hetimaregex:
+    description:
+      ref: null
+      resolved-ref: "37608feb7512f73a4fe352587d083cefb842b0fb"
+      url: "https://github.com/kyorohiro/dart_hetimaregex"
+    source: git
+    version: "0.0.1"
   path:
     description: path
     source: hosted
-    version: "1.3.0"
+    version: "1.3.5"
   petitparser:
     description: petitparser
     source: hosted
-    version: "1.2.2"
+    version: "1.4.1"
   pool:
     description: pool
     source: hosted
@@ -50,16 +61,12 @@ packages:
   source_span:
     description: source_span
     source: hosted
-    version: "1.0.0"
+    version: "1.1.2"
   stack_trace:
     description: stack_trace
     source: hosted
-    version: "1.1.1"
-  unittest:
-    description: unittest
-    source: hosted
-    version: "0.11.0+5"
+    version: "1.3.2"
   xml:
     description: xml
     source: hosted
-    version: "2.1.5"
+    version: "2.3.2"

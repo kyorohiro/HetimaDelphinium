@@ -4,8 +4,10 @@ dependencies:
   chrome: any
   crypto: any
   dart_web_toolkit: any
-  hetima:
-    path: /Users/kiyohiro/dart/git/dart_hetimalib
+  hetimacore:
+    git: https://github.com/kyorohiro/dart_hetimacore
+  hetimanet:
+    git: https://github.com/kyorohiro/dart_hetimanet
 transformers:
 - chrome
 - $dart2js:
