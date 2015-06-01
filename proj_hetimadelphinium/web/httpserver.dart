@@ -1,201 +1,20 @@
 part of delphiniumapp;
 
-class HttpServerResponseItem {
-  hetima.HetiHttpServerRequest req;
-  
-  HttpServerResponseItem(hetima.HetiHttpServerRequest req) {
-    this.req = req;
-  }
-
-  hetima.HetiSocket get socket => req.socket;
-  String get targetLine => req.info.line.requestTarget;
-  String get path {
-    int index = path.indexOf("?");
-    if (index == -1) {
-      index = path.length;
-    }
-    return path.substring(0, index);
-  }
-
-  String get option {
-    int index = path.indexOf("?");
-    if (index == -1) {
-      index = path.length;
-    }
-    return path.substring(index);
-  }
-}
-
-class HttpServer {
-  String localIP = "0.0.0.0";
-  int basePort = 18085;
-  int _localPort = 18085;
-  int get localPort => _localPort;
-
-  hetima.HetiHttpServer _server = null;
-
-  async.StreamController<String> _controllerUpdateLocalServer = new async.StreamController.broadcast();
-  async.Stream<String> get onUpdateLocalServer => _controllerUpdateLocalServer.stream;
-  async.StreamController<HttpServerResponseItem> _onResponse = new async.StreamController();
-  async.Stream<HttpServerResponseItem> get onResponse => _onResponse.stream;
-
-  HttpServer() {
-  }
-
-
-  void stopServer() {
-    if (_server == null) {
-      return;
-    }
-    _server.close();
-    _server = null;
-  }
-
-  async.Future<int> startServer() {
-    print("startServer");
-    _localPort = basePort;
-    async.Completer<int> completer = new async.Completer();
-    if (_server != null) {
-      completer.completeError({});
-      return completer.future;
-    }
-
-    _retryBind().then((hetima.HetiHttpServer server) {
-      _controllerUpdateLocalServer.add("${_localPort}");
-      _server = server;
-      completer.complete(0);
-      server.onNewRequest().listen(_hundleRequest);
-    }).catchError((e) {
-      completer.completeError(e);
-    });
-
-    return completer.future;
-  }
-
-  void _hundleRequest(hetima.HetiHttpServerRequest req) {
-    print("${req.info.line.requestTarget}");
-    if (req.info.line.requestTarget.length < 0) {
-      req.socket.close();
-      return;
-    }
-    _onResponse.add(new HttpServerResponseItem(req));
-  }
-
-
-  void response(hetima.HetiHttpServerRequest req, hetima.HetimaFile file, [String contentType="application/octet-stream"]) {
-    hetima.HetiHttpResponseHeaderField header = req.info.find(hetima.RfcTable.HEADER_FIELD_RANGE);
-    if (header != null) {
-      typed_data.Uint8List buff = new typed_data.Uint8List.fromList(convert.UTF8.encode(header.fieldValue));
-      hetima.ArrayBuilder builder = new hetima.ArrayBuilder.fromList(buff);
-      builder.fin();
-      hetima.HetiHttpResponse.decodeRequestRangeValue(new hetima.EasyParser(builder)).then((hetima.HetiHttpRequestRange range) {
-        _startResponseRangeFile(req.socket, file, contentType, range.start, range.end);
-      });
-    } else {
-      _startResponseFile(req.socket, file);
-    }
-  }
-
-
-  void _startResponseRangeFile(hetima.HetiSocket socket, hetima.HetimaFile file, String contentType, int start, int end) {
-    hetima.ArrayBuilder response = new hetima.ArrayBuilder();
-    file.getLength().then((int length) {
-      if (end == -1 || end > length - 1) {
-        end = length - 1;
-      }
-      int contentLength = end - start + 1;
-      response.appendString("HTTP/1.1 206 Partial Content\r\n");
-      response.appendString("Connection: close\r\n");
-      response.appendString("Content-Length: ${contentLength}\r\n");
-      response.appendString("Content-Type: ${contentType}\r\n");
-      response.appendString("Content-Range: bytes ${start}-${end}/${length}\r\n");
-      response.appendString("\r\n");
-      print(response.toText());
-      socket.send(response.toList()).then((hetima.HetiSendInfo i) {
-        _startResponseBuffer(socket, file, start, contentLength);
-      }).catchError((e) {
-        socket.close();
-      });
-    });
-  }
-
-  void _startResponseFile(hetima.HetiSocket socket, hetima.HetimaFile file) {
-    hetima.ArrayBuilder response = new hetima.ArrayBuilder();
-    file.getLength().then((int length) {
-      response.appendString("HTTP/1.1 200 OK\r\n");
-      response.appendString("Connection: close\r\n");
-      response.appendString("Content-Length: ${length}\r\n");
-      response.appendString("\r\n");
-      socket.send(response.toList()).then((hetima.HetiSendInfo i) {
-        _startResponseBuffer(socket, file, 0, length);
-      }).catchError((e) {
-        socket.close();
-      });
-    });
-  }
-
-  void _startResponseBuffer(hetima.HetiSocket socket, hetima.HetimaFile file, int index, int length) {
-    int start = index;
-    responseTask() {
-      int end = start + 256 * 1024;
-      if (end > (index + length)) {
-        end = (index + length);
-      }
-      print("####### ${start} ${end}");
-      file.read(start, end).then((hetima.ReadResult readResult) {
-        return socket.send(readResult.buffer);
-      }).then((hetima.HetiSendInfo i) {
-        if (end >= (index + length)) {
-          socket.close();
-        } else {
-          start = end;
-          responseTask();
-        }
-      }).catchError((e) {
-        socket.close();
-      }).catchError((e) {
-
-      });
-    }
-    responseTask();
-  }
-
-
-  async.Future<hetima.HetiHttpServer> _retryBind() {
-    async.Completer<hetima.HetiHttpServer> completer = new async.Completer();
-    int portMax = _localPort + 100;
-    bindFunc() {
-      hetima.HetiHttpServer.bind(new hetima.HetiSocketBuilderChrome(), localIP, _localPort).then((hetima.HetiHttpServer server) {
-        completer.complete(server);
-      }).catchError((e) {
-        _localPort++;
-        if (_localPort < portMax) {
-          bindFunc();
-        } else {
-          completer.completeError(e);
-        }
-      });
-    }
-    bindFunc();
-    return completer.future;
-  }
-
-}
 
 /**
  * app parts
  */
-class DelphiniumHttpServer extends HttpServer {
+class DelphiniumHttpServer extends hetima.HetiHttpServerPlus {
   static const String SYSTEM_FILE_PATH = "hetima.system";
   String dataPath = "hetima";
 
   Map<String, FileSelectResult> _publicFileList = {};
-  hetima.HetiHttpServer _server = null;
+ /// hetima.HetiHttpServer _server = null;
 
-  async.StreamController<String> _controllerUpdateLocalServer = new async.StreamController.broadcast();
-  async.Stream<String> get onUpdateLocalServer => _controllerUpdateLocalServer.stream;
+ /// async.StreamController<String> _controllerUpdateLocalServer = new async.StreamController.broadcast();
+ /// async.Stream<String> get onUpdateLocalServer => _controllerUpdateLocalServer.stream;
 
-  DelphiniumHttpServer() {
+  DelphiniumHttpServer() :super(new hetima.HetiSocketBuilderChrome()){
     _init();
     this.onResponse.listen(onHundleRequest);
   }
@@ -220,7 +39,7 @@ class DelphiniumHttpServer extends HttpServer {
     _publicFileList.remove(key);
   }
 
-  void onHundleRequest(HttpServerResponseItem item) {
+  void onHundleRequest(hetima.HetiHttpServerPlusResponseItem item) {
     hetima.HetiHttpServerRequest req = item.req;
     print("${req.info.line.requestTarget}");
     if (req.info.line.requestTarget.length < 0) {
@@ -318,43 +137,6 @@ class DelphiniumHttpServer extends HttpServer {
       socket.close();
     }).catchError((e) {
       socket.close();
-    });
-  }
-
-  void _startResponseRangeFile(hetima.HetiSocket socket, hetima.HetimaFile file, String contentType, int start, int end) {
-    hetima.ArrayBuilder response = new hetima.ArrayBuilder();
-    file.getLength().then((int length) {
-      if (end == -1 || end > length - 1) {
-        end = length - 1;
-      }
-      int contentLength = end - start + 1;
-      response.appendString("HTTP/1.1 206 Partial Content\r\n");
-      response.appendString("Connection: close\r\n");
-      response.appendString("Content-Length: ${contentLength}\r\n");
-      response.appendString("Content-Type: ${contentType}\r\n");
-      response.appendString("Content-Range: bytes ${start}-${end}/${length}\r\n");
-      response.appendString("\r\n");
-      print(response.toText());
-      socket.send(response.toList()).then((hetima.HetiSendInfo i) {
-        _startResponseBuffer(socket, file, start, contentLength);
-      }).catchError((e) {
-        socket.close();
-      });
-    });
-  }
-
-  void _startResponseFile(hetima.HetiSocket socket, hetima.HetimaFile file) {
-    hetima.ArrayBuilder response = new hetima.ArrayBuilder();
-    file.getLength().then((int length) {
-      response.appendString("HTTP/1.1 200 OK\r\n");
-      response.appendString("Connection: close\r\n");
-      response.appendString("Content-Length: ${length}\r\n");
-      response.appendString("\r\n");
-      socket.send(response.toList()).then((hetima.HetiSendInfo i) {
-        _startResponseBuffer(socket, file, 0, length);
-      }).catchError((e) {
-        socket.close();
-      });
     });
   }
 

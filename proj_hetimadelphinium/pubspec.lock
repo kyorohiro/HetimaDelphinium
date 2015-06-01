@@ -28,14 +28,14 @@ packages:
   hetimacore:
     description:
       ref: null
-      resolved-ref: "19cdf7af53960387cda960f07fcd90e72e1b182c"
+      resolved-ref: fedb117729442cbb4de822b66d4b7d2a7b307ad5
       url: "https://github.com/kyorohiro/dart_hetimacore"
     source: git
     version: "0.0.2"
   hetimanet:
     description:
       ref: null
-      resolved-ref: b7ee7f50464aacc106fa11e951fc122f001e4034
+      resolved-ref: "4c8dced36aced6c822ff2759a2c34b3a369c8ffb"
       url: "https://github.com/kyorohiro/dart_hetimanet"
     source: git
     version: "0.0.1"
@@ -53,11 +53,11 @@ packages:
   petitparser:
     description: petitparser
     source: hosted
-    version: "1.4.1"
+    version: "1.4.3"
   pool:
     description: pool
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   source_span:
     description: source_span
     source: hosted
