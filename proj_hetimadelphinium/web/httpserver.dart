@@ -1,45 +1,47 @@
 part of delphiniumapp;
 
-/**
- * app parts
- */
+class HttpServerResponseItem {
+  hetima.HetiHttpServerRequest req;
+  
+  HttpServerResponseItem(hetima.HetiHttpServerRequest req) {
+    this.req = req;
+  }
+
+  hetima.HetiSocket get socket => req.socket;
+  String get targetLine => req.info.line.requestTarget;
+  String get path {
+    int index = path.indexOf("?");
+    if (index == -1) {
+      index = path.length;
+    }
+    return path.substring(0, index);
+  }
+
+  String get option {
+    int index = path.indexOf("?");
+    if (index == -1) {
+      index = path.length;
+    }
+    return path.substring(index);
+  }
+}
+
 class HttpServer {
-  static const String SYSTEM_FILE_PATH = "hetima.system";
   String localIP = "0.0.0.0";
   int basePort = 18085;
   int _localPort = 18085;
   int get localPort => _localPort;
-  String dataPath = "hetima";
 
-  Map<String, FileSelectResult> _publicFileList = {};
   hetima.HetiHttpServer _server = null;
 
   async.StreamController<String> _controllerUpdateLocalServer = new async.StreamController.broadcast();
   async.Stream<String> get onUpdateLocalServer => _controllerUpdateLocalServer.stream;
+  async.StreamController<HttpServerResponseItem> _onResponse = new async.StreamController();
+  async.Stream<HttpServerResponseItem> get onResponse => _onResponse.stream;
 
   HttpServer() {
-    _init();
   }
 
-  _init() {
-    {
-      FileSelectResult result = new FileSelectResult();
-      result.file = SwfPlayerBuffer.createPlayerswf();
-      result.fname = "hetima.system.player.swf";
-      result.apath = "hetima.system";
-      addFile(result.fname, result);
-    }
-  }
-
-  void addFile(String name, FileSelectResult fileinfo) {
-    String key = hetima.PercentEncode.encode(convert.UTF8.encode(name));
-    _publicFileList[key] = fileinfo;
-  }
-
-  void removeFile(String name) {
-    String key = hetima.PercentEncode.encode(convert.UTF8.encode(name));
-    _publicFileList.remove(key);
-  }
 
   void stopServer() {
     if (_server == null) {
@@ -76,6 +78,155 @@ class HttpServer {
       req.socket.close();
       return;
     }
+    _onResponse.add(new HttpServerResponseItem(req));
+  }
+
+
+  void response(hetima.HetiHttpServerRequest req, hetima.HetimaFile file, [String contentType="application/octet-stream"]) {
+    hetima.HetiHttpResponseHeaderField header = req.info.find(hetima.RfcTable.HEADER_FIELD_RANGE);
+    if (header != null) {
+      typed_data.Uint8List buff = new typed_data.Uint8List.fromList(convert.UTF8.encode(header.fieldValue));
+      hetima.ArrayBuilder builder = new hetima.ArrayBuilder.fromList(buff);
+      builder.fin();
+      hetima.HetiHttpResponse.decodeRequestRangeValue(new hetima.EasyParser(builder)).then((hetima.HetiHttpRequestRange range) {
+        _startResponseRangeFile(req.socket, file, contentType, range.start, range.end);
+      });
+    } else {
+      _startResponseFile(req.socket, file);
+    }
+  }
+
+
+  void _startResponseRangeFile(hetima.HetiSocket socket, hetima.HetimaFile file, String contentType, int start, int end) {
+    hetima.ArrayBuilder response = new hetima.ArrayBuilder();
+    file.getLength().then((int length) {
+      if (end == -1 || end > length - 1) {
+        end = length - 1;
+      }
+      int contentLength = end - start + 1;
+      response.appendString("HTTP/1.1 206 Partial Content\r\n");
+      response.appendString("Connection: close\r\n");
+      response.appendString("Content-Length: ${contentLength}\r\n");
+      response.appendString("Content-Type: ${contentType}\r\n");
+      response.appendString("Content-Range: bytes ${start}-${end}/${length}\r\n");
+      response.appendString("\r\n");
+      print(response.toText());
+      socket.send(response.toList()).then((hetima.HetiSendInfo i) {
+        _startResponseBuffer(socket, file, start, contentLength);
+      }).catchError((e) {
+        socket.close();
+      });
+    });
+  }
+
+  void _startResponseFile(hetima.HetiSocket socket, hetima.HetimaFile file) {
+    hetima.ArrayBuilder response = new hetima.ArrayBuilder();
+    file.getLength().then((int length) {
+      response.appendString("HTTP/1.1 200 OK\r\n");
+      response.appendString("Connection: close\r\n");
+      response.appendString("Content-Length: ${length}\r\n");
+      response.appendString("\r\n");
+      socket.send(response.toList()).then((hetima.HetiSendInfo i) {
+        _startResponseBuffer(socket, file, 0, length);
+      }).catchError((e) {
+        socket.close();
+      });
+    });
+  }
+
+  void _startResponseBuffer(hetima.HetiSocket socket, hetima.HetimaFile file, int index, int length) {
+    int start = index;
+    responseTask() {
+      int end = start + 256 * 1024;
+      if (end > (index + length)) {
+        end = (index + length);
+      }
+      print("####### ${start} ${end}");
+      file.read(start, end).then((hetima.ReadResult readResult) {
+        return socket.send(readResult.buffer);
+      }).then((hetima.HetiSendInfo i) {
+        if (end >= (index + length)) {
+          socket.close();
+        } else {
+          start = end;
+          responseTask();
+        }
+      }).catchError((e) {
+        socket.close();
+      }).catchError((e) {
+
+      });
+    }
+    responseTask();
+  }
+
+
+  async.Future<hetima.HetiHttpServer> _retryBind() {
+    async.Completer<hetima.HetiHttpServer> completer = new async.Completer();
+    int portMax = _localPort + 100;
+    bindFunc() {
+      hetima.HetiHttpServer.bind(new hetima.HetiSocketBuilderChrome(), localIP, _localPort).then((hetima.HetiHttpServer server) {
+        completer.complete(server);
+      }).catchError((e) {
+        _localPort++;
+        if (_localPort < portMax) {
+          bindFunc();
+        } else {
+          completer.completeError(e);
+        }
+      });
+    }
+    bindFunc();
+    return completer.future;
+  }
+
+}
+
+/**
+ * app parts
+ */
+class DelphiniumHttpServer extends HttpServer {
+  static const String SYSTEM_FILE_PATH = "hetima.system";
+  String dataPath = "hetima";
+
+  Map<String, FileSelectResult> _publicFileList = {};
+  hetima.HetiHttpServer _server = null;
+
+  async.StreamController<String> _controllerUpdateLocalServer = new async.StreamController.broadcast();
+  async.Stream<String> get onUpdateLocalServer => _controllerUpdateLocalServer.stream;
+
+  DelphiniumHttpServer() {
+    _init();
+    this.onResponse.listen(onHundleRequest);
+  }
+
+  _init() {
+    {
+      FileSelectResult result = new FileSelectResult();
+      result.file = SwfPlayerBuffer.createPlayerswf();
+      result.fname = "hetima.system.player.swf";
+      result.apath = "hetima.system";
+      addFile(result.fname, result);
+    }
+  }
+
+  void addFile(String name, FileSelectResult fileinfo) {
+    String key = hetima.PercentEncode.encode(convert.UTF8.encode(name));
+    _publicFileList[key] = fileinfo;
+  }
+
+  void removeFile(String name) {
+    String key = hetima.PercentEncode.encode(convert.UTF8.encode(name));
+    _publicFileList.remove(key);
+  }
+
+  void onHundleRequest(HttpServerResponseItem item) {
+    hetima.HetiHttpServerRequest req = item.req;
+    print("${req.info.line.requestTarget}");
+    if (req.info.line.requestTarget.length < 0) {
+      req.socket.close();
+      return;
+    }
     if ("/${dataPath}/index.html" == req.info.line.requestTarget || "/${dataPath}/" == req.info.line.requestTarget) {
       _startResponseHomePage(req.socket);
       return;
@@ -99,17 +250,7 @@ class HttpServer {
       return;
     }
 
-    hetima.HetiHttpResponseHeaderField header = req.info.find(hetima.RfcTable.HEADER_FIELD_RANGE);
-    if (header != null) {
-      typed_data.Uint8List buff = new typed_data.Uint8List.fromList(convert.UTF8.encode(header.fieldValue));
-      hetima.ArrayBuilder builder = new hetima.ArrayBuilder.fromList(buff);
-      builder.fin();
-      hetima.HetiHttpResponse.decodeRequestRangeValue(new hetima.EasyParser(builder)).then((hetima.HetiHttpRequestRange range) {
-        _startResponseRangeFile(req.socket, _publicFileList[filename].file, contentType(filename), range.start, range.end);
-      });
-    } else {
-      _startResponseFile(req.socket, _publicFileList[filename].file);
-    }
+    response(req,  _publicFileList[filename].file, contentType(filename));
   }
 
   async.Future _startResponseHomePage(hetima.HetiSocket socket) {
@@ -117,7 +258,7 @@ class HttpServer {
     content.write("<html>");
     content.write("<body>");
     for (String r in _publicFileList.keys) {
-      if(_publicFileList[r].apath == HttpServer.SYSTEM_FILE_PATH) {
+      if(_publicFileList[r].apath == DelphiniumHttpServer.SYSTEM_FILE_PATH) {
         continue;
       }
       content.write("<div><a href=./${r}>${r}</a>");
@@ -217,32 +358,6 @@ class HttpServer {
     });
   }
 
-  void _startResponseBuffer(hetima.HetiSocket socket, hetima.HetimaFile file, int index, int length) {
-    int start = index;
-    responseTask() {
-      int end = start + 256 * 1024;
-      if (end > (index + length)) {
-        end = (index + length);
-      }
-      print("####### ${start} ${end}");
-      file.read(start, end).then((hetima.ReadResult readResult) {
-        return socket.send(readResult.buffer);
-      }).then((hetima.HetiSendInfo i) {
-        if (end >= (index + length)) {
-          socket.close();
-        } else {
-          start = end;
-          responseTask();
-        }
-      }).catchError((e) {
-        socket.close();
-      }).catchError((e) {
-
-      });
-    }
-    responseTask();
-  }
-
   bool isFlvFile(String path) {
     String type = contentType(path);
     if (type.startsWith("video/x-flv")) {
@@ -299,23 +414,5 @@ class HttpServer {
     }
   }
 
-  async.Future<hetima.HetiHttpServer> _retryBind() {
-    async.Completer<hetima.HetiHttpServer> completer = new async.Completer();
-    int portMax = _localPort + 100;
-    bindFunc() {
-      hetima.HetiHttpServer.bind(new hetima.HetiSocketBuilderChrome(), localIP, _localPort).then((hetima.HetiHttpServer server) {
-        completer.complete(server);
-      }).catchError((e) {
-        _localPort++;
-        if (_localPort < portMax) {
-          bindFunc();
-        } else {
-          completer.completeError(e);
-        }
-      });
-    }
-    bindFunc();
-    return completer.future;
-  }
 
 }

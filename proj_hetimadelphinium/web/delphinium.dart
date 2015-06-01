@@ -28,7 +28,7 @@ void main() {
   String downloadPath = "hetima";
   MainView mainView = new MainView();
   mainView.downloadPath = downloadPath;
-  HttpServer httpServer = new HttpServer();
+  DelphiniumHttpServer httpServer = new DelphiniumHttpServer();
   httpServer.dataPath = downloadPath;
   PortMap portMap = new PortMap();
 
