@@ -9,10 +9,6 @@ class DelphiniumHttpServer extends hetima.HetiHttpServerPlus {
   String dataPath = "hetima";
 
   Map<String, FileSelectResult> _publicFileList = {};
- /// hetima.HetiHttpServer _server = null;
-
- /// async.StreamController<String> _controllerUpdateLocalServer = new async.StreamController.broadcast();
- /// async.Stream<String> get onUpdateLocalServer => _controllerUpdateLocalServer.stream;
 
   DelphiniumHttpServer() :super(new hetima.HetiSocketBuilderChrome()){
     _init();
