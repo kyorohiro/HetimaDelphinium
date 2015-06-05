@@ -28,14 +28,14 @@ class PortMap {
         if (searcher.deviceInfoList.length <= 0) {
           return;
         }
-        hetima.UPnpDeviceInfo info = searcher.deviceInfoList.first;
-        hetima.UPnpPPPDevice pppDevice = new hetima.UPnpPPPDevice(info);
-        pppDevice.requestGetExternalIPAddress().then((hetima.UPnpGetExternalIPAddressResponse res) {
+        hetima.UpnpDeviceInfo info = searcher.deviceInfoList.first;
+        hetima.UpnpPPPDevice pppDevice = new hetima.UpnpPPPDevice(info);
+        pppDevice.requestGetExternalIPAddress().then((hetima.UpnpGetExternalIPAddressResponse res) {
           _controllerUpdateGlobalIp.add(res.externalIp);
         });
         int baseExternalPort = _externalPort + 50;
         tryAddPortMap() {
-          pppDevice.requestAddPortMapping(_externalPort, hetima.UPnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP, localPort, localAddress, hetima.UPnpPPPDevice.VALUE_ENABLE, "HetimaDelphinium", 0).then((hetima.UPnpAddPortMappingResponse res) {
+          pppDevice.requestAddPortMapping(_externalPort, hetima.UpnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP, localPort, localAddress, hetima.UpnpPPPDevice.VALUE_ENABLE, "HetimaDelphinium", 0).then((hetima.UpnpAddPortMappingResponse res) {
             if (200 == res.resultCode) {
               _controllerUpdateGlobalPort.add("${_externalPort}");
               searcher.close();
@@ -66,25 +66,25 @@ class PortMap {
         }
         int index = 0;
         List<int> deletePortList = [];
-        deletePortMap(hetima.UPnpPPPDevice pppDevice) {
+        deletePortMap(hetima.UpnpPPPDevice pppDevice) {
           for (int port in deletePortList) {
-            pppDevice.requestDeletePortMapping(port, hetima.UPnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP);
+            pppDevice.requestDeletePortMapping(port, hetima.UpnpPPPDevice.VALUE_PORT_MAPPING_PROTOCOL_TCP);
           }
           new async.Future.delayed(new Duration(seconds: 5),(){
             searcher.close();
           });
         }
         tryGetPortMapInfo() {
-          hetima.UPnpDeviceInfo info = searcher.deviceInfoList.first;
-          hetima.UPnpPPPDevice pppDevice = new hetima.UPnpPPPDevice(info);
-          pppDevice.requestGetGenericPortMapping(index++).then((hetima.UPnpGetGenericPortMappingResponse res) {
+          hetima.UpnpDeviceInfo info = searcher.deviceInfoList.first;
+          hetima.UpnpPPPDevice pppDevice = new hetima.UpnpPPPDevice(info);
+          pppDevice.requestGetGenericPortMapping(index++).then((hetima.UpnpGetGenericPortMappingResponse res) {
             if (res.resultCode != 200) {
               deletePortMap(pppDevice);
               return;
             }
-            String description = res.getValue(hetima.UPnpGetGenericPortMappingResponse.KEY_NewPortMappingDescription, "");
-            String port = res.getValue(hetima.UPnpGetGenericPortMappingResponse.KEY_NewExternalPort, "");
-            String ip = res.getValue(hetima.UPnpGetGenericPortMappingResponse.KEY_NewInternalClient, "");
+            String description = res.getValue(hetima.UpnpGetGenericPortMappingResponse.KEY_NewPortMappingDescription, "");
+            String port = res.getValue(hetima.UpnpGetGenericPortMappingResponse.KEY_NewExternalPort, "");
+            String ip = res.getValue(hetima.UpnpGetGenericPortMappingResponse.KEY_NewInternalClient, "");
             if (description == "HetimaDelphinium") {
               int portAsNum = int.parse(port);
               deletePortList.add(portAsNum);

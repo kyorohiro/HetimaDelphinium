@@ -58,7 +58,7 @@ void main() {
   mainView.init();
   mainView.onChangeMainButtonState.listen((bool isDown) {
     if (isDown) {
-      httpServer.startServer().then((int v) {
+      httpServer.startServer().then((hetima.HetiHttpStartServerResult v) {
         return portMap.startGetLocalIp();
       }).then((int v) {
         portMap.startPortMap();

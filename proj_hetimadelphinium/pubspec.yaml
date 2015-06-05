@@ -7,7 +7,7 @@ dependencies:
   hetimacore:
     git: https://github.com/kyorohiro/dart_hetimacore
   hetimanet:
-    git: https://github.com/kyorohiro/dart_hetimanet
+    path: /Users/kiyohiro/dart/git/dart_hetimanet
 transformers:
 - chrome
 - $dart2js:

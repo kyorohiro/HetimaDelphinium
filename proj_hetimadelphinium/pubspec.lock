@@ -34,10 +34,9 @@ packages:
     version: "0.0.2"
   hetimanet:
     description:
-      ref: null
-      resolved-ref: "4c8dced36aced6c822ff2759a2c34b3a369c8ffb"
-      url: "https://github.com/kyorohiro/dart_hetimanet"
-    source: git
+      path: "/Users/kiyohiro/dart/git/dart_hetimanet"
+      relative: false
+    source: path
     version: "0.0.1"
   hetimaregex:
     description:

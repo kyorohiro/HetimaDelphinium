@@ -65,7 +65,7 @@ class DelphiniumHttpServer extends hetima.HetiHttpServerPlus {
       return;
     }
 
-    response(req,  _publicFileList[filename].file, contentType(filename));
+    response(req,  _publicFileList[filename].file, contentType:filename);
   }
 
   async.Future _startResponseHomePage(hetima.HetiSocket socket) {
