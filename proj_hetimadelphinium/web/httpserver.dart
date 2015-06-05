@@ -4,7 +4,7 @@ part of delphiniumapp;
 /**
  * app parts
  */
-class DelphiniumHttpServer extends hetima.HetiHttpServerPlus {
+class DelphiniumHttpServer extends hetima.HetiHttpServerHelper {
   static const String SYSTEM_FILE_PATH = "hetima.system";
   String dataPath = "hetima";
 
