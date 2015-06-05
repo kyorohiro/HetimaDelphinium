@@ -41,7 +41,7 @@ class PortMap {
               searcher.close();
               return;
             }
-            if (-500 == res.resultCode) {
+            if (500 == res.resultCode) {
               _externalPort++;
               if (_externalPort < baseExternalPort) {
                 tryAddPortMap();
