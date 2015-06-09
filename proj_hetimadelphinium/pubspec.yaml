@@ -5,9 +5,9 @@ dependencies:
   crypto: any
   dart_web_toolkit: any
   hetimacore:
-    git: https://github.com/kyorohiro/dart_hetimacore
+    git: https://github.com/kyorohiro/dart_hetimacore.git
   hetimanet:
-    path: /Users/kiyohiro/dart/git/dart_hetimanet
+    git: https://github.com/kyorohiro/dart_hetimanet.git
 transformers:
 - chrome
 - $dart2js:

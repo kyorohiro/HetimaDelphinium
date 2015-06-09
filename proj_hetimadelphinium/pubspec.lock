@@ -28,21 +28,29 @@ packages:
   hetimacore:
     description:
       ref: null
-      resolved-ref: d0e43c7004eff9d7e1e4ab4839394f18fb1cde42
-      url: "https://github.com/kyorohiro/dart_hetimacore"
+      resolved-ref: "4f493da5a8e5d26f36f590d81b83aac53fb3794e"
+      url: "https://github.com/kyorohiro/dart_hetimacore.git"
     source: git
-    version: "0.0.2"
+    version: "0.1.0"
+  hetimafile:
+    description:
+      ref: null
+      resolved-ref: f26f528b798306bc1b343dab87bbdba3cb345426
+      url: "https://github.com/kyorohiro/dart_hetimafile.git"
+    source: git
+    version: "0.0.1"
   hetimanet:
     description:
-      path: "/Users/kiyohiro/dart/git/dart_hetimanet"
-      relative: false
-    source: path
+      ref: null
+      resolved-ref: "3a0da99a963feac9458e9c00a00189933415d7e9"
+      url: "https://github.com/kyorohiro/dart_hetimanet.git"
+    source: git
     version: "0.0.1"
   hetimaregex:
     description:
       ref: null
-      resolved-ref: "37608feb7512f73a4fe352587d083cefb842b0fb"
-      url: "https://github.com/kyorohiro/dart_hetimaregex"
+      resolved-ref: c66c9a58dfd25be1a039e0ed1ca686d203a9b57d
+      url: "https://github.com/kyorohiro/dart_hetimaregex.git"
     source: git
     version: "0.0.1"
   path:
