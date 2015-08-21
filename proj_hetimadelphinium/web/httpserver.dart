@@ -10,7 +10,7 @@ class DelphiniumHttpServer extends hetima.HetiHttpServerHelper {
 
   Map<String, FileSelectResult> _publicFileList = {};
 
-  DelphiniumHttpServer() :super(new hetima.HetiSocketBuilderChrome()){
+  DelphiniumHttpServer() :super(new hetima.HetimaSocketBuilderChrome()){
     _init();
     this.onResponse.listen(onHundleRequest);
   }
@@ -68,7 +68,7 @@ class DelphiniumHttpServer extends hetima.HetiHttpServerHelper {
     response(req,  _publicFileList[filename].file, contentType:filename);
   }
 
-  async.Future _startResponseHomePage(hetima.HetiSocket socket) {
+  async.Future _startResponseHomePage(hetima.HetimaSocket socket) {
     StringBuffer content = new StringBuffer();
     content.write("<html>");
     content.write("<body>");
@@ -94,16 +94,16 @@ class DelphiniumHttpServer extends hetima.HetiHttpServerHelper {
     response.write("Content-Length: ${b.length}\r\n");
     response.write("Content-Type: text/html\r\n");
     response.write("\r\n");
-    return socket.send(convert.UTF8.encode(response.toString())).then((hetima.HetiSendInfo i) {
+    return socket.send(convert.UTF8.encode(response.toString())).then((hetima.HetimaSendInfo i) {
       return socket.send(b);
-    }).then((hetima.HetiSendInfo i) {
+    }).then((hetima.HetimaSendInfo i) {
       socket.close();
     }).catchError((e) {
       socket.close();
     });
   }
 
-  async.Future _startResponsePreviewPage(hetima.HetiSocket socket, String path) {
+  async.Future _startResponsePreviewPage(hetima.HetimaSocket socket, String path) {
     StringBuffer content = new StringBuffer();
     if (isFlvFile(path)) {
       content.write(SwfPlayerBuffer.previewFlvHtml(path));
@@ -127,9 +127,9 @@ class DelphiniumHttpServer extends hetima.HetiHttpServerHelper {
     response.write("Content-Length: ${b.length}\r\n");
     response.write("Content-Type: text/html\r\n");
     response.write("\r\n");
-    return socket.send(convert.UTF8.encode(response.toString())).then((hetima.HetiSendInfo i) {
+    return socket.send(convert.UTF8.encode(response.toString())).then((hetima.HetimaSendInfo i) {
       return socket.send(b);
-    }).then((hetima.HetiSendInfo i) {
+    }).then((hetima.HetimaSendInfo i) {
       socket.close();
     }).catchError((e) {
       socket.close();

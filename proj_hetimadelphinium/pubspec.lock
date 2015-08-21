@@ -4,7 +4,7 @@ packages:
   barback:
     description: barback
     source: hosted
-    version: "0.15.2+4"
+    version: "0.15.2+6"
   browser:
     description: browser
     source: hosted
@@ -28,24 +28,17 @@ packages:
   hetimacore:
     description:
       ref: null
-      resolved-ref: "4f493da5a8e5d26f36f590d81b83aac53fb3794e"
+      resolved-ref: "420381d9b9e1b42f04fd1dae5e4d47218fcf771e"
       url: "https://github.com/kyorohiro/dart_hetimacore.git"
     source: git
     version: "0.1.0"
-  hetimafile:
-    description:
-      ref: null
-      resolved-ref: f26f528b798306bc1b343dab87bbdba3cb345426
-      url: "https://github.com/kyorohiro/dart_hetimafile.git"
-    source: git
-    version: "0.0.1"
   hetimanet:
     description:
       ref: null
-      resolved-ref: "3a0da99a963feac9458e9c00a00189933415d7e9"
+      resolved-ref: "49c53e80d247d6a472ed7a2ff59953a0e37ee557"
       url: "https://github.com/kyorohiro/dart_hetimanet.git"
     source: git
-    version: "0.0.1"
+    version: "0.0.4"
   hetimaregex:
     description:
       ref: null
@@ -56,7 +49,7 @@ packages:
   path:
     description: path
     source: hosted
-    version: "1.3.5"
+    version: "1.3.6"
   petitparser:
     description: petitparser
     source: hosted
@@ -64,15 +57,15 @@ packages:
   pool:
     description: pool
     source: hosted
-    version: "1.0.2"
+    version: "1.1.0"
   source_span:
     description: source_span
     source: hosted
-    version: "1.1.2"
+    version: "1.1.3"
   stack_trace:
     description: stack_trace
     source: hosted
-    version: "1.3.2"
+    version: "1.4.1"
   xml:
     description: xml
     source: hosted
